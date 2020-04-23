@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_friends"
+        android:icon="@drawable/ic_supervisor_account_black_24dp"
+        android:title="@string/title_friends" />
+
+    <item
+        android:id="@+id/navigation_favorites"
+        android:icon="@drawable/ic_favorite_black_24dp"
+        android:title="@string/title_favorites" />
+
+    <item
+        android:id="@+id/navigation_map"
+        android:icon="@drawable/ic_location_on_black_24dp"
+        android:title="@string/title_map" />
+
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_notifications" />
+
+    <item
+        android:id="@+id/navigation_messages"
+        android:icon="@drawable/ic_chat_black_24dp"
+        android:title="@string/title_messages" />
+
+</menu>
