@@ -6,4 +6,8 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_friends">Friends</string>
     <string name="title_favorites">Favorites</string>
+    <string name="location_disabled_message">Your Locations seems to be disabled, do you want to enable it?</string>
+    <string name="oops">Ooops</string>
+    <string name="sure">Sure</string>
+    <string name="no">No</string>
 </resources>
