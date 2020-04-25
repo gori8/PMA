@@ -6,6 +6,10 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_friends">Friends</string>
     <string name="title_favorites">Favorites</string>
+    <string name="title_my_ratings">My Ratings</string>
+    <string name="title_my_events">My Events</string>
+    <string name="title_profile_management">Profile Management</string>
+    <string name="title_settings">Settings</string>
     <string name="location_disabled_message">Your Locations seems to be disabled, do you want to enable it?</string>
     <string name="oops">Ooops</string>
     <string name="sure">Sure</string>
