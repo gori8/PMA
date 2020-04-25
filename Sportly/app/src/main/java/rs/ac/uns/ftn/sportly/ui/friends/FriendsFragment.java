@@ -26,7 +26,6 @@ public class FriendsFragment extends Fragment {
         return root;
     }
 
-
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
