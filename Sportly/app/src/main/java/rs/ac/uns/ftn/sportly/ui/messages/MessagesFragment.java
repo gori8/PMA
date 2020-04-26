@@ -12,28 +12,49 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.map.MapViewModel;
+import rs.ac.uns.ftn.sportly.ui.notifications.NotificationAdapter;
 
 public class MessagesFragment extends Fragment {
 
-    private MessagesViewModel messagesViewModel;
-
-    public View onCreateView(@NonNull LayoutInflater inflater,
+   public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        messagesViewModel =
-                ViewModelProviders.of(this).get(MessagesViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_messages, container, false);
-        final TextView textView = root.findViewById(R.id.text_messages);
-        messagesViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
         return root;
+    }
+
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        List<String> names = new ArrayList<>();
+        names.add("Milan Škrbić");
+        names.add("Stevan Vulić");
+
+        List<Integer> images = new ArrayList<>();
+        images.add(R.drawable.milan_skrbic);
+        images.add(R.drawable.stevan_vulic);
+
+        List<String> info = new ArrayList<>();
+        info.add("Vazi, mozemo se prijaviti u petak.");
+        info.add("Pozdrav!");
+
+        List<String> time = new ArrayList<>();
+        time.add("20:18");
+        time.add("2d");
+
+        MessagesAdapter adapter = new MessagesAdapter(getContext(), names, images, info, time);
+
+        ListView listView = (ListView) getActivity().findViewById(R.id.messages_list);
+        listView.setAdapter(adapter);
     }
 
 }
