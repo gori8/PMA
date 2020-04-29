@@ -296,11 +296,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
 
+        LatLng latLngForSearch = new LatLng(45.253513,19.829127);
+
+
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
         RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(location.getLatitude()-0.02, location.getLongitude()-0.02),
-                new LatLng(location.getLatitude()+0.02, location.getLongitude()+0.02));
+                new LatLng(latLngForSearch.latitude-0.02, latLngForSearch.longitude-0.02),
+                new LatLng(latLngForSearch.latitude+0.02, latLngForSearch.longitude+0.02));
 
         // Use the builder to create a FindAutocompletePredictionsRequest.
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
@@ -310,12 +313,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 .setCountry("RS")
                 //.setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setSessionToken(token)
-                .setQuery("košarka")
+                .setQuery("basketball")
                 .build();
 
         placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
             for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
                 Log.i(TAG, prediction.getPlaceId());
+                //Log.i(TAG, prediction.getPlaceTypes().get(0).name());
                 Log.i(TAG, prediction.getPrimaryText(null).toString());
             }
         }).addOnFailureListener((exception) -> {
