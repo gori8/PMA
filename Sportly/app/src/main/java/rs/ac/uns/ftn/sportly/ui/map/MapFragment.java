@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,9 +37,18 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
+
+import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
 
@@ -48,6 +60,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private AlertDialog dialog;
     private Marker home;
     private GoogleMap map;
+    private final String API_KEY = "AIzaSyCu0iJ9uGcf9eSb7QsyxgxILwj7tkDyc00";
+    private PlacesClient placesClient;
 
     public static MapFragment newInstance() {
 
@@ -63,6 +77,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Places.initialize(getActivity().getApplicationContext(), API_KEY);
+        placesClient = Places.createClient(getActivity());
+
 
     }
 
@@ -71,25 +88,29 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * po kom kriterijumu zelimo da dobijamo informacije GSP, MOBILNO(WIFI, MObilni internet), GPS+MOBILNO
      * **/
     private void createMapFragmentAndInflate() {
-        //specificiramo krijterijum da dobijamo informacije sa svih izvora
-        //ako korisnik to dopusti
-        Criteria criteria = new Criteria();
+        if(map==null) {
+            //specificiramo krijterijum da dobijamo informacije sa svih izvora
+            //ako korisnik to dopusti
+            Criteria criteria = new Criteria();
 
-        //sistemskom servisu prosledjujemo taj kriterijum da bi
-        //mogli da dobijamo informacje sa tog izvora
-        provider = locationManager.getBestProvider(criteria, true);
+            //sistemskom servisu prosledjujemo taj kriterijum da bi
+            //mogli da dobijamo informacje sa tog izvora
+            provider = locationManager.getBestProvider(criteria, true);
 
-        //kreiramo novu instancu fragmenta
-        mMapFragment = SupportMapFragment.newInstance();
+            //kreiramo novu instancu fragmenta
+            mMapFragment = SupportMapFragment.newInstance();
 
-        //i vrsimo zamenu trenutnog prikaza sa prikazom mape
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.map_container, mMapFragment).commit();
+            //i vrsimo zamenu trenutnog prikaza sa prikazom mape
+            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.replace(R.id.map_container, mMapFragment).commit();
 
-        //pozivamo ucitavnje mape.
-        //VODITI RACUNA OVO JE ASINHRONA OPERACIJA
-        //LOKACIJE MOGU DA SE DOBIJU PRE MAPE I OBRATNO
-        mMapFragment.getMapAsync(this);
+            //pozivamo ucitavnje mape.
+            //VODITI RACUNA OVO JE ASINHRONA OPERACIJA
+            //LOKACIJE MOGU DA SE DOBIJU PRE MAPE I OBRATNO
+            mMapFragment.getMapAsync(this);
+
+
+        }
     }
 
     private void showLocatonDialog() {
@@ -122,6 +143,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                     //Request location updates:
                     locationManager.requestLocationUpdates(provider, 0, 0, this);
+
                 }else if(ContextCompat.checkSelfPermission(getContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
@@ -273,6 +295,35 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 location = locationManager.getLastKnownLocation(provider);
             }
         }
+
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(location.getLatitude()-0.02, location.getLongitude()-0.02),
+                new LatLng(location.getLatitude()+0.02, location.getLongitude()+0.02));
+
+        // Use the builder to create a FindAutocompletePredictionsRequest.
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                // Call either setLocationBias() OR setLocationRestriction().
+                .setLocationRestriction(bounds)
+                .setOrigin(new LatLng(location.getLatitude(), location.getLongitude()))
+                .setCountry("RS")
+                //.setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setSessionToken(token)
+                .setQuery("košarka")
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                Log.i(TAG, prediction.getPlaceId());
+                Log.i(TAG, prediction.getPrimaryText(null).toString());
+            }
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+            }
+        });
 
         //ako zelimo da rucno postavljamo markere to radimo
         //dodavajuci click listener
