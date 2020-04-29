@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.sportly.ui.messages;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.List;
 
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.messages.chat.ChatActivity;
 
 public class MessagesAdapter extends ArrayAdapter<String> {
 
@@ -46,6 +51,20 @@ public class MessagesAdapter extends ArrayAdapter<String> {
         textViewName.setText(names.get(position));
         textViewInfo.setText(info.get(position));
         textViewTime.setText(time.get(position));
+
+        final int i = position;
+
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MainActivity mainActivity = (MainActivity) context;
+
+                Intent intent = new Intent(mainActivity, ChatActivity.class);
+                intent.putExtra("person_username", names.get(i));
+                mainActivity.startActivity(intent);
+            }
+        });
 
         return row;
     }
