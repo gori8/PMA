@@ -309,7 +309,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 // Call either setLocationBias() OR setLocationRestriction().
                 .setLocationRestriction(bounds)
-                .setOrigin(new LatLng(location.getLatitude(), location.getLongitude()))
+                .setOrigin(latLngForSearch)
                 .setCountry("RS")
                 //.setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setSessionToken(token)
