@@ -194,6 +194,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                                 Manifest.permission.ACCESS_COARSE_LOCATION},
                                         MY_PERMISSIONS_REQUEST_LOCATION);
+
                             }
                         })
                         .create()
