@@ -17,13 +17,22 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
-            android:label="Sportly">
+            android:name=".ui.login.LoginActivity"
+            android:label="Sportly"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:label="Sportly">
+            <!--intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter-->
         </activity>
 
         <meta-data
