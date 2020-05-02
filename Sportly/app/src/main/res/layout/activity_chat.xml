@@ -7,7 +7,6 @@
     android:id="@+id/activity_chat"
     android:background="@color/chatBackground"
     tools:context=".ui.messages.chat.ChatActivity">
-
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
