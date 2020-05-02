@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.sportly.ui.map;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,10 +60,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
+import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 
 import static android.content.ContentValues.TAG;
 
@@ -166,6 +170,29 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
 
+
+        //Dummy Button samo da prikazem Event Overview
+        Button eventButton = getActivity().findViewById(R.id.eventButton);
+
+        eventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MainActivity mainActivity = (MainActivity) getContext();
+
+                Intent intent = new Intent(mainActivity, EventActivity.class);
+                intent.putExtra("location", "Đačko igralište");
+                intent.putExtra("name", "FTN Friday Basketball");
+                intent.putExtra("time", "18:00 - 20:00");
+                intent.putExtra("people", "2/6 people");
+                intent.putExtra("date", "17/05/2020");
+                intent.putExtra("price", "Free");
+                intent.putExtra("creator", "Pera Perić");
+                intent.putExtra("description", "Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
+                intent.putExtra("imageView", R.drawable.djacko);
+                mainActivity.startActivity(intent);
+            }
+        });
     }
 
     @Override

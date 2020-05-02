@@ -4,6 +4,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark">
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
     <LinearLayout
         android:padding="10dp"
         android:layout_width="match_parent"
@@ -19,7 +33,6 @@
             app:riv_border_width="1dip"
             app:riv_border_color="@color/colorPrimary"
             app:riv_mutate_background="true"
-            app:riv_tile_mode="repeat"
             app:riv_oval="false"
             android:layout_height="100dp"
             android:layout_width="140dp"/>
@@ -38,8 +51,8 @@
 
                 <ImageView
                     android:layout_gravity="center"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
                     android:src="@drawable/ic_location_gray"/>
 
                 <TextView
@@ -49,7 +62,7 @@
                     android:id="@+id/location"
                     android:text="Location"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="10dp"/>
+                    android:textSize="12dp"/>
 
             </LinearLayout>
 
@@ -69,8 +82,8 @@
 
                 <ImageView
                     android:layout_gravity="center"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
                     android:src="@drawable/ic_access_time_gray"/>
 
                 <TextView
@@ -80,7 +93,7 @@
                     android:id="@+id/time"
                     android:text="12:00 - 14:00"
                     android:textColor="@color/description"
-                    android:textSize="10dp"/>
+                    android:textSize="12dp"/>
 
             </LinearLayout>
 
@@ -91,8 +104,8 @@
 
                 <ImageView
                     android:layout_gravity="center"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
                     android:src="@drawable/ic_people_gray"/>
 
                 <TextView
@@ -102,7 +115,7 @@
                     android:id="@+id/people"
                     android:text="4/6 people"
                     android:textColor="@color/description"
-                    android:textSize="10dp"/>
+                    android:textSize="12dp"/>
 
             </LinearLayout>
 
@@ -184,6 +197,37 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Creator"
+            android:textStyle="bold"
+            android:textColor="@color/name"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Creator name"
+            android:id="@+id/creator"
+            android:textColor="@color/name"
+            android:textSize="15dp"
+            android:background="@drawable/line_background"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="10dp"
+        android:background="@drawable/gray_line_top"
+        android:paddingTop="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Description"
             android:textStyle="bold"
             android:textColor="@color/name"
@@ -201,6 +245,32 @@
             android:textSize="15dp"
             android:padding="15dp"
             android:background="@drawable/gray_edges_background"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:gravity="center|bottom"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:background="@color/message"
+            android:text="Message creator"/>
+
+        <Button
+            android:textColor="@color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Apply"/>
 
     </LinearLayout>
 

@@ -10,10 +10,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.event.EventActivity"></activity>
+        <activity
+            android:name=".ui.event.EventActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.messages.chat.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="Sportly"

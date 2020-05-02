@@ -10,5 +10,7 @@
     <color name="description">#6E6E6E</color>
     <color name="chatBackground">#E4E4E4</color>
     <color name="background">#FAFAFA</color>
+    <color name="message">#454545</color>
+    <color name="apply">#2889FF</color>
 
 </resources>
