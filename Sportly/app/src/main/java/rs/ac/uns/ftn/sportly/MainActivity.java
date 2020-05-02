@@ -1,8 +1,15 @@
 package rs.ac.uns.ftn.sportly;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -10,6 +17,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -41,6 +50,8 @@ public class MainActivity extends AppCompatActivity{
                 R.id.navigation_friends, R.id.navigation_favorites, R.id.navigation_map, R.id.navigation_notifications, R.id.navigation_messages)
                 .setDrawerLayout(drawer)
                 .build();
+
+        createOnClickListenerForSignOut();
     }
 
     @Override
@@ -56,4 +67,37 @@ public class MainActivity extends AppCompatActivity{
             super.onBackPressed();
         }
     }
+
+    public void createOnClickListenerForSignOut(){
+        final Button button = findViewById(R.id.logout);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showLogoutPopup();
+            }
+        });
+    }
+
+    private void goToLoginActivity(){
+        MainActivity mainActivity = (MainActivity) this;
+        Intent intent = new Intent(mainActivity, LoginActivity.class);
+        mainActivity.startActivity(intent);
+    }
+
+    private void showLogoutPopup() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+        alert.setMessage("Are you sure you want to sign out?")
+                .setPositiveButton("Sign out", new DialogInterface.OnClickListener()                 {
+
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        LoginActivity.mGoogleSignInClient.signOut();
+                        goToLoginActivity();
+
+                    }
+                }).setNegativeButton("Cancel", null);
+
+        AlertDialog alert1 = alert.create();
+        alert1.show();
+    }
+
 }

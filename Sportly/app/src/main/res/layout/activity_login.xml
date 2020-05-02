@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ui.login.LoginActivity"
+    android:background="@color/colorPrimary">
+
+    <com.google.android.gms.common.SignInButton
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sign_in_button"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+    </com.google.android.gms.common.SignInButton>
+
+    <TextView
+        android:id="@+id/sign_in_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/colorAccent"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        />
+
+</RelativeLayout>

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,18 +26,44 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.ArrayType;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.util.ArrayList;
+
+import lombok.SneakyThrows;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
+import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
+
+import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
 
@@ -46,8 +73,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private String provider;
     private SupportMapFragment mMapFragment;
     private AlertDialog dialog;
-    private Marker home;
+    private Marker myLoc;
     private GoogleMap map;
+    private final String API_KEY_PLACES = "AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
 
     public static MapFragment newInstance() {
 
@@ -64,6 +92,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         super.onCreate(savedInstanceState);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
+
+
     }
 
     /**
@@ -71,25 +101,29 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * po kom kriterijumu zelimo da dobijamo informacije GSP, MOBILNO(WIFI, MObilni internet), GPS+MOBILNO
      * **/
     private void createMapFragmentAndInflate() {
-        //specificiramo krijterijum da dobijamo informacije sa svih izvora
-        //ako korisnik to dopusti
-        Criteria criteria = new Criteria();
+        if(map==null) {
+            //specificiramo krijterijum da dobijamo informacije sa svih izvora
+            //ako korisnik to dopusti
+            Criteria criteria = new Criteria();
 
-        //sistemskom servisu prosledjujemo taj kriterijum da bi
-        //mogli da dobijamo informacje sa tog izvora
-        provider = locationManager.getBestProvider(criteria, true);
+            //sistemskom servisu prosledjujemo taj kriterijum da bi
+            //mogli da dobijamo informacje sa tog izvora
+            provider = locationManager.getBestProvider(criteria, true);
 
-        //kreiramo novu instancu fragmenta
-        mMapFragment = SupportMapFragment.newInstance();
+            //kreiramo novu instancu fragmenta
+            mMapFragment = SupportMapFragment.newInstance();
 
-        //i vrsimo zamenu trenutnog prikaza sa prikazom mape
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.map_container, mMapFragment).commit();
+            //i vrsimo zamenu trenutnog prikaza sa prikazom mape
+            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.replace(R.id.map_container, mMapFragment).commit();
 
-        //pozivamo ucitavnje mape.
-        //VODITI RACUNA OVO JE ASINHRONA OPERACIJA
-        //LOKACIJE MOGU DA SE DOBIJU PRE MAPE I OBRATNO
-        mMapFragment.getMapAsync(this);
+            //pozivamo ucitavnje mape.
+            //VODITI RACUNA OVO JE ASINHRONA OPERACIJA
+            //LOKACIJE MOGU DA SE DOBIJU PRE MAPE I OBRATNO
+            mMapFragment.getMapAsync(this);
+
+
+        }
     }
 
     private void showLocatonDialog() {
@@ -121,12 +155,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                     //Request location updates:
-                    locationManager.requestLocationUpdates(provider, 0, 0, this);
+                    locationManager.requestLocationUpdates(provider, 30*1000, 300, this);
+
                 }else if(ContextCompat.checkSelfPermission(getContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
                     //Request location updates:
-                    locationManager.requestLocationUpdates(provider, 0, 0, this);
+                    locationManager.requestLocationUpdates(provider, 30*1000, 300, this);
                 }
             }
         }
@@ -147,8 +182,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * */
     @Override
     public void onLocationChanged(Location location) {
+        //todo Kad odes u Novi Sad majmune
        if (map != null) {
-            addMarker(location);
+            //addMarker(location);
         }
     }
 
@@ -191,6 +227,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                                 Manifest.permission.ACCESS_COARSE_LOCATION},
                                         MY_PERMISSIONS_REQUEST_LOCATION);
+
                             }
                         })
                         .create()
@@ -226,7 +263,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                             == PackageManager.PERMISSION_GRANTED) {
 
                         //Request location updates:
-                        locationManager.requestLocationUpdates(provider, 0, 0, this);
+                        locationManager.requestLocationUpdates(provider, 30*1000, 300, this);
                     }
 
                 } else if (grantResults.length > 0
@@ -239,7 +276,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                             == PackageManager.PERMISSION_GRANTED) {
 
                         //Request location updates:
-                        locationManager.requestLocationUpdates(provider, 0, 0, this);
+                        locationManager.requestLocationUpdates(provider, 30*1000, 300, this);
                     }
 
                 }
@@ -249,6 +286,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+
+    private String locationToString(LatLng loc){
+        return loc.latitude+","+loc.longitude;
+    }
 
     /**
      * KAda je mapa spremna mozemo da radimo sa njom.
@@ -273,23 +314,44 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
 
-        //ako zelimo da rucno postavljamo markere to radimo
-        //dodavajuci click listener
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        LatLng latLngForSearch = new LatLng(45.253513,19.829127);
+
+        location.setLatitude(latLngForSearch.latitude);
+        location.setLongitude(latLngForSearch.longitude);
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+
+        Call<ResponseBody> call = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"basketball court");
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @SneakyThrows
             @Override
-            public void onMapClick(LatLng latLng) {
-                map.addMarker(new MarkerOptions()
-                        .title("YOUR_POSITON")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                        .position(latLng));
-                home.setFlat(true);
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200){
+                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
+                    JsonNode resultsListJSON = responseJSON.get("results");
+                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
+                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
+                    for (PlaceDTO place : placesList) {
+                        Log.i("MapFragment",place.getName());
+                        addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),BitmapDescriptorFactory.HUE_RED);
+                    }
+                }else{
+                    Log.e("MapFragment","Meesage recieved: "+response.code());
+                }
+            }
 
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(latLng).zoom(14).build();
-
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
             }
         });
+
+
+
 
         //ako zelmo da reagujemo na klik markera koristimo marker click listener
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -300,47 +362,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         });
 
-        //ako je potrebno da reagujemo na pomeranje markera koristimo marker drag listener
-        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-                Toast.makeText(getActivity(), "Drag started", Toast.LENGTH_SHORT).show();
-            }
 
-            @Override
-            public void onMarkerDrag(Marker marker) {
-                Toast.makeText(getActivity(), "Dragging", Toast.LENGTH_SHORT).show();
-                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                Toast.makeText(getActivity(), "Drag ended", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         if (location != null) {
-            addMarker(location);
+            if (myLoc != null) {
+                myLoc.remove();
+            }
+            LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
+            myLoc = addMarker(loc,"My position", BitmapDescriptorFactory.HUE_BLUE);
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(loc).zoom(14).build();
+
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
-    private void addMarker(Location location) {
-        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+    private Marker addMarker(LatLng loc, String title, float color) {
 
-        if (home != null) {
-            home.remove();
-        }
-
-        home = map.addMarker(new MarkerOptions()
-                .title("YOUR_POSITON")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+        Marker ret = map.addMarker(new MarkerOptions()
+                .title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(color))
                 .position(loc));
-        home.setFlat(true);
+        ret.setFlat(true);
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(loc).zoom(14).build();
-
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        return ret;
     }
 
     /**
