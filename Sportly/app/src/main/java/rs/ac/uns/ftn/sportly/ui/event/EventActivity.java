@@ -6,7 +6,9 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import okhttp3.ResponseBody;
@@ -42,6 +44,15 @@ public class EventActivity extends AppCompatActivity {
         String creator = myIntent.getStringExtra("creator");
         String description = myIntent.getStringExtra("description");
         int image = myIntent.getIntExtra("imageView",R.drawable.ic_location_on_black_24dp);
+        boolean isCreator = myIntent.getBooleanExtra("isCreator",false);
+
+        if(isCreator){
+            LinearLayout creatorButtons = findViewById(R.id.creatorButtons);
+            creatorButtons.setVisibility(View.VISIBLE);
+        }else{
+            LinearLayout applierButtons = findViewById(R.id.applierButtons);
+            applierButtons.setVisibility(View.VISIBLE);
+        }
 
         TextView tvLocation = findViewById(R.id.location);
         TextView tvName = findViewById(R.id.name);

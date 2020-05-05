@@ -12,12 +12,32 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_marginBottom="55dp">
-        <Button
-            android:layout_width="100dp"
-            android:id="@+id/eventButton"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimary"
-            android:text="Event"
-            android:textColor="@color/white"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:id="@+id/eventButton"
+                android:background="@color/colorPrimary"
+                android:text="Event"/>
+
+            <Button
+                android:textColor="@color/white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/myEventButton"
+                android:background="@color/message"
+                android:text="My event"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

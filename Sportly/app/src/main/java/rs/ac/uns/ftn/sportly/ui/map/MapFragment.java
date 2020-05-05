@@ -190,6 +190,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 intent.putExtra("creator", "Pera Perić");
                 intent.putExtra("description", "Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
                 intent.putExtra("imageView", R.drawable.djacko);
+                intent.putExtra("isCreator",false);
+                mainActivity.startActivity(intent);
+            }
+        });
+
+        Button myEventButton = getActivity().findViewById(R.id.myEventButton);
+
+        myEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MainActivity mainActivity = (MainActivity) getContext();
+
+                Intent intent = new Intent(mainActivity, EventActivity.class);
+                intent.putExtra("location", "Sportski centar Spens");
+                intent.putExtra("name", "Mali fudbal za programere");
+                intent.putExtra("time", "20:00 - 21:30");
+                intent.putExtra("people", "1/10 people");
+                intent.putExtra("date", "20/05/2020");
+                intent.putExtra("price", "2$");
+                intent.putExtra("creator", "Marko Markovic");
+                intent.putExtra("description", "Programeri koji zele posle posla da se druze uz mali fudbal su dobrodosli.");
+                intent.putExtra("imageView", R.drawable.spens);
+                intent.putExtra("isCreator",true);
                 mainActivity.startActivity(intent);
             }
         });
