@@ -14,7 +14,13 @@
     <string name="oops">Ooops</string>
     <string name="sure">Sure</string>
     <string name="no">No</string>
+    <string name="facebook_app_id">189301622103991</string>
+    <string name="fb_login_protocol_scheme">fb189301622103991</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_application_list">ApplicationListActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
 </resources>
