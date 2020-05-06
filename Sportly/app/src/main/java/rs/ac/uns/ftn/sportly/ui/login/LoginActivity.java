@@ -1,8 +1,13 @@
 package rs.ac.uns.ftn.sportly.ui.login;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
@@ -43,6 +48,10 @@ public class LoginActivity extends AppCompatActivity {
     private static final String AUTH_TYPE = "rerequest";
     private CallbackManager mCallbackManager;
 
+    //----------EMAIL----------
+    public static final int EMAIL_SIGN_IN = 135;
+    public static final String EMAIL_ACCOUNT = "Account";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         signInButton = findViewById(R.id.sign_in_button);
-        setGoogleButtonText(signInButton, "Sign up with Google");
+        setGoogleButtonText(signInButton, "Continue with Google");
         setGoogleButtonClickEvent(signInButton, mGoogleSignInClient);
 
         //----------FACEBOOOK----------
@@ -66,6 +75,10 @@ public class LoginActivity extends AppCompatActivity {
         mLoginButton.setPermissions(Arrays.asList(EMAIL));
         mLoginButton.setAuthType(AUTH_TYPE);
         setFacebookButtonClickEvent(mLoginButton);
+
+        //----------EMAIL----------
+        Button emailLogInButton = findViewById(R.id.log_in_with_email_button);
+        setEmailButtonClickEvent(emailLogInButton);
     }
 
     @Override
@@ -77,6 +90,9 @@ public class LoginActivity extends AppCompatActivity {
         //----------FACEBOOOK----------
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         boolean isLoggedInFacebook = accessToken != null && !accessToken.isExpired();
+
+        //----------EMAIL----------
+        //to do, sacuvati zadnji login pa iscitati
 
         if(googleAccount != null){
             // Signed in successfully with google, show authenticated UI.
@@ -100,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
         }else{
             //----------FACEBOOOK----------
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
+            goToMainActivityIfLoginSuccess(FACEBOOK);
         }
     }
 
@@ -121,11 +138,35 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loadingView(){
         //on sign in view hide buttons
+        TextView title = findViewById(R.id.login_title);
+        title.setVisibility(View.GONE);
+
+        TextView about = findViewById(R.id.login_about);
+        about.setVisibility(View.GONE);
+
+        EditText email = findViewById(R.id.login_email);
+        email.setVisibility(View.GONE);
+
+        EditText password = findViewById(R.id.login_password);
+        password.setVisibility(View.GONE);
+
+        Button emailLogin = findViewById(R.id.log_in_with_email_button);
+        emailLogin.setVisibility(View.GONE);
+
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setVisibility(View.GONE);
 
         LoginButton mLoginButton = findViewById(R.id.login_button);
         mLoginButton.setVisibility(View.GONE);
+
+        TextView message = findViewById(R.id.sign_in_message);
+        message.setVisibility(View.GONE);
+
+        TextView registerLabel = findViewById(R.id.register_txt);
+        registerLabel.setVisibility(View.GONE);
+
+        Button register = findViewById(R.id.register_button);
+        register.setVisibility(View.GONE);
 
         //on sign in view show loading
         findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
@@ -156,7 +197,7 @@ public class LoginActivity extends AppCompatActivity {
                 TextView tv = (TextView) v;
                 tv.setText(text);
                 tv.setTextSize(17);
-
+                tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
                 return;
             }
         }
@@ -214,7 +255,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                goToMainActivityIfLoginSuccess(FACEBOOK);
+                //goToMainActivityIfLoginSuccess(FACEBOOK);
                 setResult(RESULT_OK);
                 System.out.println("Facebook sign in success");
             }
@@ -231,6 +272,43 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println("Facebook sign in error");
                 System.out.println(e.getMessage());
                 showErrorMessageIfLoginFail("Sign in with Facebook failed. Please try again.");
+            }
+        });
+    }
+    //----------EMAIL-FUNCTIONS----------
+    private void setEmailButtonClickEvent(Button signInButton){
+        // Register a callback to respond to the user
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            private void signIn() {
+                TextView email = (TextView)findViewById(R.id.login_email);
+                TextView password = (TextView)findViewById(R.id.login_password);
+                String email_txt = email.getText().toString();
+                String password_txt = password.getText().toString();
+
+                //validacija
+                if(email_txt.equals("test") && password_txt.equals("test")) {
+                    loadingView();
+                    goToMainActivityIfLoginSuccess(EMAIL_ACCOUNT);
+                    System.out.println("Email sign in success");
+                }else{
+                    System.out.println("Email sign in error");
+                    showErrorMessageIfLoginFail("Sign in failed. Please try again.");
+                }
+
+            }
+
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.log_in_with_email_button:
+                        //hide keyboard
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                InputMethodManager.RESULT_UNCHANGED_SHOWN);
+
+                        signIn();
+                        break;
+                }
             }
         });
     }
