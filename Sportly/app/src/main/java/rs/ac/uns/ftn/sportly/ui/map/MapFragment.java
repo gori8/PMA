@@ -93,7 +93,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
 
-
     }
 
     /**
