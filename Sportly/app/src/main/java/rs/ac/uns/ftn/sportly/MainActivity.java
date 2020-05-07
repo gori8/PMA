@@ -89,14 +89,17 @@ public class MainActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialog, int which) {
                         boolean google = false;
                         boolean facebook = false;
+                        boolean email = false;
 
                         if (LoginActivity.signInMethod == LoginActivity.GOOGLE){
                             google = tryGoogleSignOut();
                         }else if(LoginActivity.signInMethod == LoginActivity.FACEBOOK){
                             facebook = tryFacebookSignOut();
+                        }else if(LoginActivity.signInMethod == LoginActivity.EMAIL_ACCOUNT){
+                            email = true;
                         }
 
-                        if(google || facebook) {
+                        if(google || facebook || email) {
                             goToLoginActivity();
                         }
                     }
