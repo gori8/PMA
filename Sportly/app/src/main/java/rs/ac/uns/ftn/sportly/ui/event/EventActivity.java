@@ -17,6 +17,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.ApplicationListActivity;
+import rs.ac.uns.ftn.sportly.ui.event.edit_event.EditEventActivity;
 
 public class EventActivity extends AppCompatActivity {
 
@@ -83,6 +84,26 @@ public class EventActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(v.getContext(), ApplicationListActivity.class);
                 intent.putExtra("eventName", name);
+                startActivity(intent);
+            }
+        });
+
+        Button editEventButton = findViewById(R.id.editEventButton);
+        editEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(v.getContext(), EditEventActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("date", date);
+                intent.putExtra("people", people);
+                intent.putExtra("price", price);
+                intent.putExtra("description", description);
+
+                String[] timeArray = time.split("-");
+
+                intent.putExtra("startingTime", timeArray[0].trim());
+                intent.putExtra("endingTime", timeArray[1].trim());
                 startActivity(intent);
             }
         });

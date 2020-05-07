@@ -11,7 +11,6 @@
     sothree:umanoScrollableView="@+id/events_list"
     sothree:umanoInitialState="hidden"
     sothree:umanoShadowHeight="4dp"
-    android:paddingBottom="?android:attr/actionBarSize"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
@@ -31,7 +30,7 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <Button
+                <android.widget.Button
                     android:id="@+id/eventButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -40,7 +39,7 @@
                     android:text="Event"
                     android:textColor="@color/white" />
 
-                <Button
+                <android.widget.Button
                     android:id="@+id/myEventButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
