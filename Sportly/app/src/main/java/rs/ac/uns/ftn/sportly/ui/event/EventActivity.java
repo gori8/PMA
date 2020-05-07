@@ -7,6 +7,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.event.application_list.ApplicationListActivity;
 
 public class EventActivity extends AppCompatActivity {
 
@@ -73,6 +75,17 @@ public class EventActivity extends AppCompatActivity {
         tvCreator.setText(creator);
         tvDescription.setText(description);
         imageView.setImageResource(image);
+
+        Button applicationListButton = findViewById(R.id.applicationListButton);
+        applicationListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(v.getContext(), ApplicationListActivity.class);
+                intent.putExtra("eventName", name);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
