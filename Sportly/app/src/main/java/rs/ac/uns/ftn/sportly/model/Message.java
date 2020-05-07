@@ -1,4 +1,4 @@
-package rs.ac.uns.ftn.sportly.ui.model;
+package rs.ac.uns.ftn.sportly.model;
 
 public class Message {
     private String text;

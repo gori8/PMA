@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -52,8 +54,10 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
@@ -63,9 +67,11 @@ import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
+import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
+import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
 
 import static android.content.ContentValues.TAG;
 
@@ -73,6 +79,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
+    private SlidingUpPanelLayout slidingPanel;
     private LocationManager locationManager;
     private String provider;
     private SupportMapFragment mMapFragment;
@@ -95,8 +102,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-
     }
 
     /**
@@ -146,6 +151,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         super.onResume();
 
         createMapFragmentAndInflate();
+
+        slidingPanel.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            }
+        });
 
         boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean wifi = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -222,7 +234,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public View onCreateView(LayoutInflater inflater, ViewGroup vg, Bundle data) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_map, vg, false);
-
+        slidingPanel = view.findViewById(R.id.sliding_layout);
         return view;
     }
 
@@ -386,8 +398,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
                     Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
                     for (PlaceDTO place : placesList) {
-                        Log.i("MapFragment",place.getName());
-                        addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),BitmapDescriptorFactory.HUE_RED);
+                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),BitmapDescriptorFactory.HUE_RED);
+                        marker.setTag(place);
                     }
                 }else{
                     Log.e("MapFragment","Meesage recieved: "+response.code());
@@ -407,7 +419,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getActivity(), marker.getTitle(), Toast.LENGTH_SHORT).show();
+                if(marker.getId()!=myLoc.getId()) {
+                    PlaceDTO placeDTO = (PlaceDTO) marker.getTag();
+                    TextView placeName = getView().findViewById(R.id.place_info_name);
+                    placeName.setText(placeDTO.getName());
+                    slidingPanel.setAnchorPoint(0.5f);
+                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                }
                 return true;
             }
         });
@@ -447,5 +465,38 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         super.onPause();
 
         locationManager.removeUpdates(this);
+    }
+
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        List<Event> events = new ArrayList<>();
+
+        Event event1 = new Event();
+        event1.setName("FTN Friday Basketball");
+        event1.setDescription("Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
+        event1.setFrom("18:00");
+        event1.setTo("20:00");
+        event1.setSignedUpPlayers((short)2);
+        event1.setTotalPlayers((short)6);
+        event1.setSport("basketball");
+
+        Event event2 = new Event();
+        event2.setName("Mali fudbal za programere");
+        event2.setDescription("Programeri koji zele posle posla da se druze uz mali fudbal su dobrodosli.");
+        event2.setFrom("20:00");
+        event2.setTo("21:30");
+        event2.setSignedUpPlayers((short)1);
+        event2.setTotalPlayers((short)10);
+        event2.setSport("football");
+
+        events.add(event1);
+        events.add(event2);
+
+
+        EventsAdapter adapter = new EventsAdapter(getContext(), events);
+
+        ListView listView = (ListView) getActivity().findViewById(R.id.events_list);
+        listView.setAdapter(adapter);
     }
 }

@@ -10,13 +10,11 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
-import rs.ac.uns.ftn.sportly.ui.model.Message;
+import rs.ac.uns.ftn.sportly.model.Message;
 
 public class ChatActivity extends AppCompatActivity {
 
