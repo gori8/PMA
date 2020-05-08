@@ -226,11 +226,11 @@
             <android.widget.Button
                 android:textColor="@color/white"
                 android:layout_width="0dp"
-                android:id="@+id/doneButton"
+                android:id="@+id/createButton"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
-                android:text="Done"/>
+                android:text="Create"/>
 
         </LinearLayout>
 

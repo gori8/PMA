@@ -99,6 +99,7 @@ public class EventActivity extends AppCompatActivity {
                 intent.putExtra("people", people);
                 intent.putExtra("price", price);
                 intent.putExtra("description", description);
+                intent.putExtra("location", location);
 
                 String[] timeArray = time.split("-");
 

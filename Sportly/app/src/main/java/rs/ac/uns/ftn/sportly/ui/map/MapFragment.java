@@ -71,6 +71,7 @@ import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
+import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
 
 import static android.content.ContentValues.TAG;
@@ -87,6 +88,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private Marker myLoc;
     private GoogleMap map;
     private final String API_KEY_PLACES = "AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
+    private String placeName;
 
     public static MapFragment newInstance() {
 
@@ -421,8 +423,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getId()!=myLoc.getId()) {
                     PlaceDTO placeDTO = (PlaceDTO) marker.getTag();
-                    TextView placeName = getView().findViewById(R.id.place_info_name);
-                    placeName.setText(placeDTO.getName());
+                    TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
+                    tvPlaceName.setText(placeDTO.getName());
+                    placeName = placeDTO.getName();
                     slidingPanel.setAnchorPoint(0.5f);
                     slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 }
@@ -493,10 +496,23 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         events.add(event1);
         events.add(event2);
 
-
         EventsAdapter adapter = new EventsAdapter(getContext(), events);
 
         ListView listView = (ListView) getActivity().findViewById(R.id.events_list);
         listView.setAdapter(adapter);
+
+        Button createButton = getActivity().findViewById(R.id.createButton);
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MainActivity mainActivity = (MainActivity) getContext();
+
+                Intent intent = new Intent(mainActivity, CreateEventActivity.class);
+                intent.putExtra("location", placeName);
+
+                mainActivity.startActivity(intent);
+            }
+        });
     }
 }

@@ -53,10 +53,10 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/dragView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
         android:background="@color/white"
         android:clickable="true"
         android:focusable="false"
@@ -91,14 +91,23 @@
                 android:textSize="32sp" />
         </LinearLayout>
 
+        <android.widget.Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/createButton"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/white"
+            android:text="Create event"
+            android:layout_alignParentBottom="true" />
 
         <ListView
             android:background="@drawable/events_list_border"
             android:id="@+id/events_list"
+            android:layout_above="@id/createButton"
+            android:layout_below="@id/place_info"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

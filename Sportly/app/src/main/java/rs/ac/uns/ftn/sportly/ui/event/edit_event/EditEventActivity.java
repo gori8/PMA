@@ -37,6 +37,7 @@ public class EditEventActivity extends AppCompatActivity {
         String date = myIntent.getStringExtra("date");
         String price = myIntent.getStringExtra("price");
         String description = myIntent.getStringExtra("description");
+        String location = myIntent.getStringExtra("location");
 
         TextInputEditText tvName = findViewById(R.id.name);
         TextInputEditText tvStartingTime = findViewById(R.id.startingTime);
@@ -45,6 +46,7 @@ public class EditEventActivity extends AppCompatActivity {
         TextInputEditText tvDate = findViewById(R.id.date);
         TextInputEditText tvPrice = findViewById(R.id.price);
         TextInputEditText tvDescription = findViewById(R.id.description);
+        TextView tvLocation = findViewById(R.id.location);
 
         tvName.setText(name);
         tvStartingTime.setText(startingTime);
@@ -53,6 +55,7 @@ public class EditEventActivity extends AppCompatActivity {
         tvDate.setText(date);
         tvPrice.setText(price);
         tvDescription.setText(description);
+        tvLocation.setText(location);
     }
 
     @Override
