@@ -32,6 +32,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
@@ -79,6 +80,10 @@ public class LoginActivity extends AppCompatActivity {
         //----------EMAIL----------
         Button emailLogInButton = findViewById(R.id.log_in_with_email_button);
         setEmailButtonClickEvent(emailLogInButton);
+
+        //----------REGISTER----------
+        Button registerButton = findViewById(R.id.register_button);
+        setRegisterButtonClickEvent(registerButton);
     }
 
     @Override
@@ -307,6 +312,28 @@ public class LoginActivity extends AppCompatActivity {
                                 InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
                         signIn();
+                        break;
+                }
+            }
+        });
+    }
+
+    //----------REGISTER-FUNCTIONS----------
+
+    private void goToRegisterActivity(){
+        LoginActivity loginActivity = (LoginActivity) this;
+        Intent intent = new Intent(loginActivity, RegisterActivity.class);
+        loginActivity.startActivity(intent);
+    }
+
+    private void setRegisterButtonClickEvent(Button registerButton){
+        // Register a callback to respond to the user
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.register_button:
+                        goToRegisterActivity();
                         break;
                 }
             }
