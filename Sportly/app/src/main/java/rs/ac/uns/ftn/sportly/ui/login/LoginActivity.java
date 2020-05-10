@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -297,7 +299,7 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println("Email sign in success");
                 }else{
                     System.out.println("Email sign in error");
-                    showErrorMessageIfLoginFail("Sign in failed. Please try again.");
+                    showErrorMessageIfLoginFail("Log in failed. Please try again.");
                 }
 
             }
@@ -338,5 +340,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void onForgotPasswordClick(View v) {
+        //click on forgot pasword
+        EditText email = findViewById(R.id.login_email);
+        String emailString = email.getText().toString();
+
+        String toastMsg = "";
+        if(emailString.equals("")) {
+            toastMsg = "Please enter email";
+        }else{
+            toastMsg = "We sent an email to " + emailString;
+        }
+
+        Context context = getApplicationContext();
+        CharSequence text = toastMsg;
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 }

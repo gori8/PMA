@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,11 +24,12 @@ public class ProfileManagementFragment extends Fragment {
         profileManagementViewModel =
                 ViewModelProviders.of(this).get(ProfileManagementViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
-        final TextView textView = root.findViewById(R.id.text_profile_management);
+        //final TextView textView = root.findViewById(R.id.text_profile_management);
         profileManagementViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onChanged(@Nullable String s)
+            {
+                //textView.setText(s);
             }
         });
         return root;
