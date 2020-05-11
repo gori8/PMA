@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
-import rs.ac.uns.ftn.sportly.ui.map.MapViewModel;
-import rs.ac.uns.ftn.sportly.ui.notifications.NotificationAdapter;
 
 public class MessagesFragment extends Fragment {
 

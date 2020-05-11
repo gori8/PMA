@@ -25,4 +25,14 @@
     <string name="title_activity_application_list">ApplicationListActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
+
+
+
+
+    <string-array name="roles_array">
+        <item>Creator</item>
+        <item>Participant</item>
+    </string-array>
+    <string name="role_selection_label">Select your role:</string>
+
 </resources>

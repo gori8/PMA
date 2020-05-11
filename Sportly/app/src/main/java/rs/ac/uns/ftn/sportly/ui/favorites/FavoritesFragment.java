@@ -20,7 +20,6 @@ import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
-import rs.ac.uns.ftn.sportly.ui.map.MapViewModel;
 
 public class FavoritesFragment extends Fragment {
 

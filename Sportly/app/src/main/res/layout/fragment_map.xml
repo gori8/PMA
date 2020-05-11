@@ -114,14 +114,6 @@
 
         </LinearLayout>
 
-        <!--<android.widget.Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/createButton"
-            android:background="@color/colorPrimary"
-            android:textColor="@color/white"
-            android:text="Create event"
-            android:layout_alignParentBottom="true" />-->
 
         <ListView
             android:background="@drawable/events_list_border"

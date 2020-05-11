@@ -20,11 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,17 +31,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.ArrayType;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,13 +47,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.SimpleDateFormat;
@@ -79,12 +65,10 @@ import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.adapters.EventsAdapter;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
-import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
-
-import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
 

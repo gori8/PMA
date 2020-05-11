@@ -20,6 +20,8 @@ import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity{
 
+    //TODO fragment se ponovo kreira kada se na toolbaru izabere vec selektovani!!!
+
     DrawerLayout drawer;
     NavigationView navigationView;
     BottomNavigationView bottomNavigationView;
