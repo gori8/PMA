@@ -96,7 +96,10 @@ public class EventActivity extends AppCompatActivity {
                 Intent intent = new Intent(v.getContext(), EditEventActivity.class);
                 intent.putExtra("name", name);
                 intent.putExtra("date", date);
-                intent.putExtra("people", people);
+
+                String numberOfPeople = people.split("/")[1].split(" ")[0];
+
+                intent.putExtra("people", numberOfPeople);
                 intent.putExtra("price", price);
                 intent.putExtra("description", description);
                 intent.putExtra("location", location);
