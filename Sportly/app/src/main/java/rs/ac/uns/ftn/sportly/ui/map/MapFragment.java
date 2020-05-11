@@ -1,10 +1,14 @@
 package rs.ac.uns.ftn.sportly.ui.map;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,6 +19,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +63,11 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
@@ -148,18 +158,89 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         dialog.show();
     }
 
+    private void updateDateLabel(TextView edittext, Calendar myCalendar){
+        String myFormat = "dd/MM/yy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
+        edittext.setText(sdf.format(myCalendar.getTime()));
+    }
+
+
     @Override
-    public void onResume() {
-        super.onResume();
-
-        createMapFragmentAndInflate();
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         slidingPanel.setFadeOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
             }
         });
+
+        setUpDatePicker();
+
+        Button createButton = getActivity().findViewById(R.id.createButton);
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MainActivity mainActivity = (MainActivity) getContext();
+
+                Intent intent = new Intent(mainActivity, CreateEventActivity.class);
+                intent.putExtra("location", placeName);
+
+                mainActivity.startActivity(intent);
+            }
+        });
+    }
+
+    private void setUpDatePicker(){
+
+        final Calendar myCalendar = Calendar.getInstance();
+
+        TextView edittext= (TextView) getView().findViewById(R.id.events_date_filter);
+
+        updateDateLabel(edittext,myCalendar);
+
+        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateDateLabel(edittext,myCalendar);
+            }
+
+        };
+
+        edittext.setOnClickListener(v -> {
+
+            new DatePickerDialog(getActivity(), date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+        });
+
+        ImageView calendarImage = (ImageView) getView().findViewById(R.id.calendar_image);
+
+        calendarImage.setOnClickListener(v -> {
+
+            new DatePickerDialog(getActivity(), date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+        });
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        createMapFragmentAndInflate();
+
+
 
         boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean wifi = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -184,52 +265,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
 
 
-        //Dummy Button samo da prikazem Event Overview
-        Button eventButton = getActivity().findViewById(R.id.eventButton);
-
-        eventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                MainActivity mainActivity = (MainActivity) getContext();
-
-                Intent intent = new Intent(mainActivity, EventActivity.class);
-                intent.putExtra("location", "Đačko igralište");
-                intent.putExtra("name", "FTN Friday Basketball");
-                intent.putExtra("time", "18:00 - 20:00");
-                intent.putExtra("people", "2/6 people");
-                intent.putExtra("date", "17/05/2020");
-                intent.putExtra("price", "Free");
-                intent.putExtra("creator", "Pera Perić");
-                intent.putExtra("description", "Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
-                intent.putExtra("imageView", R.drawable.djacko);
-                intent.putExtra("isCreator",false);
-                mainActivity.startActivity(intent);
-            }
-        });
-
-        Button myEventButton = getActivity().findViewById(R.id.myEventButton);
-
-        myEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                MainActivity mainActivity = (MainActivity) getContext();
-
-                Intent intent = new Intent(mainActivity, EventActivity.class);
-                intent.putExtra("location", "Sportski centar Spens");
-                intent.putExtra("name", "Mali fudbal za programere");
-                intent.putExtra("time", "20:00 - 21:30");
-                intent.putExtra("people", "1/10 people");
-                intent.putExtra("date", "20/05/2020");
-                intent.putExtra("price", "2$");
-                intent.putExtra("creator", "Marko Markovic");
-                intent.putExtra("description", "Programeri koji zele posle posla da se druze uz mali fudbal su dobrodosli.");
-                intent.putExtra("imageView", R.drawable.spens);
-                intent.putExtra("isCreator",true);
-                mainActivity.startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -237,6 +272,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_map, vg, false);
         slidingPanel = view.findViewById(R.id.sliding_layout);
+
+
+
         return view;
     }
 
@@ -400,7 +438,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
                     Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
                     for (PlaceDTO place : placesList) {
-                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),BitmapDescriptorFactory.HUE_RED);
+                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_basketball));
                         marker.setTag(place);
                     }
                 }else{
@@ -421,7 +459,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if(marker.getId()!=myLoc.getId()) {
+                if(marker.getTag()!=null) {
                     PlaceDTO placeDTO = (PlaceDTO) marker.getTag();
                     TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
                     tvPlaceName.setText(placeDTO.getName());
@@ -440,7 +478,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 myLoc.remove();
             }
             LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
-            myLoc = addMarker(loc,"My position", BitmapDescriptorFactory.HUE_BLUE);
+            myLoc = addMarker(loc,"My position", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(loc).zoom(14).build();
 
@@ -448,15 +486,24 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
-    private Marker addMarker(LatLng loc, String title, float color) {
+    private Marker addMarker(LatLng loc, String title, BitmapDescriptor bitmapDescriptor) {
 
         Marker ret = map.addMarker(new MarkerOptions()
                 .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(color))
+                .icon(bitmapDescriptor)
                 .position(loc));
         ret.setFlat(true);
 
         return ret;
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     /**
@@ -476,6 +523,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         List<Event> events = new ArrayList<>();
 
         Event event1 = new Event();
+        event1.setLocation("Đačko igralište");
         event1.setName("FTN Friday Basketball");
         event1.setDescription("Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
         event1.setFrom("18:00");
@@ -485,6 +533,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         event1.setSport("basketball");
 
         Event event2 = new Event();
+        event1.setLocation("Đačko igralište");
         event2.setName("Mali fudbal za programere");
         event2.setDescription("Programeri koji zele posle posla da se druze uz mali fudbal su dobrodosli.");
         event2.setFrom("20:00");
@@ -501,18 +550,29 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         ListView listView = (ListView) getActivity().findViewById(R.id.events_list);
         listView.setAdapter(adapter);
 
-        Button createButton = getActivity().findViewById(R.id.createButton);
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        listView.setOnItemClickListener((parent, view, position, id) -> {
 
-                MainActivity mainActivity = (MainActivity) getContext();
+            SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yy");
 
-                Intent intent = new Intent(mainActivity, CreateEventActivity.class);
-                intent.putExtra("location", placeName);
+            Event event = (Event) listView.getAdapter().getItem(position);
 
-                mainActivity.startActivity(intent);
-            }
+            MainActivity mainActivity = (MainActivity) getContext();
+
+            Intent intent = new Intent(mainActivity, EventActivity.class);
+            intent.putExtra("location", event.getLocation());
+            intent.putExtra("name", event.getName());
+            intent.putExtra("time", event.getFrom()+" - "+event.getTo());
+            intent.putExtra("people", event.getSignedUpPlayers()+"/"+event.getTotalPlayers()+" people");
+            intent.putExtra("date", formater.format(event.getDate()));
+            intent.putExtra("price", "Free");
+            intent.putExtra("creator", "Pera Perić");
+            intent.putExtra("description", event.getDescription());
+            intent.putExtra("imageView", R.drawable.djacko);
+            intent.putExtra("isCreator",position%2==0?true:false);
+            mainActivity.startActivity(intent);
+
         });
+
+
     }
 }
