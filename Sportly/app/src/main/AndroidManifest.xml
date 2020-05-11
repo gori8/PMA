@@ -40,14 +40,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="Sportly">
-
-            <!--
-            intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter
-            -->
+            android:label="Sportly"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name="com.facebook.FacebookActivity"

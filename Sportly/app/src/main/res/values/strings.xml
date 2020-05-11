@@ -34,5 +34,6 @@
         <item>Participant</item>
     </string-array>
     <string name="role_selection_label">Select your role:</string>
+    <string name="search">Search</string>
 
 </resources>
