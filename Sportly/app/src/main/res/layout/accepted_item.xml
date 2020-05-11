@@ -50,7 +50,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:tint="@color/white"
-        android:background="@color/colorAccent"
+        android:background="@color/red"
         app:srcCompat="@drawable/ic_x" />
 
 </LinearLayout>

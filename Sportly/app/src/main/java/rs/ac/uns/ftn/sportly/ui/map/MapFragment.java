@@ -543,13 +543,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             MainActivity mainActivity = (MainActivity) getContext();
 
             Intent intent = new Intent(mainActivity, EventActivity.class);
-            intent.putExtra("location", event.getLocation());
+            intent.putExtra("location", placeName);
             intent.putExtra("name", event.getName());
             intent.putExtra("time", event.getFrom()+" - "+event.getTo());
             intent.putExtra("people", event.getSignedUpPlayers()+"/"+event.getTotalPlayers()+" people");
             intent.putExtra("date", formater.format(event.getDate()));
             intent.putExtra("price", "Free");
-            intent.putExtra("creator", "Pera Perić");
+            intent.putExtra("creator", position%2==0?"Stevan Vulić":"Pera Perić");
             intent.putExtra("description", event.getDescription());
             intent.putExtra("imageView", R.drawable.djacko);
             intent.putExtra("isCreator",position%2==0?true:false);
