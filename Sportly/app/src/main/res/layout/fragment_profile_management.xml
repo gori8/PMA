@@ -21,7 +21,7 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
@@ -46,7 +46,7 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
@@ -73,7 +73,7 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
@@ -114,7 +114,7 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
@@ -139,11 +139,11 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
-            android:text="Current Password:"/>
+            android:text="Current password:"/>
 
         <EditText
             android:id="@+id/edit_profile_current_password"
@@ -165,11 +165,11 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
-            android:text="Password:"/>
+            android:text="New password:"/>
 
         <EditText
             android:id="@+id/edit_profile_new_password"
@@ -191,11 +191,11 @@
         android:layout_marginTop="5dp">
 
         <TextView
-            android:layout_width="140dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="14dp"
             android:textColor="@color/colorPrimary"
-            android:text="Repeat Password:"/>
+            android:text="Repeat new password:"/>
 
         <EditText
             android:id="@+id/edit_profile_repeat_new_password"
@@ -208,6 +208,22 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/edit_profile_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="18dp"
+            android:textColor="@color/red" />
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_weight="1"
@@ -218,18 +234,9 @@
         android:orientation="horizontal">
 
         <android.widget.Button
-            android:id="@+id/edit_profile_cancel_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:background="@color/message"
-            android:text="Cancel"/>
-
-        <android.widget.Button
             android:id="@+id/edit_profile_save_button"
             android:textColor="@color/white"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
