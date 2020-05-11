@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -32,6 +34,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
@@ -79,6 +82,10 @@ public class LoginActivity extends AppCompatActivity {
         //----------EMAIL----------
         Button emailLogInButton = findViewById(R.id.log_in_with_email_button);
         setEmailButtonClickEvent(emailLogInButton);
+
+        //----------REGISTER----------
+        Button registerButton = findViewById(R.id.register_button);
+        setRegisterButtonClickEvent(registerButton);
     }
 
     @Override
@@ -292,7 +299,7 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println("Email sign in success");
                 }else{
                     System.out.println("Email sign in error");
-                    showErrorMessageIfLoginFail("Sign in failed. Please try again.");
+                    showErrorMessageIfLoginFail("Log in failed. Please try again.");
                 }
 
             }
@@ -311,5 +318,46 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    //----------REGISTER-FUNCTIONS----------
+
+    private void goToRegisterActivity(){
+        LoginActivity loginActivity = (LoginActivity) this;
+        Intent intent = new Intent(loginActivity, RegisterActivity.class);
+        loginActivity.startActivity(intent);
+    }
+
+    private void setRegisterButtonClickEvent(Button registerButton){
+        // Register a callback to respond to the user
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.register_button:
+                        goToRegisterActivity();
+                        break;
+                }
+            }
+        });
+    }
+
+    public void onForgotPasswordClick(View v) {
+        //click on forgot pasword
+        EditText email = findViewById(R.id.login_email);
+        String emailString = email.getText().toString();
+
+        String toastMsg = "";
+        if(emailString.equals("")) {
+            toastMsg = "Please enter email";
+        }else{
+            toastMsg = "We sent an email to " + emailString;
+        }
+
+        Context context = getApplicationContext();
+        CharSequence text = toastMsg;
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 }
