@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.event.application_list;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.messages.chat.ChatActivity;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
 public class QueueAdapter extends ArrayAdapter<String> {
 
@@ -56,6 +58,53 @@ public class QueueAdapter extends ArrayAdapter<String> {
             }
         });
 
+        imageView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v){
+                String name = "";
+                String surname = "";
+                String username = "";
+                String email = "";
+                int photoUrl = 0;
+
+                String nameFromList = names.get(position);
+                if(nameFromList.equals("Milan Škrbić")){
+                    name = "Milan";
+                    surname = "Skrbić";
+                    username = "shekrba";
+                    email = "milan@gmail.com";
+                    photoUrl = R.drawable.milan_skrbic;
+                } else if(nameFromList.equals("Igor Antolović")){
+                    name = "Igor";
+                    surname = "Antolović";
+                    username = "gori8";
+                    email = "igor@gmail.com";
+                    photoUrl = R.drawable.igor_antolovic;
+                } else if(nameFromList.equals("Stevan Vulić")){
+                    name = "Stevan";
+                    surname = "Vulić";
+                    username = "Vul4";
+                    email = "stevan@gmail.com";
+                    photoUrl = R.drawable.stevan_vulic;
+                }
+
+                goToUserProfileActivity(name, surname, username, email, photoUrl);
+            }
+        });
+
         return row;
+    }
+
+    public void goToUserProfileActivity(String name, String surname, String username, String email, int photoUrl){
+        ApplicationListActivity appListActivity = (ApplicationListActivity) context;
+        Intent intent = new Intent(appListActivity, UserProfileActivity.class);
+
+        intent.putExtra("name", name);
+        intent.putExtra("surname", surname);
+        intent.putExtra("username", username);
+        intent.putExtra("email", email);
+        intent.putExtra("email", email);
+        intent.putExtra("photoUrl", photoUrl);
+
+        appListActivity.startActivity(intent);
     }
 }
