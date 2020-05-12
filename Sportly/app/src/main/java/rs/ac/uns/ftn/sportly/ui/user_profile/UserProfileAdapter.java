@@ -1,4 +1,4 @@
-package rs.ac.uns.ftn.sportly.ui.favorites;
+package rs.ac.uns.ftn.sportly.ui.user_profile;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 import rs.ac.uns.ftn.sportly.R;
 
-public class FavoriteAdapter extends ArrayAdapter<String> {
+public class UserProfileAdapter extends ArrayAdapter<String> {
 
     private Context context;
     private List<String> names;
@@ -21,8 +21,8 @@ public class FavoriteAdapter extends ArrayAdapter<String> {
     private List<String> descriptions;
     private List<Float> ratings;
 
-    public FavoriteAdapter (Context c, List<String> n, List<Integer> i, List<String> d, List<Float> r){
-        super(c, R.layout.favorite_item, R.id.favorite_name, n);
+    public UserProfileAdapter (Context c, List<String> n, List<Integer> i, List<String> d, List<Float> r){
+        super(c, R.layout.ratings_item, R.id.ratings_name, n);
         this.context = c;
         this.names = n;
         this.images = i;
@@ -34,11 +34,11 @@ public class FavoriteAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View row = layoutInflater.inflate(R.layout.favorite_item, parent, false);
-        ImageView imageView = row.findViewById(R.id.favorite_image);
-        TextView textViewName = row.findViewById(R.id.favorite_name);
-        TextView textViewDescription = row.findViewById(R.id.favorite_description);
-        RatingBar ratingBar = row.findViewById(R.id.favorite_ratingBar);
+        View row = layoutInflater.inflate(R.layout.ratings_item, parent, false);
+        ImageView imageView = row.findViewById(R.id.ratings_image);
+        TextView textViewName = row.findViewById(R.id.ratings_name);
+        TextView textViewDescription = row.findViewById(R.id.ratings_description);
+        RatingBar ratingBar = row.findViewById(R.id.ratings_ratingBar);
 
         imageView.setImageResource(images.get(position));
         textViewName.setText(names.get(position));

@@ -48,12 +48,6 @@
         tools:layout="@layout/fragment_my_events" />
 
     <fragment
-        android:id="@+id/navigation_my_ratings"
-        android:name="rs.ac.uns.ftn.sportly.ui.my_ratings.MyRatingsFragment"
-        android:label="@string/title_my_ratings"
-        tools:layout="@layout/fragment_my_ratings" />
-
-    <fragment
         android:id="@+id/navigation_settings"
         android:name="rs.ac.uns.ftn.sportly.ui.settings.SettingsFragment"
         android:label="@string/title_settings"

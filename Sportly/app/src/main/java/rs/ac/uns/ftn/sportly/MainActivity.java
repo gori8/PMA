@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -17,8 +19,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     //TODO fragment se ponovo kreira kada se na toolbaru izabere vec selektovani!!!
 
@@ -27,6 +30,12 @@ public class MainActivity extends AppCompatActivity{
     BottomNavigationView bottomNavigationView;
     AppBarConfiguration appBarConfiguration;
     NavController navController;
+
+    String name;
+    String surname;
+    String username;
+    String email;
+    int photoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +61,7 @@ public class MainActivity extends AppCompatActivity{
                 .build();
 
         createOnClickListenerForSignOut();
+        fillDataBasedOnEmail();
     }
 
     @Override
@@ -133,5 +143,70 @@ public class MainActivity extends AppCompatActivity{
             System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    public void goToUserProfileActivity(String name, String surname, String username, String email, int photoUrl){
+        MainActivity mainActivity = (MainActivity) this;
+        Intent intent = new Intent(mainActivity, UserProfileActivity.class);
+
+        intent.putExtra("name", name);
+        intent.putExtra("surname", surname);
+        intent.putExtra("username", username);
+        intent.putExtra("email", email);
+        intent.putExtra("email", email);
+        intent.putExtra("photoUrl", photoUrl);
+
+        mainActivity.startActivity(intent);
+    }
+
+    public void onDrawerIconClick(View v) {
+        goToUserProfileActivity(name, surname, username, email, photoUrl);
+    }
+
+    //TEMP FUNCTION FOR FILLING DATA
+    public void fillDataBasedOnEmail(){
+        String current_email = LoginActivity.userEmail;
+        if(current_email.equals("None")){
+            return;
+        }
+
+        String stevanAccount = "stevan@gmail.com";
+        String stevanGoogle = "stevanvulic96@gmail.com";
+        String stevanFacebook = "stevafudbal@gmail.com";
+
+        String milanAccount = "milan@gmail.com";
+        String milanGoogle = "kickapoo889@gmail.com";
+        String milanFacebook = "kickapoo889@gmail.com";
+
+        String igorAccount = "igor@gmail.com";
+        String igorGoogle = "goriantolovic@gmail.com";
+        String igorFacebook = "goriantolovic@gmail.com";
+
+        ImageView drawerIcon = navigationView.getHeaderView(0).findViewById(R.id.main_drawer_icon);
+        TextView nameTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_title);
+        TextView emailTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_subTitle);
+
+        if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
+            name = "Stevan";
+            surname = "Vulic";
+            username = "Vul4";
+            photoUrl = R.drawable.stevan_vulic;
+        }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
+            name = "Milan";
+            surname = "Skrbic";
+            username = "shekrba";
+            photoUrl = R.drawable.milan_skrbic;
+        }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
+            name = "Igor";
+            surname = "Antolovic";
+            username = "gori8";
+            photoUrl = R.drawable.igor_antolovic;
+        }
+
+        email = current_email;
+
+        drawerIcon.setImageResource(photoUrl);
+        nameTV.setText(name + " " + surname);
+        emailTV.setText(email);
     }
 }

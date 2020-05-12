@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.sportly.ui.login;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -17,9 +18,14 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -28,9 +34,14 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
@@ -38,6 +49,7 @@ import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
+    public static String userEmail = "None";
 
     //----------GOOGLE----------
     public static final String GOOGLE = "Google";
@@ -88,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         setRegisterButtonClickEvent(registerButton);
     }
 
+    @SneakyThrows
     @Override
     protected void onStart() {
         super.onStart();
@@ -104,9 +117,15 @@ public class LoginActivity extends AppCompatActivity {
         if(googleAccount != null){
             // Signed in successfully with google, show authenticated UI.
             goToMainActivityIfLoginSuccess(GOOGLE);
+            userEmail = googleAccount.getEmail();
+            System.out.println("GOOGLE: " + userEmail);
         }else if(isLoggedInFacebook){
             // Signed in successfully with facebook, show authenticated UI.
             goToMainActivityIfLoginSuccess(FACEBOOK);
+
+            Map<String, String> facebookInfo = returnFacebookSignInParameters(accessToken);
+            userEmail = facebookInfo.get("email");
+            System.out.println("FACEBOOK: " + userEmail);
         }
     }
 
@@ -187,6 +206,9 @@ public class LoginActivity extends AppCompatActivity {
             // Signed in successfully, show authenticated UI.
             System.out.println("Google sign in success");
             goToMainActivityIfLoginSuccess(GOOGLE);
+            userEmail = account.getEmail();
+            System.out.println("GOOGLE: " + userEmail);
+
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -238,33 +260,46 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     //----------FACEBOOOK-FUNCTIONS----------
-    private List<String> returnFacebookSignInParameters(AccessToken accessToken){
-        List<String> data = new ArrayList<>();
+    private Map<String, String> returnFacebookSignInParameters(AccessToken accessToken) throws ExecutionException, InterruptedException {
+        Map<String, String> data = null;
+
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @SneakyThrows
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 //All parameters that we want
-                String email = object.getString(EMAIL);
-                data.add(email);
             }
         });
 
         Bundle parameters = new Bundle();
         parameters.putString("fields", "email");
         request.setParameters(parameters);
-        request.executeAsync();
+        GraphRequestAsyncTask task = request.executeAsync();
+        String json = task.get().get(0).getRawResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            data = objectMapper.readValue(json, new TypeReference<Map<String, String>>(){});
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         return data;
     }
 
     private void setFacebookButtonClickEvent(LoginButton mLoginButton){
         // Register a callback to respond to the user
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @SneakyThrows
             @Override
             public void onSuccess(LoginResult loginResult) {
                 //goToMainActivityIfLoginSuccess(FACEBOOK);
                 setResult(RESULT_OK);
                 System.out.println("Facebook sign in success");
+
+                AccessToken accessToken = loginResult.getAccessToken();
+                Map<String, String> facebookInfo = returnFacebookSignInParameters(accessToken);
+                userEmail = facebookInfo.get("email");
+                System.out.println("FACEBOOK: " + userEmail);
             }
 
             @Override
@@ -292,11 +327,18 @@ public class LoginActivity extends AppCompatActivity {
                 String email_txt = email.getText().toString();
                 String password_txt = password.getText().toString();
 
-                //validacija
-                if(email_txt.equals("test") && password_txt.equals("test")) {
-                    loadingView();
-                    goToMainActivityIfLoginSuccess(EMAIL_ACCOUNT);
-                    System.out.println("Email sign in success");
+                //TEMP VALIDATION
+                if(email_txt.equals("stevan@gmail.com") || email_txt.equals("milan@gmail.com") || email_txt.equals("igor@gmail.com")){
+                    if(password_txt.equals("test")) {
+                        loadingView();
+                        goToMainActivityIfLoginSuccess(EMAIL_ACCOUNT);
+                        userEmail = email_txt;
+                        System.out.println(userEmail);
+                        System.out.println("Email sign in success");
+                    }else{
+                        System.out.println("Email sign in error");
+                        showErrorMessageIfLoginFail("Log in failed. Please try again.");
+                    }
                 }else{
                     System.out.println("Email sign in error");
                     showErrorMessageIfLoginFail("Log in failed. Please try again.");

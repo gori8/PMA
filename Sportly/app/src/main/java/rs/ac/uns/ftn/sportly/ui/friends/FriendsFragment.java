@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 
 public class FriendsFragment extends Fragment {
@@ -49,7 +51,6 @@ public class FriendsFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_friends, container, false);
-
         return root;
     }
 
@@ -68,7 +69,40 @@ public class FriendsFragment extends Fragment {
 
         FriendsAdapter adapter = new FriendsAdapter(getContext(), names, images);
 
-        ListView listView = (ListView) getActivity().findViewById(R.id.friends_list);
+        ListView listView = (ListView) getView().findViewById(R.id.friends_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            String name = "";
+            String surname = "";
+            String username = "";
+            String email = "";
+            int photoUrl = 0;
+
+            String nameFromList = names.get(position);
+            if(nameFromList.equals("Milan Škrbić")){
+                name = "Milan";
+                surname = "Skrbic";
+                username = "shekrba";
+                email = "milan@gmail.com";
+                photoUrl = R.drawable.milan_skrbic;
+            } else if(nameFromList.equals("Igor Antolović")){
+                name = "Igor";
+                surname = "Antolovic";
+                username = "gori8";
+                email = "igor@gmail.com";
+                photoUrl = R.drawable.igor_antolovic;
+            } else if(nameFromList.equals("Stevan Vulić")){
+                name = "Stevan";
+                surname = "Vulic";
+                username = "Vul4";
+                email = "stevan@gmail.com";
+                photoUrl = R.drawable.stevan_vulic;
+            }
+
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
+        });
+
     }
 }
