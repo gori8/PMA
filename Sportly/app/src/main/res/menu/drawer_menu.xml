@@ -12,11 +12,6 @@
             android:title="@string/title_my_events" />
 
         <item
-            android:id="@+id/navigation_my_ratings"
-            android:icon="@drawable/ic_star_primary_24dp"
-            android:title="@string/title_my_ratings" />
-
-        <item
             android:id="@+id/navigation_settings"
             android:icon="@drawable/ic_settings_primary_24dp"
             android:title="@string/title_settings" />

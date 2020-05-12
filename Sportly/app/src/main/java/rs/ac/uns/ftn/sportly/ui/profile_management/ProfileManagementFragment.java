@@ -20,17 +20,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 
 public class ProfileManagementFragment extends Fragment {
     private String name;
     private String surname;
     private String gender;
     private String username;
+    private int photoUrl;
 
     private static final int CAMERA = 101;
     private static final int GALLERY = 102;
@@ -76,16 +81,15 @@ public class ProfileManagementFragment extends Fragment {
         Button saveButton = getView().findViewById(R.id.edit_profile_save_button);
         setSaveButtonClickEvent(saveButton);
 
-        //init data
-        name = "Stevan";
-        surname = "Vulic";
-        gender = "Male";
-        username = "vul4";
+        fillDataBasedOnEmail();
 
         setFieldsOnView();
     }
 
     public void setFieldsOnView(){
+        ImageView img = getView().findViewById(R.id.edit_profile_icon);
+        img.setImageResource(photoUrl);
+
         EditText nameEdit = getView().findViewById(R.id.edit_profile_name);
         EditText surnameEdit = getView().findViewById(R.id.edit_profile_surname);
         EditText usernameEdit = getView().findViewById(R.id.edit_profile_username);
@@ -239,5 +243,59 @@ public class ProfileManagementFragment extends Fragment {
         }
         cursor.moveToFirst();
         return cursor.getInt(0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.VISIBLE);
+    }
+
+    //TEMP FUNCTION FOR FILLING DATA
+    public void fillDataBasedOnEmail(){
+        String current_email = LoginActivity.userEmail;
+        if(current_email.equals("None")){
+            return;
+        }
+
+        String stevanAccount = "stevan@gmail.com";
+        String stevanGoogle = "stevanvulic96@gmail.com";
+        String stevanFacebook = "stevafudbal@gmail.com";
+
+        String milanAccount = "milan@gmail.com";
+        String milanGoogle = "kickapoo889@gmail.com";
+        String milanFacebook = "kickapoo889@gmail.com";
+
+        String igorAccount = "igor@gmail.com";
+        String igorGoogle = "goriantolovic@gmail.com";
+        String igorFacebook = "goriantolovic@gmail.com";
+
+        if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
+            name = "Stevan";
+            surname = "Vulic";
+            username = "Vul4";
+            photoUrl = R.drawable.stevan_vulic;
+            gender = "Male";
+        }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
+            name = "Milan";
+            surname = "Skrbic";
+            username = "shekrba";
+            photoUrl = R.drawable.milan_skrbic;
+            gender = "Male";
+        }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
+            name = "Igor";
+            surname = "Antolovic";
+            username = "gori8";
+            photoUrl = R.drawable.igor_antolovic;
+            gender = "Male";
+        }
     }
 }
