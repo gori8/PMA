@@ -5,7 +5,7 @@
     <string name="title_messages">Messages</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_friends">Friends</string>
-    <string name="title_favorites">Favorites</string>
+    <string name="title_favorites">Favourites</string>
     <string name="title_my_ratings">My Ratings</string>
     <string name="title_my_events">My Events</string>
     <string name="title_profile_management">Profile Management</string>
@@ -35,5 +35,9 @@
     </string-array>
     <string name="role_selection_label">Select your role:</string>
     <string name="search">Search</string>
+    <string name="basketball">Basketball</string>
+    <string name="football">Football</string>
+    <string name="tennis">Tennis</string>
+    <string name="all">All</string>
 
 </resources>

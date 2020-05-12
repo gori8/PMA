@@ -15,9 +15,7 @@
     <item
         android:id="@+id/navigation_map"
         android:icon="@drawable/ic_location_on_black_24dp"
-        android:title="@string/title_map"
-        app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="collapseActionView|ifRoom" />
+        android:title="@string/title_map" />
 
     <item
         android:id="@+id/navigation_notifications"

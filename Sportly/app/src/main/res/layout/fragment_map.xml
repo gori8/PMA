@@ -13,18 +13,89 @@
     sothree:umanoShadowHeight="4dp"
     >
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.map.MapFragment">
 
-        <LinearLayout
+
+        <!--LinearLayout
             android:id="@+id/map_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout-->
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="vertical"
+            class="com.google.android.gms.maps.SupportMapFragment">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="1"
+                android:layout_gravity="center|top"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+
+                    android:alpha="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/all"
+                        android:padding="5dp"
+                        android:layout_margin="10dp"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        />
+                    <Button
+                        android:id="@+id/btn_basketball"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/basketball"
+                        android:padding="5dp"
+                        android:layout_margin="10dp"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        />
+                    <Button
+                        android:id="@+id/btn_football"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/football"
+                        android:padding="5dp"
+                        android:layout_margin="10dp"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        />
+                    <Button
+                        android:id="@+id/btn_tennis"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/tennis"
+                        android:padding="5dp"
+                        android:layout_margin="10dp"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+        </fragment>
+
 
     <LinearLayout
         android:id="@+id/dragView"

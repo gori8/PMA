@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -55,6 +56,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,6 +88,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private GoogleMap map;
     private final String API_KEY_PLACES = "AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
     private String placeName;
+    private HashMap<String,Boolean> filterChecks = new HashMap<>();
+    private HashMap<String,ArrayList<Marker>> markersMap = new HashMap<>();
 
     public static MapFragment newInstance() {
 
@@ -102,6 +106,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         super.onCreate(savedInstanceState);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         setHasOptionsMenu(true);
+        markersMap.put("basketball",new ArrayList<>());
+        markersMap.put("football",new ArrayList<>());
+        markersMap.put("tennis",new ArrayList<>());
     }
 
     @Override
@@ -122,7 +129,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * Kada zelmo da dobijamo informacije o lokaciji potrebno je da specificiramo
      * po kom kriterijumu zelimo da dobijamo informacije GSP, MOBILNO(WIFI, MObilni internet), GPS+MOBILNO
      * **/
-    private void createMapFragmentAndInflate() {
+    private void createMapFragmentAndInflate(View view) {
         if(map==null) {
             //specificiramo krijterijum da dobijamo informacije sa svih izvora
             //ako korisnik to dopusti
@@ -133,11 +140,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             provider = locationManager.getBestProvider(criteria, true);
 
             //kreiramo novu instancu fragmenta
-            mMapFragment = SupportMapFragment.newInstance();
+            mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
 
             //i vrsimo zamenu trenutnog prikaza sa prikazom mape
-            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.replace(R.id.map_container, mMapFragment).commit();
+            //FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            //transaction.replace(R.id.map_container, mMapFragment).commit();
 
             //pozivamo ucitavnje mape.
             //VODITI RACUNA OVO JE ASINHRONA OPERACIJA
@@ -192,6 +200,113 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 mainActivity.startActivity(intent);
             }
         });
+
+        Button btnAll = view.findViewById(R.id.btn_all);
+        filterChecks.put("all",true);
+
+        Button btnBasketball = view.findViewById(R.id.btn_basketball);
+        filterChecks.put("basketball",true);
+
+        Button btnFootball = view.findViewById(R.id.btn_football);
+        filterChecks.put("football",true);
+
+        Button btnTennis = view.findViewById(R.id.btn_tennis);
+        filterChecks.put("tennis",true);
+
+        btnAll.setOnClickListener(v -> {
+
+            if(filterChecks.get("all")) {
+                uncheckButton(btnAll,"all");
+                uncheckButton(btnBasketball,"basketball");
+                uncheckButton(btnFootball,"football");
+                uncheckButton(btnTennis,"tennis");
+            }else{
+                checkButton(btnAll,"all");
+                checkButton(btnBasketball,"basketball");
+                checkButton(btnFootball,"football");
+                checkButton(btnTennis,"tennis");
+            }
+        });
+
+        btnBasketball.setOnClickListener(v -> {
+
+            if(filterChecks.get("basketball")) {
+                uncheckButton(btnAll,"all");
+                uncheckButton(btnBasketball,"basketball");
+            }else{
+                checkButton(btnBasketball,"basketball");
+                if(checkIfAllChecked()){
+                    checkButton(btnAll,"all");
+                }
+            }
+        });
+
+        btnFootball.setOnClickListener(v -> {
+
+            if(filterChecks.get("football")) {
+                uncheckButton(btnAll,"all");
+                uncheckButton(btnFootball,"football");
+            }else{
+                checkButton(btnFootball,"football");
+                if(checkIfAllChecked()){
+                    checkButton(btnAll,"all");
+                }
+            }
+        });
+
+        btnTennis.setOnClickListener(v -> {
+
+            if(filterChecks.get("tennis")) {
+                uncheckButton(btnAll,"all");
+                uncheckButton(btnTennis,"tennis");
+            }else{
+                checkButton(btnTennis,"tennis");
+                if(checkIfAllChecked()){
+                    checkButton(btnAll,"all");
+                }
+            }
+        });
+
+    }
+
+    private boolean checkIfAllChecked(){
+        boolean ret = true;
+        for(String key : filterChecks.keySet()){
+            if(key.equals("all")){
+                continue;
+            }
+            boolean check = filterChecks.get(key);
+            if(!check){
+                ret = false;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    private void checkButton(Button btn, String key){
+        btn.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
+        btn.setTextColor(Color.WHITE);
+        filterChecks.put(key,true);
+        if(!key.equals("all")) {
+            ArrayList<Marker> markers = markersMap.get(key);
+            for (Marker marker : markers) {
+                marker.setVisible(true);
+            }
+        }
+    }
+
+    private void uncheckButton(Button btn, String key){
+        btn.setBackgroundColor(Color.WHITE);
+        btn.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
+        filterChecks.put(key,false);
+        if(!key.equals("all")) {
+            ArrayList<Marker> markers = markersMap.get(key);
+            for (Marker marker : markers) {
+                marker.setVisible(false);
+            }
+        }
     }
 
     private void setUpDatePicker(){
@@ -240,7 +355,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onResume() {
         super.onResume();
 
-        createMapFragmentAndInflate();
 
 
 
@@ -274,7 +388,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_map, vg, false);
         slidingPanel = view.findViewById(R.id.sliding_layout);
-
+        createMapFragmentAndInflate(view);
 
 
         return view;
@@ -402,6 +516,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
         Location location = null;
 
         if (checkLocationPermission()) {
@@ -428,6 +543,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 
+        //Basketball
         Call<ResponseBody> call = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"basketball court");
 
         call.enqueue(new Callback<ResponseBody>() {
@@ -439,9 +555,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     JsonNode resultsListJSON = responseJSON.get("results");
                     ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
                     Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
+                    ArrayList<Marker> markers = markersMap.get("basketball");
                     for (PlaceDTO place : placesList) {
                         Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_basketball));
                         marker.setTag(place);
+                        markers.add(marker);
                     }
                 }else{
                     Log.e("MapFragment","Meesage recieved: "+response.code());
@@ -454,6 +572,63 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         });
 
+        //Football
+        Call<ResponseBody> footballCall = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"football court");
+
+        footballCall.enqueue(new Callback<ResponseBody>() {
+            @SneakyThrows
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200){
+                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
+                    JsonNode resultsListJSON = responseJSON.get("results");
+                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
+                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
+                    ArrayList<Marker> markers = markersMap.get("football");
+                    for (PlaceDTO place : placesList) {
+                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_football));
+                        marker.setTag(place);
+                        markers.add(marker);
+                    }
+                }else{
+                    Log.e("MapFragment","Meesage recieved: "+response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
+            }
+        });
+
+        //Tennis
+        Call<ResponseBody> tennisCall = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"tennis court");
+
+        tennisCall.enqueue(new Callback<ResponseBody>() {
+            @SneakyThrows
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200){
+                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
+                    JsonNode resultsListJSON = responseJSON.get("results");
+                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
+                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
+                    ArrayList<Marker> markers = markersMap.get("tennis");
+                    for (PlaceDTO place : placesList) {
+                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
+                        marker.setTag(place);
+                        markers.add(marker);
+                    }
+                }else{
+                    Log.e("MapFragment","Meesage recieved: "+response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
+            }
+        });
 
 
 
@@ -484,7 +659,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(loc).zoom(14).build();
 
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
