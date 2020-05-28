@@ -48,12 +48,18 @@ public class ChatActivity extends AppCompatActivity {
             messages.add(new Message("Hoces na basket u petak?", false));
             messages.add(new Message("Vazi, mozemo se prijaviti u petak.", true));
         }
-        else{
+        else if (personUsername.equals("Stevan Vulić")){
             name = "Stevan Vulić";
             image = R.drawable.stevan_vulic;
 
             messages.add(new Message("Cao :)", true));
             messages.add(new Message("Pozdrav!", false));
+        }else{
+            name = "Igor Antolović";
+            image = R.drawable.igor_antolovic;
+
+            messages.add(new Message("Gde si? :)", true));
+            messages.add(new Message("Evo me, sta ima?", false));
         }
 
         TextView textViewName = toolbar.findViewById(R.id.name);

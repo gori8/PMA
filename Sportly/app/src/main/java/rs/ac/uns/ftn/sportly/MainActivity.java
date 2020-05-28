@@ -210,17 +210,17 @@ public class MainActivity extends AppCompatActivity {
 
         if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
             name = "Stevan";
-            surname = "Vulic";
+            surname = "Vulić";
             username = "Vul4";
             photoUrl = R.drawable.stevan_vulic;
         }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
             name = "Milan";
-            surname = "Skrbic";
+            surname = "Skrbić";
             username = "shekrba";
             photoUrl = R.drawable.milan_skrbic;
         }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
             name = "Igor";
-            surname = "Antolovic";
+            surname = "Antolović";
             username = "gori8";
             photoUrl = R.drawable.igor_antolovic;
         }
