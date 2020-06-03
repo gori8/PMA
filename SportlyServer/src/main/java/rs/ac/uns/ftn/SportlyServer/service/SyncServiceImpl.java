@@ -88,6 +88,7 @@ public class SyncServiceImpl implements SyncService {
                     eventDTO.setPrice(event.getPrice());
                     eventDTO.setNumbOfPpl(event.getNumbOfPpl());
                     eventDTO.setCurr(event.getCurr());
+                    eventDTO.setDescription(event.getDescription());
 
                     sfDTO.getEvents().add(eventDTO);
                 }

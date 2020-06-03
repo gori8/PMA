@@ -29,6 +29,8 @@ public class Event {
 
     private String curr;
 
+    private String description;
+
     @ManyToOne(fetch = FetchType.EAGER)
     protected User creator;
 
