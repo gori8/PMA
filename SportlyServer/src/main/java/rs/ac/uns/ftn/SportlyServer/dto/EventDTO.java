@@ -8,7 +8,10 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventDTO {
+public class EventDTO implements Comparable<EventDTO> {
+
+    private Long id;
+
     private Date timeFrom;
 
     private Date timeTo;
@@ -18,4 +21,9 @@ public class EventDTO {
     private double price;
 
     private String curr;
+
+    @Override
+    public int compareTo(EventDTO e) {
+        return getTimeFrom().compareTo(e.getTimeFrom());
+    }
 }

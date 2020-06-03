@@ -9,6 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FriendDTO {
 
+    private Long id;
+
     private String username;
 
     private String firstName;

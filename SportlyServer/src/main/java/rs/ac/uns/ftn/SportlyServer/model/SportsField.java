@@ -28,4 +28,7 @@ public class SportsField {
 
     @ManyToMany(mappedBy = "favourite")
     private List<User> users = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sportsField")
+    private List<Event> events = new ArrayList<>();
 }

@@ -32,6 +32,9 @@ public class Event {
     @ManyToOne(fetch = FetchType.EAGER)
     protected User creator;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    protected SportsField sportsField;
+
     @ManyToMany(mappedBy = "participantEvents")
     private List<User> participants = new ArrayList<>();
 }
