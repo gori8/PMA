@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         //----------GOOGLE----------
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestIdToken("985432247508-ku5dtbds3eul9j9mf3mdrhlr6fhborho.apps.googleusercontent.com")
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
@@ -123,7 +124,14 @@ public class LoginActivity extends AppCompatActivity {
             // Signed in successfully with facebook, show authenticated UI.
             goToMainActivityIfLoginSuccess(FACEBOOK);
 
-            Map<String, String> facebookInfo = returnFacebookSignInParameters(accessToken);
+            Map<String, String> facebookInfo = null;
+            try {
+                facebookInfo = returnFacebookSignInParameters(accessToken);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             userEmail = facebookInfo.get("email");
             System.out.println("FACEBOOK: " + userEmail);
         }
@@ -207,7 +215,10 @@ public class LoginActivity extends AppCompatActivity {
             System.out.println("Google sign in success");
             goToMainActivityIfLoginSuccess(GOOGLE);
             userEmail = account.getEmail();
-            System.out.println("GOOGLE: " + userEmail);
+            System.out.println("GOOGLE EMAIL: " + userEmail);
+            System.out.println("GOOGLE ID: " + account.getId());
+            System.out.println("GOOGLE ID TOKEN: " + account.getIdToken());
+            System.out.println("GOOGLE SERVER AUTH CODE: " + account.getServerAuthCode());
 
 
         } catch (ApiException e) {
@@ -268,6 +279,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 //All parameters that we want
+                System.out.println("onCompleted jsonObject: " + object);
+                System.out.println("onCompleted response: " + response);
             }
         });
 
@@ -297,9 +310,17 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println("Facebook sign in success");
 
                 AccessToken accessToken = loginResult.getAccessToken();
-                Map<String, String> facebookInfo = returnFacebookSignInParameters(accessToken);
+                System.out.println("FACEBOOK TOKEN: " + accessToken.getToken());
+                Map<String, String> facebookInfo = null;
+                try {
+                    facebookInfo = returnFacebookSignInParameters(accessToken);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 userEmail = facebookInfo.get("email");
-                System.out.println("FACEBOOK: " + userEmail);
+                System.out.println("FACEBOOK EMAIL: " + userEmail);
             }
 
             @Override
