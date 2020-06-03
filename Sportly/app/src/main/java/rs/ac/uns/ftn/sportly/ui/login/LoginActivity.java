@@ -311,6 +311,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 AccessToken accessToken = loginResult.getAccessToken();
                 System.out.println("FACEBOOK TOKEN: " + accessToken.getToken());
+                System.out.println("FACEBOOK USER ID: " + accessToken.getUserId());
                 Map<String, String> facebookInfo = null;
                 try {
                     facebookInfo = returnFacebookSignInParameters(accessToken);

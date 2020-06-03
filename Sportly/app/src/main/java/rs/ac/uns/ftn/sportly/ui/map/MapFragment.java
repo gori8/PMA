@@ -533,8 +533,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         LatLng latLngForSearch = new LatLng(45.253513,19.829127);
 
-        //location.setLatitude(latLngForSearch.latitude);
-        //location.setLongitude(latLngForSearch.longitude);
+        location.setLatitude(latLngForSearch.latitude);
+        location.setLongitude(latLngForSearch.longitude);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -721,7 +721,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         events.add(event2);
 
         EventsAdapter adapter = new EventsAdapter(getContext(), events);
-
         ListView listView = (ListView) getActivity().findViewById(R.id.events_list);
         listView.setAdapter(adapter);
 

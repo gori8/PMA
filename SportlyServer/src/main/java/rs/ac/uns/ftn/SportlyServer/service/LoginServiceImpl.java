@@ -10,12 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import rs.ac.uns.ftn.SportlyServer.dto.FacebookRequest;
+import rs.ac.uns.ftn.SportlyServer.dto.FacebookResponse;
 import rs.ac.uns.ftn.SportlyServer.dto.GoogleRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.UserDTO;
 import rs.ac.uns.ftn.SportlyServer.model.Authority;
@@ -50,12 +55,15 @@ public class LoginServiceImpl implements  LoginService{
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
 
     @Override
     public User checkCredentials(JwtAuthenticationRequest request) {
-        User user=userRepository.findOneByUsername(request.getUsername());
+        User user=userRepository.findByEmail(request.getUsername());
         if(user!=null){
             if(passwordEncoder.matches(request.getPassword(),user.getPassword())){
                 return user;
@@ -69,7 +77,7 @@ public class LoginServiceImpl implements  LoginService{
     public UserDTO register(UserDTO userDTO) throws RollbackException {
         User user = new User();
 
-        if(userRepository.findOneByUsername(userDTO.getUsername()) != null){
+        if(userRepository.findByEmail(userDTO.getUsername()) != null){
             userDTO.setId(null);
             return userDTO;
         }
@@ -77,7 +85,6 @@ public class LoginServiceImpl implements  LoginService{
         user.setLastName(userDTO.getPrezime());
         user.setEnabled(true);
         user.setFirstName(userDTO.getIme());
-        user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         Authority authority = authorityRepository.findOneByName("ROLE_USER");
@@ -93,7 +100,7 @@ public class LoginServiceImpl implements  LoginService{
 
     @Override
     public UserDTO login(JwtAuthenticationRequest request) {
-        User user=userRepository.findOneByUsername(request.getUsername());
+        User user=userRepository.findByEmail(request.getUsername());
         if(user!=null){
             if(passwordEncoder.matches(request.getPassword(),user.getPassword())){
                 String jwt = tokenUtils.generateToken(request.getUsername());
@@ -110,7 +117,7 @@ public class LoginServiceImpl implements  LoginService{
 
     @Override
     public void changePassword(String oldPassword, String newPassword, String username) throws Exception{
-        User user= userRepository.findOneByUsername(username);
+        User user= userRepository.findByEmail(username);
         if(passwordEncoder.matches(oldPassword,user.getPassword())){
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
@@ -122,8 +129,8 @@ public class LoginServiceImpl implements  LoginService{
     @Override
     public UserDTO refreshAuthenticationToken(HttpServletRequest request){
         String token = tokenUtils.getToken(request);
-        String username = this.tokenUtils.getUsernameFromToken(token);
-        User user = (User) userRepository.findOneByUsername(username);
+        String username = this.tokenUtils.getEmailFromToken(token);
+        User user = (User) userRepository.findByEmail(username);
         if (this.tokenUtils.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
             String refreshedToken = tokenUtils.refreshToken(token);
             int expiresIn = tokenUtils.getExpiredIn();
@@ -139,7 +146,7 @@ public class LoginServiceImpl implements  LoginService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findOneByUsername(username);
+        User user = userRepository.findByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         } else {
@@ -158,7 +165,6 @@ public class LoginServiceImpl implements  LoginService{
                 //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
                 .build();
 
-// (Receive idTokenString by HTTPS POST)
 
         GoogleIdToken idToken = verifier.verify(googleRequest.getIdToken());
         if (idToken != null) {
@@ -178,13 +184,13 @@ public class LoginServiceImpl implements  LoginService{
             String givenName = (String) payload.get("given_name");
 
             logger.info("---------------------------------- GOOGLE DATA ----------------------------------");
-            logger.info("Email: ",email);
-            logger.info("Name: ",name);
-            logger.info("Email verified: ",emailVerified);
-            logger.info("Picture url: ",pictureUrl);
-            logger.info("Locale: ",locale);
-            logger.info("Familiy name: ",familyName);
-            logger.info("Given name: ",givenName);
+            logger.info("Email: " + email);
+            logger.info("Name: " + name);
+            logger.info("Email verified: " + emailVerified);
+            logger.info("Picture url: " + pictureUrl);
+            logger.info("Locale: " + locale);
+            logger.info("Familiy name: " + familyName);
+            logger.info("Given name: " + givenName);
 
             UserDTO ret =new UserDTO();
             ret.setEmail(email);
@@ -201,6 +207,32 @@ public class LoginServiceImpl implements  LoginService{
         }
 
         return null;
+    }
+
+
+    @Override
+    public UserDTO loginFacebook(FacebookRequest facebookRequest) {
+
+
+        ResponseEntity<FacebookResponse> facebookResponseResponseEntity = restTemplate.getForEntity("https://graph.facebook.com/v7.0/"+facebookRequest.getUserId()+"?fields=id,name,email"+"&access_token="+facebookRequest.getToken(), FacebookResponse.class);
+
+        FacebookResponse facebookResponse = facebookResponseResponseEntity.getBody();
+
+        logger.info("---------------------------------- FACEBOOK DATA ----------------------------------");
+        logger.info("Email: " + facebookResponse.getEmail());
+        logger.info("Name: " + facebookResponse.getName());
+        logger.info("Id: " + facebookResponse.getId());
+
+
+        UserDTO ret =new UserDTO();
+        ret.setEmail(facebookResponse.getEmail());
+        ret.setIme(facebookResponse.getName());
+        String jwt = tokenUtils.generateToken(facebookResponse.getEmail());
+        int expiresIn = tokenUtils.getExpiredIn();
+        ret.setExpiresIn(expiresIn);
+        ret.setToken(jwt);
+
+        return ret;
     }
 
 }

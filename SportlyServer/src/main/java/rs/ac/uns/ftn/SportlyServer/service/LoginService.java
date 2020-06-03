@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.service;
 
 
 import org.springframework.security.core.userdetails.UserDetailsService;
+import rs.ac.uns.ftn.SportlyServer.dto.FacebookRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.GoogleRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.UserDTO;
 import rs.ac.uns.ftn.SportlyServer.model.User;
@@ -21,5 +22,6 @@ public interface LoginService extends UserDetailsService {
     void changePassword(String oldPassword, String newPassword, String username) throws Exception;
     UserDTO refreshAuthenticationToken(HttpServletRequest request);
     UserDTO loginGoogle(GoogleRequest googleRequest) throws GeneralSecurityException, IOException;
+    UserDTO loginFacebook(FacebookRequest facebookRequest);
 
 }

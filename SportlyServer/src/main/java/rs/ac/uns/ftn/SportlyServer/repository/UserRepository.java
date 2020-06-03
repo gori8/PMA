@@ -7,6 +7,6 @@ import rs.ac.uns.ftn.SportlyServer.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findOneByUsername(String username);
+    User findByEmail(String email);
 
 }

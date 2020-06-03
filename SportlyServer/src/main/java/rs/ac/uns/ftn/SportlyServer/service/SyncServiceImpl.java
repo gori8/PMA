@@ -30,7 +30,7 @@ public class SyncServiceImpl implements SyncService {
 
 
         //USER DATA
-        User user = userRepository.findOneByUsername(username);
+        User user = userRepository.findByEmail(username);
 
         for (User friend : user.getFriends()) {
             FriendDTO friendDTO = new FriendDTO();

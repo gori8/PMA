@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import rs.ac.uns.ftn.SportlyServer.dto.FacebookRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.GoogleRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.UserDTO;
 import rs.ac.uns.ftn.SportlyServer.security.TokenUtils;
@@ -17,6 +18,7 @@ import rs.ac.uns.ftn.SportlyServer.service.LoginServiceImpl;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,8 +44,9 @@ public class AuthController {
 
     }
 
-    @RequestMapping(value = "/standard/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationTokenGoogle(@RequestBody GoogleRequest googleRequest) throws AuthenticationException, IOException {
+
+    @RequestMapping(value = "/google/login", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationTokenGoogle(@RequestBody GoogleRequest googleRequest) throws AuthenticationException, IOException, GeneralSecurityException {
 
         UserDTO user=loginService.loginGoogle(googleRequest);
         if(user!=null){
@@ -54,6 +57,21 @@ public class AuthController {
         }
 
     }
+
+
+    @RequestMapping(value = "/facebook/login", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationTokenFacebook(@RequestBody FacebookRequest facebookRequest) throws AuthenticationException, IOException, GeneralSecurityException {
+
+        UserDTO user=loginService.loginFacebook(facebookRequest);
+        if(user!=null){
+            // Vrati user-a sa tokenom kao odgovor na uspesno autentifikaciju
+            return ResponseEntity.ok(user);
+        }else{
+            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public UserDTO register(@RequestBody UserDTO userDTO)

@@ -91,7 +91,7 @@ public class TokenUtils {
 
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		User user = (User) userDetails;
-		final String username = getUsernameFromToken(token);
+		final String username = getEmailFromToken(token);
 		final Date created = getIssuedAtDateFromToken(token);
 
 		return (username != null && username.equals(userDetails.getUsername())
@@ -127,7 +127,7 @@ public class TokenUtils {
 		return claims;
 	}
 
-	public String getUsernameFromToken(String token) {
+	public String getEmailFromToken(String token) {
 		String username;
 		try {
 			final Claims claims = this.getAllClaimsFromToken(token);

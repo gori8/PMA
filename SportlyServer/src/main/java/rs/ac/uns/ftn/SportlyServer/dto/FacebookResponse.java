@@ -7,10 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FacebookRequest {
+public class FacebookResponse {
 
-    private String userId;
+    String name;
 
-    private String token;
+    String id;
+
+    String email;
 
 }
