@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 
 @Entity
 @NoArgsConstructor
@@ -18,6 +20,8 @@ public class Notification {
     private Long id;
 
     private String content;
+
+    private Date date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     protected User user;

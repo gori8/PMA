@@ -522,12 +522,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         if (checkLocationPermission()) {
             if (ContextCompat.checkSelfPermission(getContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
                 //Request location updates:
                 location = locationManager.getLastKnownLocation(provider);
             }else if(ContextCompat.checkSelfPermission(getContext(),
                     Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
                 //Request location updates:
                 location = locationManager.getLastKnownLocation(provider);
             }
@@ -535,8 +533,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         LatLng latLngForSearch = new LatLng(45.253513,19.829127);
 
-        location.setLatitude(latLngForSearch.latitude);
-        location.setLongitude(latLngForSearch.longitude);
+        //location.setLatitude(latLngForSearch.latitude);
+        //location.setLongitude(latLngForSearch.longitude);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
