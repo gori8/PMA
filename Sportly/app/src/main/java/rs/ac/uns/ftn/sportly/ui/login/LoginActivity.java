@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.sportly.ui.login;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.FaceDetector;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -43,8 +44,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import lombok.SneakyThrows;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
+import rs.ac.uns.ftn.sportly.dto.UserDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -66,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
     //----------EMAIL----------
     public static final int EMAIL_SIGN_IN = 135;
     public static final String EMAIL_ACCOUNT = "Account";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,6 +230,7 @@ public class LoginActivity extends AppCompatActivity {
             System.out.println("GOOGLE ID TOKEN: " + account.getIdToken());
             System.out.println("GOOGLE SERVER AUTH CODE: " + account.getServerAuthCode());
 
+            postGoogleToken(account.getEmail(), account.getIdToken());
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -266,6 +277,32 @@ public class LoginActivity extends AppCompatActivity {
                         signIn();
                         break;
                 }
+            }
+        });
+    }
+
+    private void postGoogleToken(String email, String idToken){
+        GoogleRequestDTO dto = new GoogleRequestDTO();
+        dto.setEmail(email);
+        dto.setIdToken(idToken);
+
+        Call<UserDTO> call = SportlyServerServiceUtils.sportlyServerService.postGoogleToken(dto);
+        call.enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.code() == 200){
+                        /*
+                        TODO: Save to DB
+                         */
+                    UserDTO userDTO = response.body();
+                }else{
+                    Log.d("REZ","Meesage recieved: "+response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
             }
         });
     }
@@ -322,6 +359,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 userEmail = facebookInfo.get("email");
                 System.out.println("FACEBOOK EMAIL: " + userEmail);
+
+                postFacebookToken(accessToken.getUserId(), accessToken.getToken());
             }
 
             @Override
@@ -339,6 +378,33 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void postFacebookToken(String userId, String token){
+        FacebookRequestDTO dto = new FacebookRequestDTO();
+        dto.setUserId(userId);
+        dto.setToken(token);
+
+        Call<UserDTO> call = SportlyServerServiceUtils.sportlyServerService.postFacebookToken(dto);
+        call.enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.code() == 200){
+                        /*
+                        TODO: Save to DB
+                         */
+                    UserDTO userDTO = response.body();
+                }else{
+                    Log.d("REZ","Meesage recieved: "+response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
+            }
+        });
+    }
+
     //----------EMAIL-FUNCTIONS----------
     private void setEmailButtonClickEvent(Button signInButton){
         // Register a callback to respond to the user
