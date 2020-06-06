@@ -85,7 +85,6 @@ public class LoginServiceImpl implements  LoginService{
         user.setLastName(userDTO.getPrezime());
         user.setEnabled(true);
         user.setFirstName(userDTO.getIme());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         Authority authority = authorityRepository.findOneByName("ROLE_USER");
         List<Authority> authorities = new ArrayList<>();

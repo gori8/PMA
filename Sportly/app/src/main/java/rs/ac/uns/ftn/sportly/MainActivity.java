@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     AppBarConfiguration appBarConfiguration;
     NavController navController;
 
+    public static String SYNC_DATA = "SYNC_DATA";
+
 
     String name;
     String surname;
