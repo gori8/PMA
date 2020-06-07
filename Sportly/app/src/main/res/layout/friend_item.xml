@@ -25,15 +25,31 @@
         android:orientation="vertical"
         android:layout_gravity="center_vertical">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Name"
-            android:textColor="@color/name"
-            android:layout_margin="5dp"
-            android:textSize="25dp"
-            android:paddingLeft="10dp"
-            android:id="@+id/friend_name"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="First"
+                android:textColor="@color/name"
+                android:layout_margin="5dp"
+                android:textSize="25dp"
+                android:paddingLeft="10dp"
+                android:id="@+id/firstName"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last"
+                android:textColor="@color/name"
+                android:layout_margin="5dp"
+                android:textSize="25dp"
+                android:id="@+id/lastName"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <ImageButton

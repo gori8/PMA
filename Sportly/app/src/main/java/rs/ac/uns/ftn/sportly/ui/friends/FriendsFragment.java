@@ -1,6 +1,8 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
 import android.app.Activity;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,14 +21,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.database.SportlySQLiteHelper;
 
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private SimpleCursorAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,18 +68,11 @@ public class FriendsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        List<String> names = new ArrayList<>();
-        names.add("Milan Škrbić");
-        names.add("Igor Antolović");
-        names.add("Stevan Vulić");
-
-        List<Integer> images = new ArrayList<>();
-        images.add(R.drawable.milan_skrbic);
-        images.add(R.drawable.igor_antolovic);
-        images.add(R.drawable.stevan_vulic);
-
-        FriendsAdapter adapter = new FriendsAdapter(getContext(), names, images);
-
+        getLoaderManager().initLoader(0, null, this);
+        String[] from = new String[] { DataBaseTables.FRIENDS_FIRST_NAME, DataBaseTables.FRIENDS_LAST_NAME };
+        int[] to = new int[] {R.id.firstName, R.id.lastName};
+        adapter = new SimpleCursorAdapter(getActivity(), R.layout.friend_item, null, from,
+                to, 0);
         ListView listView = (ListView) getView().findViewById(R.id.friends_list);
         listView.setAdapter(adapter);
 
@@ -79,7 +83,7 @@ public class FriendsFragment extends Fragment {
             String email = "";
             int photoUrl = 0;
 
-            String nameFromList = names.get(position);
+            /*String nameFromList = names.get(position);
             if(nameFromList.equals("Milan Škrbić")){
                 name = "Milan";
                 surname = "Skrbic";
@@ -98,11 +102,38 @@ public class FriendsFragment extends Fragment {
                 username = "Vul4";
                 email = "stevan@gmail.com";
                 photoUrl = R.drawable.stevan_vulic;
-            }
+            }*/
 
             MainActivity mainActivity = (MainActivity) getActivity();
             mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
         });
 
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] allColumns = {
+                DataBaseTables.ID,
+                DataBaseTables.FRIENDS_FIRST_NAME,
+                DataBaseTables.FRIENDS_LAST_NAME,
+                DataBaseTables.FRIENDS_EMAIL,
+                DataBaseTables.FRIENDS_USERNAME,
+                DataBaseTables.SERVER_ID
+        };
+
+        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                allColumns, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }

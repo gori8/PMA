@@ -26,6 +26,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //TODO: Samo provera, treba napraviti da se servis pokrece na tajmer
+        startService(new Intent(this, SyncDataService.class));
+        System.out.println("INTENT CREATED");
 
         init();
 
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fillDataBasedOnEmail();
-
     }
 
     @Override

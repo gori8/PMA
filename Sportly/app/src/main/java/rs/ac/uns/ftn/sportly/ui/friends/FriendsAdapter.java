@@ -22,7 +22,7 @@ public class FriendsAdapter extends ArrayAdapter<String> {
     private List<Integer> images;
 
     FriendsAdapter (Context c, List<String> n, List<Integer> i){
-        super(c, R.layout.friend_item, R.id.friend_name, n);
+        super(c, R.layout.friend_item, R.id.firstName, n);
         this.context = c;
         this.names = n;
         this.images = i;
@@ -34,7 +34,7 @@ public class FriendsAdapter extends ArrayAdapter<String> {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = layoutInflater.inflate(R.layout.friend_item, parent, false);
         ImageView imageView = row.findViewById(R.id.friend_image);
-        TextView textView = row.findViewById(R.id.friend_name);
+        TextView textView = row.findViewById(R.id.firstName);
 
         imageView.setImageResource(images.get(position));
         textView.setText(names.get(position));
