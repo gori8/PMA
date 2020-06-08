@@ -36,7 +36,7 @@ import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
 
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private SimpleCursorAdapter adapter;
+    private FavoriteCursorAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,10 +72,14 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         super.onActivityCreated(savedInstanceState);
 
         getLoaderManager().initLoader(0, null, this);
-        String[] from = new String[] { DataBaseTables.SPORTSFIELDS_NAME, DataBaseTables.SPORTSFIELDS_DESCRIPTION };
-        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description};
-        adapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
-                to, 0);
+        String[] from = new String[] {
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                DataBaseTables.SPORTSFIELDS_RATING
+        };
+        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description, R.id.favorite_ratingBar};
+        adapter = new FavoriteCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
+                to);
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
@@ -91,6 +95,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                 DataBaseTables.SPORTSFIELDS_FAVORITE,
                 DataBaseTables.SPORTSFIELDS_LATITUDE,
                 DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                DataBaseTables.SPORTSFIELDS_RATING,
                 DataBaseTables.SERVER_ID
         };
 

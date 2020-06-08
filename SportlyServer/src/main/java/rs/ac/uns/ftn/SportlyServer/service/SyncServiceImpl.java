@@ -77,6 +77,7 @@ public class SyncServiceImpl implements SyncService {
             sfDTO.setDescription(sportsField.getDescription());
             sfDTO.setLongitude(sportsField.getLongitude());
             sfDTO.setLatitude(sportsField.getLatitude());
+            sfDTO.setRating(sportsField.getRating());
             sfDTO.setEvents(new ArrayList<EventDTO>());
 
             for (Event event : sportsField.getEvents()){
