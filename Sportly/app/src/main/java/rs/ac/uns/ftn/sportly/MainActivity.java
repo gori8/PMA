@@ -1,8 +1,12 @@
 package rs.ac.uns.ftn.sportly;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +16,7 @@ import android.widget.Button;
 
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -43,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static String SYNC_DATA = "SYNC_DATA";
 
+    private PendingIntent pendingIntent;
+
+    private AlarmManager manager;
+
 
     String name;
     String surname;
@@ -56,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO: Samo provera, treba napraviti da se servis pokrece na tajmer
-        startService(new Intent(this, SyncDataService.class));
-        System.out.println("INTENT CREATED");
+        Intent alarmIntent = new Intent(this, SyncDataService.class);
+        pendingIntent = PendingIntent.getService(this, 888, alarmIntent, 0);
+
+        manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
         init();
 
@@ -238,4 +248,30 @@ public class MainActivity extends AppCompatActivity {
         nameTV.setText(name + " " + surname);
         emailTV.setText(email);
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 20*1000, pendingIntent);
+    }
+
+
+
+
+    @Override
+    protected void onPause() {
+        if (manager != null) {
+            manager.cancel(pendingIntent);
+        }
+        Log.i("MAIN ACTIVITY","ACTIVITY MAIN PAUSED");
+
+        super.onPause();
+    }
+
+
+
+
 }

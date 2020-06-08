@@ -77,10 +77,11 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            String name = "";
-            String surname = "";
-            String username = "";
-            String email = "";
+            Cursor cursor = (Cursor)adapter.getItem(position);
+            String name = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_FIRST_NAME));
+            String surname = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_LAST_NAME));
+            String username = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_FIRST_NAME));
+            String email = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_EMAIL));
             int photoUrl = 0;
 
             /*String nameFromList = names.get(position);

@@ -10,6 +10,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <service android:name="rs.ac.uns.ftn.sportly.sync.SyncDataService" />
+
+
         <activity
             android:name=".ui.event.create_event.CreateEventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
