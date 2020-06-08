@@ -20,20 +20,28 @@ public class DataBaseTables {
     public static final String SPORTSFIELDS_LATITUDE = "latitude";
     public static final String SPORTSFIELDS_LONGITUDE = "longitude";
     public static final String SPORTSFIELDS_NAME = "name";
+    public static final String SPORTSFIELDS_FAVORITE = "favorite";
 
     //EVENTS
     public static final String TABLE_EVENTS = "events";
+    public static final String EVENTS_NAME = "name";
     public static final String EVENTS_CURR = "curr";
     public static final String EVENTS_NUMB_OF_PPL = "numb_of_ppl";
     public static final String EVENTS_PRICE = "price";
+    public static final String EVENTS_DESCRIPTION = "description";
+    public static final String EVENTS_DATE_FROM = "date_from";
+    public static final String EVENTS_DATE_TO = "date_to";
     public static final String EVENTS_TIME_FROM = "time_from";
     public static final String EVENTS_TIME_TO = "time_to";
     public static final String EVENTS_SPORTS_FILED_ID = "sports_field_id";
+    public static final String EVENTS_CREATOR = "creator";
+    public static final String EVENTS_PARTICIPATING = "participating";
 
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_MY_EVENTS = "my_events";
     public static final String TABLE_PARTICIPATING_EVENTS = "participating_events";
 
+    //CREATE SQL
     public static final String FRIENDS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_FRIENDS+"("
             + ID + " integer primary key autoincrement ,"
             + FRIENDS_FIRST_NAME + " text, "
@@ -48,15 +56,23 @@ public class DataBaseTables {
             + SPORTSFIELDS_LATITUDE + " real, "
             + SPORTSFIELDS_LONGITUDE + " real, "
             + SPORTSFIELDS_NAME + " text, "
+            + SPORTSFIELDS_FAVORITE + " BOOLEAN NOT NULL CHECK ("+SPORTSFIELDS_FAVORITE+" IN (0,1)), "
             + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"))";
 
     public static final String EVENTS_CREATE = "CREATE TABLE "+TABLE_EVENTS+"("
             + ID + " integer primary key autoincrement ,"
+            + EVENTS_NAME + " text, "
             + EVENTS_CURR + " text, "
             + EVENTS_PRICE + " real, "
+            + EVENTS_DESCRIPTION + " text, "
             + EVENTS_NUMB_OF_PPL + " integer, "
+            + EVENTS_DATE_FROM + " date, "
+            + EVENTS_DATE_TO + " date, "
+            + EVENTS_TIME_FROM + " text, "
+            + EVENTS_TIME_TO + " text, "
             + EVENTS_SPORTS_FILED_ID + " integer, "
-            + EVENTS_TIME_FROM + " datetime, "
-            + EVENTS_TIME_TO + " datetime, "
-            + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"))";
+            + EVENTS_CREATOR + " BOOLEAN NOT NULL CHECK ("+EVENTS_CREATOR+" IN (0,1)), "
+            + EVENTS_PARTICIPATING + " BOOLEAN NOT NULL CHECK ("+EVENTS_PARTICIPATING+" IN (0,1)), "
+            + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"), "
+            + "FOREIGN KEY ("+EVENTS_SPORTS_FILED_ID+") REFERENCES "+TABLE_SPORTSFIELDS+"("+ID+"))";
 }

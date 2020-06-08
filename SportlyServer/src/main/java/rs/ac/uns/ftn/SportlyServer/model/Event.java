@@ -19,9 +19,15 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Date timeFrom;
+    private String name;
 
-    private Date timeTo;
+    private Date dateFrom;
+
+    private Date dateTo;
+
+    private String timeFrom;
+
+    private String timeTo;
 
     private short numbOfPpl;
 

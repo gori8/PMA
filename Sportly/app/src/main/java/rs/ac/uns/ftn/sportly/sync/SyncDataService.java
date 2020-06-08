@@ -15,7 +15,9 @@ import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendDTO;
+import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
@@ -60,12 +62,80 @@ public class SyncDataService extends Service {
                             values.put(DataBaseTables.FRIENDS_USERNAME,friendDTO.getUsername());
                             values.put(DataBaseTables.SERVER_ID,friendDTO.getId());
 
-                            Uri uri = getContentResolver().insert(
-                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
-                                    values);
+                           getContentResolver().insert(
+                                   Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
+                                   values);
                         }
 
+                        for(SportsFieldDTO sportsFieldDTO : syncDataDTO.getAllSportsFields()){
 
+                            System.out.println("---SPORTSFIELD---");
+                            System.out.println("NAME:"+sportsFieldDTO.getName());
+                            System.out.println("DESCRIPTION:"+sportsFieldDTO.getDescription());
+                            System.out.println("LATITUDE:"+sportsFieldDTO.getLatitude());
+                            System.out.println("LONGITUDE:"+sportsFieldDTO.getLongitude());
+                            System.out.println("SERVER ID:"+sportsFieldDTO.getId());
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.SPORTSFIELDS_NAME,sportsFieldDTO.getName());
+                            values.put(DataBaseTables.SPORTSFIELDS_DESCRIPTION,sportsFieldDTO.getDescription());
+                            values.put(DataBaseTables.SPORTSFIELDS_LATITUDE,sportsFieldDTO.getLatitude());
+                            values.put(DataBaseTables.SPORTSFIELDS_LONGITUDE,sportsFieldDTO.getLongitude());
+                            values.put(DataBaseTables.SERVER_ID,sportsFieldDTO.getId());
+
+                            if(syncDataDTO.getFavorite().contains(sportsFieldDTO.getId())){
+                                values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,1);
+                            }else{
+                                values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,0);
+                            }
+
+                            Uri sfUri = getContentResolver().insert(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_SPORTSFIELDS),
+                                    values);
+
+                            for(EventDTO eventDTO : sportsFieldDTO.getEvents()){
+
+                                System.out.println("---EVENT---");
+                                System.out.println("CURR:"+eventDTO.getCurr());
+                                System.out.println("NUMBER OF PEOPLE:"+eventDTO.getNumbOfPpl());
+                                System.out.println("PRICE:"+eventDTO.getPrice());
+                                System.out.println("DESCRIPTION:"+eventDTO.getDescription());
+                                System.out.println("TIME FROM:"+eventDTO.getTimeFrom());
+                                System.out.println("TIME TO:"+eventDTO.getTimeTo());
+                                System.out.println("SPORTS FIELD ID:"+sfUri.getLastPathSegment());
+                                System.out.println("SERVER ID:"+eventDTO.getId());
+
+                                ContentValues valuesEvent = new ContentValues();
+                                valuesEvent.put(DataBaseTables.EVENTS_NAME,eventDTO.getName());
+                                valuesEvent.put(DataBaseTables.EVENTS_CURR,eventDTO.getCurr());
+                                valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PPL,eventDTO.getNumbOfPpl());
+                                valuesEvent.put(DataBaseTables.EVENTS_PRICE,eventDTO.getPrice());
+                                valuesEvent.put(DataBaseTables.EVENTS_DESCRIPTION,eventDTO.getDescription());
+                                valuesEvent.put(DataBaseTables.EVENTS_DATE_FROM,eventDTO.getDateFrom().toString());
+                                valuesEvent.put(DataBaseTables.EVENTS_DATE_TO,eventDTO.getDateTo().toString());
+                                valuesEvent.put(DataBaseTables.EVENTS_TIME_FROM,eventDTO.getTimeFrom().toString());
+                                valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,eventDTO.getTimeTo().toString());
+                                valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sfUri.getLastPathSegment());
+                                valuesEvent.put(DataBaseTables.SERVER_ID,eventDTO.getId());
+
+                                if(syncDataDTO.getCreatorEvents().contains(eventDTO.getId())){
+                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,1);
+                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,0);
+                                }
+                                else if(syncDataDTO.getParticipantEvents().contains(eventDTO.getId())){
+                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,1);
+                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,0);
+                                }
+                                else{
+                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,0);
+                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,0);
+                                }
+
+                                getContentResolver().insert(
+                                        Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
+                                        valuesEvent);
+                            }
+                        }
 
                     }else{
                         Log.d("REZ","Meesage recieved: "+response.code());

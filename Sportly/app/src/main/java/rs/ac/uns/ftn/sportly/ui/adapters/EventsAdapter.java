@@ -52,7 +52,7 @@ public class EventsAdapter extends ArrayAdapter<Event> implements Filterable {
 
         ImageView eventImage = row.findViewById(R.id.list_event_image);
         TextView eventNameText = row.findViewById(R.id.list_event_name);
-        TextView timeText = row.findViewById(R.id.list_event_time);
+        TextView timeText = row.findViewById(R.id.list_event_time_from);
         TextView participantsText = row.findViewById(R.id.list_event_participants);
         TextView descriptionText = row.findViewById(R.id.list_event_description);
 

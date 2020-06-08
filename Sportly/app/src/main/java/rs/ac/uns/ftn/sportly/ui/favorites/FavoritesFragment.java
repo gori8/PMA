@@ -5,11 +5,16 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,15 +23,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsAdapter;
 
-public class FavoritesFragment extends Fragment {
+public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private SimpleCursorAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,33 +71,41 @@ public class FavoritesFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        List<String> names = new ArrayList<>();
-        names.add("Sportski centar Spens");
-        names.add("Bolesnikov");
-        names.add("Đačko igralište");
-        names.add("Karađorđe Stadium");
-
-        List<Integer> images = new ArrayList<>();
-        images.add(R.drawable.spens);
-        images.add(R.drawable.bolesnikov);
-        images.add(R.drawable.djacko);
-        images.add(R.drawable.karadjordjestadium);
-
-        List<String> descriptions = new ArrayList<>();
-        descriptions.add("Zadužen za sve sportske aktivnosti.");
-        descriptions.add("Fudbalski tereni. Treninzi i škola fudbala.");
-        descriptions.add("Tereni na otvorenom.");
-        descriptions.add("Stadion FK Vojvodina.");
-
-        List<Float> ratings = new ArrayList<>();
-        ratings.add(4f);
-        ratings.add(3f);
-        ratings.add(1.8f);
-        ratings.add(4.5f);
-
-        FavoriteAdapter adapter = new FavoriteAdapter(getContext(), names, images, descriptions, ratings);
+        getLoaderManager().initLoader(0, null, this);
+        String[] from = new String[] { DataBaseTables.SPORTSFIELDS_NAME, DataBaseTables.SPORTSFIELDS_DESCRIPTION };
+        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description};
+        adapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
+                to, 0);
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] allColumns = {
+                DataBaseTables.ID,
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                DataBaseTables.SPORTSFIELDS_FAVORITE,
+                DataBaseTables.SPORTSFIELDS_LATITUDE,
+                DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                DataBaseTables.SERVER_ID
+        };
+
+        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FAVORITES),
+                allColumns, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }
