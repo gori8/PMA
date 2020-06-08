@@ -61,7 +61,7 @@ public class SportlyServerApplication {
 					ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
 					logger.info("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
 					//save to DB
-					saveSportsFieldsToDB(placesList);
+					saveSportsFieldsToDB(placesList,"basketball");
 				}else{
 					logger.error("MapFragment","Meesage recieved: "+response.code());
 				}
@@ -86,7 +86,7 @@ public class SportlyServerApplication {
 					ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
 					logger.info("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
 					//save to DB
-					saveSportsFieldsToDB(placesList);
+					saveSportsFieldsToDB(placesList,"football");
 				}else{
 					logger.error("MapFragment","Meesage recieved: "+response.code());
 				}
@@ -111,7 +111,7 @@ public class SportlyServerApplication {
 					ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
 					logger.info("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
 					//save to DB
-					saveSportsFieldsToDB(placesList);
+					saveSportsFieldsToDB(placesList,"tennis");
 				}else{
 					logger.error("MapFragment","Meesage recieved: "+response.code());
 				}
@@ -125,7 +125,7 @@ public class SportlyServerApplication {
 
 	}
 
-	private void saveSportsFieldsToDB(ArrayList<PlaceDTO> placesList){
+	private void saveSportsFieldsToDB(ArrayList<PlaceDTO> placesList, String category){
 
 		for ( PlaceDTO dto : placesList ) {
 			try{
@@ -134,6 +134,7 @@ public class SportlyServerApplication {
 				sportsField.setLatitude(dto.getGeometry().getLocation().getLat());
 				sportsField.setLongitude(dto.getGeometry().getLocation().getLng());
 				sportsField.setPlace_id(dto.getPlace_id());
+				sportsField.setCategory(category);
 
 				sportsFieldRepository.save(sportsField);
 			}catch (Exception e){

@@ -23,5 +23,7 @@ public class SportsFieldDTO {
 
     private List<EventDTO> events;
 
+    private String category;
+
     private float rating;
 }
