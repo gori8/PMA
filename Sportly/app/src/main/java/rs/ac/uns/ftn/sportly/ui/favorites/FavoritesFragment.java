@@ -96,6 +96,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                 DataBaseTables.SPORTSFIELDS_LATITUDE,
                 DataBaseTables.SPORTSFIELDS_LONGITUDE,
                 DataBaseTables.SPORTSFIELDS_RATING,
+                DataBaseTables.SPORTSFIELDS_CATEGORY,
                 DataBaseTables.SERVER_ID
         };
 

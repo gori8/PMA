@@ -89,6 +89,7 @@ public class SyncDataService extends Service {
                             values.put(DataBaseTables.SPORTSFIELDS_LATITUDE,sportsFieldDTO.getLatitude());
                             values.put(DataBaseTables.SPORTSFIELDS_LONGITUDE,sportsFieldDTO.getLongitude());
                             values.put(DataBaseTables.SPORTSFIELDS_RATING,sportsFieldDTO.getRating());
+                            values.put(DataBaseTables.SPORTSFIELDS_CATEGORY,sportsFieldDTO.getCategory());
                             values.put(DataBaseTables.SERVER_ID,sportsFieldDTO.getId());
 
                             if(syncDataDTO.getFavorite().contains(sportsFieldDTO.getId())){

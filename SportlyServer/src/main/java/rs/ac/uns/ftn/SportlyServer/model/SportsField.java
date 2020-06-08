@@ -28,6 +28,8 @@ public class SportsField {
 
     private float rating;
 
+    private String category;
+
     @Column(unique=true)
     private String place_id;
 
