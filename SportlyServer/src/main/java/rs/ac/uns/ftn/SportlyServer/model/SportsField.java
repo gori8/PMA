@@ -22,11 +22,14 @@ public class SportsField {
 
     private String description;
 
-    private float latitude;
+    private double latitude;
 
-    private float longitude;
+    private double longitude;
 
     private float rating;
+
+    @Column(unique=true)
+    private String place_id;
 
     @ManyToMany(mappedBy = "favourite")
     private List<User> users = new ArrayList<>();

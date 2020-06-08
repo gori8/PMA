@@ -18,9 +18,9 @@ public class SportsFieldDTO {
 
     private String description;
 
-    private float latitude;
+    private double latitude;
 
-    private float longitude;
+    private double longitude;
 
     private List<EventDTO> events;
 
