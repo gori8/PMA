@@ -22,6 +22,7 @@ import rs.ac.uns.ftn.sportly.dto.FriendDTO;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class SyncDataService extends Service {
@@ -41,8 +42,7 @@ public class SyncDataService extends Service {
         if(status == SportlyUtils.TYPE_WIFI || status == SportlyUtils.TYPE_MOBILE){
             Log.d("SERVICE", "--------------SYNC--------------");
 
-            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
-            String jwt = sharedpreferences.getString("jwt","DEFAULT");
+            String jwt = JwtTokenUtils.getJwtToken(this);
             String authHeader = "Bearer " + jwt;
 
             Call<SyncDataDTO> call = SportlyServerServiceUtils.sportlyServerService.sync(authHeader);

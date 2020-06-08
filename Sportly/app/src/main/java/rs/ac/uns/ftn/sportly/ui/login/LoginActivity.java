@@ -55,6 +55,7 @@ import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
@@ -217,37 +218,6 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private boolean saveJwtToken(String jwtToken){
-        try {
-            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString("jwt", jwtToken);
-            editor.commit();
-            return true;
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean removeJwtToken(){
-        try {
-            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.remove("jwt");
-            editor.commit();
-            return true;
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
-    public String getJwtToken(){
-        SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
-        return sharedpreferences.getString("jwt","DEFAULT");
-    }
-
     //----------GOOGLE-FUNCTIONS----------
     private void handleSignInResultGoogle(Task<GoogleSignInAccount> completedTask) {
         try {
@@ -326,7 +296,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Google sign in success");
                     userEmail = userDTO.getEmail();
-                    saveJwtToken(userDTO.getToken());
+                    JwtTokenUtils.saveJwtToken(userDTO.getToken(), LoginActivity.this);
                     goToMainActivityIfLoginSuccess(GOOGLE);
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
@@ -430,7 +400,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Facebook sign in success");
                     userEmail = userDTO.getEmail();
-                    saveJwtToken(userDTO.getToken());
+                    JwtTokenUtils.saveJwtToken(userDTO.getToken(), LoginActivity.this);
                     goToMainActivityIfLoginSuccess(FACEBOOK);
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
