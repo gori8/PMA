@@ -83,3 +83,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+Sportly/app/src/main/java/rs/ac/uns/ftn/sportly/service/SportlyServerServiceUtils.java
+Sportly/app/src/main/res/xml/network_security_config.xml
+SportlyServer/src/main/resources/application.properties
