@@ -38,6 +38,7 @@ import rs.ac.uns.ftn.sportly.notifications.NotificationService;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -184,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         try{
             LoginActivity.mGoogleSignInClient.signOut();
             System.out.println("Google sign out success");
+            JwtTokenUtils.removeJwtToken(MainActivity.this);
             return true;
         }catch (Exception e){
             System.out.println("Google sign out error");
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         try{
             LoginManager.getInstance().logOut();
             System.out.println("Facebook sign out success");
+            JwtTokenUtils.removeJwtToken(MainActivity.this);
             return true;
         }catch (Exception e){
             System.out.println("Facebook sign out error");
