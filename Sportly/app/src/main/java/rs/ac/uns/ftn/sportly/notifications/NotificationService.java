@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
@@ -22,9 +23,18 @@ import rs.ac.uns.ftn.sportly.R;
 
 public class NotificationService extends Service {
 
+    private NotificationReciever notificationReciever;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MainActivity.NOTIFICATION);
+
+        notificationReciever = new NotificationReciever();
+
+        registerReceiver(notificationReciever, filter);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
@@ -51,6 +61,8 @@ public class NotificationService extends Service {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
         startForeground(2, notification);
+
+
     }
 
     private Context appContext;
@@ -59,6 +71,9 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+
+
         Intent ints = new Intent(MainActivity.NOTIFICATION);
         sendBroadcast(ints);
         stopSelf();
@@ -72,5 +87,9 @@ public class NotificationService extends Service {
     }
 
 
-
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(notificationReciever);
+        super.onDestroy();
+    }
 }

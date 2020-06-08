@@ -83,12 +83,7 @@ public class MainActivity extends AppCompatActivity {
         Intent alarmNotificationIntent = new Intent(this, NotificationService.class);
         pendingNotificationIntent = PendingIntent.getService(this, 889, alarmNotificationIntent, 0);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(NOTIFICATION);
 
-        notificationReciever = new NotificationReciever();
-
-        registerReceiver(notificationReciever, filter);
 
 
         init();
@@ -277,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-
+        manager.cancel(pendingNotificationIntent);
         manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 20*1000, pendingIntent);
     }
 

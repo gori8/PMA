@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +38,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -67,6 +73,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
@@ -75,7 +83,7 @@ import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
+public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -749,4 +757,39 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] allColumns = {
+                DataBaseTables.ID,
+                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                DataBaseTables.SPORTSFIELDS_LATITUDE,
+                DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_FAVORITE
+        };
+
+        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                allColumns, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        while (data.moveToNext()) {
+            String type = data.getColumnIndex(DataBaseTables.SPOR)
+
+        }
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        for(ArrayList<Marker> markersList : markersMap.values())   {
+            for(Marker marker : markersList){
+                marker.remove();
+            }
+        }
+    }
+
 }
