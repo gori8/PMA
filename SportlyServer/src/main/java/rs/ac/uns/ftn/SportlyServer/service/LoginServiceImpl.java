@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import rs.ac.uns.ftn.SportlyServer.dto.FacebookRequest;
@@ -154,8 +155,9 @@ public class LoginServiceImpl implements  LoginService{
     }
 
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     @Override
-    public UserDTO loginGoogle(GoogleRequest googleRequest) throws GeneralSecurityException, IOException {
+    public UserDTO loginGoogle(GoogleRequest googleRequest) throws GeneralSecurityException, IOException, RollbackException {
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 // Specify the CLIENT_ID of the app that accesses the backend:
@@ -199,16 +201,14 @@ public class LoginServiceImpl implements  LoginService{
             ret.setExpiresIn(expiresIn);
             ret.setToken(jwt);
 
-            try{
-
+            if(userRepository.findByEmail(ret.getEmail())==null){
                 User user = new User();
                 user.setFirstName(ret.getIme());
                 user.setLastName(ret.getIme());
                 user.setEmail(ret.getEmail());
                 user.setPassword(null);
-                user.setEnabled(true);
-                user = userRepository.save(user);
-            }catch (Exception e){
+                userRepository.save(user);
+            }else {
                 logger.info("User already exists");
             }
 
@@ -223,6 +223,7 @@ public class LoginServiceImpl implements  LoginService{
     }
 
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     @Override
     public UserDTO loginFacebook(FacebookRequest facebookRequest) {
 
@@ -245,16 +246,14 @@ public class LoginServiceImpl implements  LoginService{
         ret.setExpiresIn(expiresIn);
         ret.setToken(jwt);
 
-        try{
-
+        if(userRepository.findByEmail(ret.getEmail())==null){
             User user = new User();
             user.setFirstName(ret.getIme());
             user.setLastName(ret.getIme());
             user.setEmail(ret.getEmail());
             user.setPassword(null);
             userRepository.save(user);
-
-        }catch (Exception e){
+        }else {
             logger.info("User already exists");
         }
 

@@ -17,6 +17,7 @@ public class UserDTO {
     private String ime;
     private String prezime;
     private String email;
+    private String password;
     private String token;
     private int expiresIn;
 
