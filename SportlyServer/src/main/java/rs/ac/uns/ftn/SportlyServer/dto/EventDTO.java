@@ -12,9 +12,15 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private Long id;
 
-    private Date timeFrom;
+    private String name;
 
-    private Date timeTo;
+    private Date dateFrom;
+
+    private Date dateTo;
+
+    private String timeFrom;
+
+    private String timeTo;
 
     private short numbOfPpl;
 
@@ -26,6 +32,6 @@ public class EventDTO implements Comparable<EventDTO> {
 
     @Override
     public int compareTo(EventDTO e) {
-        return getTimeFrom().compareTo(e.getTimeFrom());
+        return getDateFrom().compareTo(e.getDateFrom());
     }
 }

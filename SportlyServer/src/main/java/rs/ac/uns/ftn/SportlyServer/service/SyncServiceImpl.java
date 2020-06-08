@@ -80,9 +80,12 @@ public class SyncServiceImpl implements SyncService {
             sfDTO.setEvents(new ArrayList<EventDTO>());
 
             for (Event event : sportsField.getEvents()){
-                if(event.getTimeFrom().after(new Date())){
+                if(event.getDateFrom().after(new Date())){
                     EventDTO eventDTO = new EventDTO();
                     eventDTO.setId(event.getId());
+                    eventDTO.setName(event.getName());
+                    eventDTO.setDateFrom(event.getDateFrom());
+                    eventDTO.setDateTo(event.getDateTo());
                     eventDTO.setTimeFrom(event.getTimeFrom());
                     eventDTO.setTimeTo(event.getTimeTo());
                     eventDTO.setPrice(event.getPrice());

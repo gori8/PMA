@@ -24,7 +24,14 @@ public class SportlyContentProvider extends ContentProvider {
     private SportlySQLiteHelper database;
 
     private static final int FRIENDS = 1;
-    private static final int FRIENDS_ID = 2;
+    private static final int FRIENDS_SERVER_ID = 2;
+    private static final int SPORTSFIELDS = 3;
+    private static final int SPORTSFIELDS_SERVER_ID = 4;
+    private static final int EVENTS = 5;
+    private static final int EVENTS_SERVER_ID = 6;
+    private static final int MY_EVENTS = 7;
+    private static final int PARTICIPATING_EVENTS = 8;
+    private static final int FAVORITES = 9;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -34,7 +41,14 @@ public class SportlyContentProvider extends ContentProvider {
 
     static {
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FRIENDS, FRIENDS);
-        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FRIENDS + "/#", FRIENDS_ID);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FRIENDS + "/#", FRIENDS_SERVER_ID);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_SPORTSFIELDS, SPORTSFIELDS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_SPORTSFIELDS + "/#", SPORTSFIELDS_SERVER_ID);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_EVENTS, EVENTS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_EVENTS + "/#", EVENTS_SERVER_ID);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_MY_EVENTS, MY_EVENTS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_PARTICIPATING_EVENTS, PARTICIPATING_EVENTS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FAVORITES, FAVORITES);
     }
 
     @Override
@@ -50,11 +64,44 @@ public class SportlyContentProvider extends ContentProvider {
 
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
-            case FRIENDS_ID:
-                queryBuilder.appendWhere(DataBaseTables.ID + "="
+            case FRIENDS_SERVER_ID:
+                queryBuilder.appendWhere(DataBaseTables.SERVER_ID + "="
                         + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_FRIENDS);
+                break;
             case FRIENDS:
                 queryBuilder.setTables(DataBaseTables.TABLE_FRIENDS);
+                break;
+            case SPORTSFIELDS_SERVER_ID:
+                queryBuilder.appendWhere(DataBaseTables.SERVER_ID + "="
+                        + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_SPORTSFIELDS);
+                break;
+            case SPORTSFIELDS:
+                queryBuilder.setTables(DataBaseTables.TABLE_SPORTSFIELDS);
+                break;
+            case EVENTS_SERVER_ID:
+                queryBuilder.appendWhere(DataBaseTables.SERVER_ID + "="
+                        + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
+                break;
+            case EVENTS:
+                queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
+                break;
+            case MY_EVENTS:
+                queryBuilder.appendWhere(DataBaseTables.EVENTS_CREATOR + "="
+                        + 1);
+                queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
+                break;
+            case PARTICIPATING_EVENTS:
+                queryBuilder.appendWhere(DataBaseTables.EVENTS_PARTICIPATING + "="
+                        + 1);
+                queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
+                break;
+            case FAVORITES:
+                queryBuilder.appendWhere(DataBaseTables.SPORTSFIELDS_FAVORITE + "="
+                        + 1);
+                queryBuilder.setTables(DataBaseTables.TABLE_SPORTSFIELDS);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -81,21 +128,31 @@ public class SportlyContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
         final SQLiteDatabase sqlDB = database.getWritableDatabase();
-        insertOrUpdateById(sqlDB, uri, contentValues, "server_id");
+        long id = insertOrUpdateById(sqlDB, uri, contentValues, "server_id");
 
-        return uri;
+        Uri returnUri = Uri.parse(uri+"/"+id);
+
+        return returnUri;
     }
 
-    private void insertOrUpdateById(SQLiteDatabase db, Uri uri,
+    private long insertOrUpdateById(SQLiteDatabase db, Uri uri,
                                     ContentValues values, String column) throws SQLException {
         try {
-            db.insertOrThrow(uri.getLastPathSegment(), null, values);
+            long id = db.insertOrThrow(uri.getLastPathSegment(), null, values);
             getContext().getContentResolver().notifyChange(uri, null);
+            return id;
         } catch (SQLiteConstraintException e) {
             int nrRows = update(uri, values, column + "=?",
                     new String[]{values.getAsString(column)});
             if (nrRows == 0)
                 throw e;
+
+            Cursor cursor = query(Uri.parse(uri+"/"+values.getAsString(column)),
+                    new String[]{DataBaseTables.ID}, null,null,null);
+            cursor.moveToFirst();
+
+            long id = cursor.getLong(0);
+            return id;
         }
     }
 
@@ -108,7 +165,6 @@ public class SportlyContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        long id = 0;
         int rowsUpdated = 0;
 
         rowsUpdated = sqlDB.update(uri.getLastPathSegment(),

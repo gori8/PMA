@@ -84,27 +84,6 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
             String email = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_EMAIL));
             int photoUrl = 0;
 
-            /*String nameFromList = names.get(position);
-            if(nameFromList.equals("Milan Škrbić")){
-                name = "Milan";
-                surname = "Skrbic";
-                username = "shekrba";
-                email = "milan@gmail.com";
-                photoUrl = R.drawable.milan_skrbic;
-            } else if(nameFromList.equals("Igor Antolović")){
-                name = "Igor";
-                surname = "Antolovic";
-                username = "gori8";
-                email = "igor@gmail.com";
-                photoUrl = R.drawable.igor_antolovic;
-            } else if(nameFromList.equals("Stevan Vulić")){
-                name = "Stevan";
-                surname = "Vulic";
-                username = "Vul4";
-                email = "stevan@gmail.com";
-                photoUrl = R.drawable.stevan_vulic;
-            }*/
-
             MainActivity mainActivity = (MainActivity) getActivity();
             mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
         });
