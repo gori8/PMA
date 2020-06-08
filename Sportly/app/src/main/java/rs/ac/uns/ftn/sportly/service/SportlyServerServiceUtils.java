@@ -9,7 +9,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class SportlyServerServiceUtils {
 
-    public static final String SERVICE_API_PATH = "http://192.168.1.8:8091/";
+    public static final String SERVICE_API_PATH = "http://192.168.0.12:8091/";
 
     public static OkHttpClient test(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

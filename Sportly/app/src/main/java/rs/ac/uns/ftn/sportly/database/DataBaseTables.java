@@ -21,6 +21,7 @@ public class DataBaseTables {
     public static final String SPORTSFIELDS_LONGITUDE = "longitude";
     public static final String SPORTSFIELDS_NAME = "name";
     public static final String SPORTSFIELDS_FAVORITE = "favorite";
+    public static final String SPORTSFIELDS_RATING = "rating";
 
     //EVENTS
     public static final String TABLE_EVENTS = "events";
@@ -56,6 +57,7 @@ public class DataBaseTables {
             + SPORTSFIELDS_LATITUDE + " real, "
             + SPORTSFIELDS_LONGITUDE + " real, "
             + SPORTSFIELDS_NAME + " text, "
+            + SPORTSFIELDS_RATING + " real, "
             + SPORTSFIELDS_FAVORITE + " BOOLEAN NOT NULL CHECK ("+SPORTSFIELDS_FAVORITE+" IN (0,1)), "
             + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"))";
 

@@ -26,9 +26,14 @@ public class SportsField {
 
     private float longitude;
 
+    private float rating;
+
     @ManyToMany(mappedBy = "favourite")
     private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "sportsField")
     private List<Event> events = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sportsField")
+    private List<FieldRating> fieldRatings = new ArrayList<>();
 }

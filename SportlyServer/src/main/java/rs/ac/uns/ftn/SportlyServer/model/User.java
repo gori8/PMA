@@ -67,6 +67,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "creator")
     private List<Event> creatorEvents = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<FieldRating> fieldRatings = new ArrayList<>();
+
     @ManyToMany
     @JsonIgnore
     @JoinTable(

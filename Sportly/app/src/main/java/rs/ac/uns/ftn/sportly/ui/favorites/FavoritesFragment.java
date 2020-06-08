@@ -72,8 +72,12 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         super.onActivityCreated(savedInstanceState);
 
         getLoaderManager().initLoader(0, null, this);
-        String[] from = new String[] { DataBaseTables.SPORTSFIELDS_NAME, DataBaseTables.SPORTSFIELDS_DESCRIPTION };
-        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description};
+        String[] from = new String[] {
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                DataBaseTables.SPORTSFIELDS_RATING
+        };
+        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description, R.id.favorite_ratingBar};
         adapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
                 to, 0);
 
@@ -91,6 +95,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                 DataBaseTables.SPORTSFIELDS_FAVORITE,
                 DataBaseTables.SPORTSFIELDS_LATITUDE,
                 DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                DataBaseTables.SPORTSFIELDS_RATING,
                 DataBaseTables.SERVER_ID
         };
 

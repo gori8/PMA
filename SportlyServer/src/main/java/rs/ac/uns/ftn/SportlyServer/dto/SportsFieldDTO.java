@@ -23,4 +23,6 @@ public class SportsFieldDTO {
     private float longitude;
 
     private List<EventDTO> events;
+
+    private float rating;
 }
