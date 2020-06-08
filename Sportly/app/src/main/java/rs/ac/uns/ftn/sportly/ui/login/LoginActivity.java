@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -128,13 +130,16 @@ public class LoginActivity extends AppCompatActivity {
 
         if(googleAccount != null){
             // Signed in successfully with google, show authenticated UI.
-            goToMainActivityIfLoginSuccess(GOOGLE);
-            userEmail = googleAccount.getEmail();
+            //goToMainActivityIfLoginSuccess(GOOGLE);
+            //userEmail = googleAccount.getEmail();
+            loadingView();
+            postGoogleToken(googleAccount.getEmail(), googleAccount.getIdToken());
+
             System.out.println("GOOGLE: " + userEmail);
         }else if(isLoggedInFacebook){
             // Signed in successfully with facebook, show authenticated UI.
-            goToMainActivityIfLoginSuccess(FACEBOOK);
-
+            //goToMainActivityIfLoginSuccess(FACEBOOK);
+            /*
             Map<String, String> facebookInfo = null;
             try {
                 facebookInfo = returnFacebookSignInParameters(accessToken);
@@ -145,7 +150,15 @@ public class LoginActivity extends AppCompatActivity {
             }
             userEmail = facebookInfo.get("email");
             System.out.println("FACEBOOK: " + userEmail);
+             */
+            loadingView();
+            postFacebookToken(accessToken.getUserId(), accessToken.getToken());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
     }
 
     @Override
