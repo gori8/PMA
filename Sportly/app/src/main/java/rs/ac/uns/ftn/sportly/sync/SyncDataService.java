@@ -3,7 +3,9 @@ package rs.ac.uns.ftn.sportly.sync;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
@@ -38,7 +40,12 @@ public class SyncDataService extends Service {
         //ima konekcije ka netu skini sta je potrebno i sinhronizuj bazu
         if(status == SportlyUtils.TYPE_WIFI || status == SportlyUtils.TYPE_MOBILE){
             Log.d("SERVICE", "--------------SYNC--------------");
-            Call<SyncDataDTO> call = SportlyServerServiceUtils.sportlyServerService.sync();
+
+            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
+            String jwt = sharedpreferences.getString("jwt","DEFAULT");
+            String authHeader = "Bearer " + jwt;
+
+            Call<SyncDataDTO> call = SportlyServerServiceUtils.sportlyServerService.sync(authHeader);
 
             call.enqueue(new Callback<SyncDataDTO>() {
                 @Override

@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -24,7 +25,7 @@ public interface SportlyServerService {
             "Content-Type:application/json"
     })
     @GET("/sync")
-    Call<SyncDataDTO> sync();
+    Call<SyncDataDTO> sync(@Header("Authorization") String authHeader);
 
     @POST("/auth/google/login")
     Call<UserDTO> postGoogleToken(@Body GoogleRequestDTO googleRequestDTO);

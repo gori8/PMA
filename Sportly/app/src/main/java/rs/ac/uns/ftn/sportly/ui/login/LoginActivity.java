@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.sportly.ui.login;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.FaceDetector;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,6 @@ import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
-import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
@@ -160,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
         }else{
             //----------FACEBOOOK----------
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
-            goToMainActivityIfLoginSuccess(FACEBOOK);
+            //goToMainActivityIfLoginSuccess(FACEBOOK);
         }
     }
 
@@ -217,15 +217,43 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private boolean saveJwtToken(String jwtToken){
+        try {
+            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            editor.putString("jwt", jwtToken);
+            editor.commit();
+            return true;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean removeJwtToken(){
+        try {
+            SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            editor.remove("jwt");
+            editor.commit();
+            return true;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public String getJwtToken(){
+        SharedPreferences sharedpreferences = getSharedPreferences("Sportly.xml", Context.MODE_PRIVATE);
+        return sharedpreferences.getString("jwt","DEFAULT");
+    }
+
     //----------GOOGLE-FUNCTIONS----------
     private void handleSignInResultGoogle(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
-            System.out.println("Google sign in success");
-            goToMainActivityIfLoginSuccess(GOOGLE);
-            userEmail = account.getEmail();
-            System.out.println("GOOGLE EMAIL: " + userEmail);
+            System.out.println("GOOGLE EMAIL: " + account.getEmail());
             System.out.println("GOOGLE ID: " + account.getId());
             System.out.println("GOOGLE ID TOKEN: " + account.getIdToken());
             System.out.println("GOOGLE SERVER AUTH CODE: " + account.getServerAuthCode());
@@ -295,6 +323,11 @@ public class LoginActivity extends AppCompatActivity {
                         TODO: Save to DB
                          */
                     UserDTO userDTO = response.body();
+
+                    System.out.println("Google sign in success");
+                    userEmail = userDTO.getEmail();
+                    saveJwtToken(userDTO.getToken());
+                    goToMainActivityIfLoginSuccess(GOOGLE);
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
                 }
@@ -349,6 +382,7 @@ public class LoginActivity extends AppCompatActivity {
                 AccessToken accessToken = loginResult.getAccessToken();
                 System.out.println("FACEBOOK TOKEN: " + accessToken.getToken());
                 System.out.println("FACEBOOK USER ID: " + accessToken.getUserId());
+                /*
                 Map<String, String> facebookInfo = null;
                 try {
                     facebookInfo = returnFacebookSignInParameters(accessToken);
@@ -358,7 +392,7 @@ public class LoginActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 userEmail = facebookInfo.get("email");
-                System.out.println("FACEBOOK EMAIL: " + userEmail);
+                System.out.println("FACEBOOK EMAIL: " + userEmail);*/
 
                 postFacebookToken(accessToken.getUserId(), accessToken.getToken());
             }
@@ -393,6 +427,11 @@ public class LoginActivity extends AppCompatActivity {
                         TODO: Save to DB
                          */
                     UserDTO userDTO = response.body();
+
+                    System.out.println("Facebook sign in success");
+                    userEmail = userDTO.getEmail();
+                    saveJwtToken(userDTO.getToken());
+                    goToMainActivityIfLoginSuccess(FACEBOOK);
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
                 }

@@ -206,8 +206,8 @@ public class LoginServiceImpl implements  LoginService{
                 user.setLastName(ret.getIme());
                 user.setEmail(ret.getEmail());
                 user.setPassword(null);
-                userRepository.save(user);
-
+                user.setEnabled(true);
+                user = userRepository.save(user);
             }catch (Exception e){
                 logger.info("User already exists");
             }
