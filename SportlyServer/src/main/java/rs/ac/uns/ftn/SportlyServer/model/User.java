@@ -30,6 +30,7 @@ public class User implements UserDetails {
 
     private String lastName;
 
+    @Column(nullable = false,unique = true)
     private String email;
 
     private Date lastPasswordResetDate;

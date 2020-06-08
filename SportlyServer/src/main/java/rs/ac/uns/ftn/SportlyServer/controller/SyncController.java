@@ -19,8 +19,7 @@ public class SyncController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> getSyncData() {
-        //String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String username = "proba";
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return new ResponseEntity<>(syncService.getSyncData(username), HttpStatus.OK);
     }
 }

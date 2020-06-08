@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -32,6 +33,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import rs.ac.uns.ftn.sportly.notifications.NotificationReciever;
+import rs.ac.uns.ftn.sportly.notifications.NotificationService;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
@@ -47,10 +50,16 @@ public class MainActivity extends AppCompatActivity {
     NavController navController;
 
     public static String SYNC_DATA = "SYNC_DATA";
+    public static String NOTIFICATION = "NOTIFICATION";
+
 
     private PendingIntent pendingIntent;
 
+    private PendingIntent pendingNotificationIntent;
+
     private AlarmManager manager;
+
+    private NotificationReciever notificationReciever;
 
 
     String name;
@@ -69,6 +78,17 @@ public class MainActivity extends AppCompatActivity {
         pendingIntent = PendingIntent.getService(this, 888, alarmIntent, 0);
 
         manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+        Intent alarmNotificationIntent = new Intent(this, NotificationService.class);
+        pendingNotificationIntent = PendingIntent.getService(this, 889, alarmNotificationIntent, 0);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NOTIFICATION);
+
+        notificationReciever = new NotificationReciever();
+
+        registerReceiver(notificationReciever, filter);
+
 
         init();
 
@@ -267,6 +287,9 @@ public class MainActivity extends AppCompatActivity {
             manager.cancel(pendingIntent);
         }
         Log.i("MAIN ACTIVITY","ACTIVITY MAIN PAUSED");
+
+        manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10*1000, pendingNotificationIntent);
+
 
         super.onPause();
     }

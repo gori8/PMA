@@ -199,6 +199,20 @@ public class LoginServiceImpl implements  LoginService{
             ret.setExpiresIn(expiresIn);
             ret.setToken(jwt);
 
+            try{
+
+                User user = new User();
+                user.setFirstName(ret.getIme());
+                user.setLastName(ret.getIme());
+                user.setEmail(ret.getEmail());
+                user.setPassword(null);
+                userRepository.save(user);
+
+            }catch (Exception e){
+                logger.info("User already exists");
+            }
+
+
             return ret;
 
         } else {
@@ -230,6 +244,19 @@ public class LoginServiceImpl implements  LoginService{
         int expiresIn = tokenUtils.getExpiredIn();
         ret.setExpiresIn(expiresIn);
         ret.setToken(jwt);
+
+        try{
+
+            User user = new User();
+            user.setFirstName(ret.getIme());
+            user.setLastName(ret.getIme());
+            user.setEmail(ret.getEmail());
+            user.setPassword(null);
+            userRepository.save(user);
+
+        }catch (Exception e){
+            logger.info("User already exists");
+        }
 
         return ret;
     }
