@@ -38,6 +38,7 @@ public class DataBaseTables {
     public static final String EVENTS_SPORTS_FILED_ID = "sports_field_id";
     public static final String EVENTS_CREATOR = "creator";
     public static final String EVENTS_PARTICIPATING = "participating";
+    public static final String EVENTS_NUMB_OF_PARTICIPANTS = "num_of_participants";
 
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_MY_EVENTS = "my_events";
@@ -71,6 +72,7 @@ public class DataBaseTables {
             + EVENTS_PRICE + " real, "
             + EVENTS_DESCRIPTION + " text, "
             + EVENTS_NUMB_OF_PPL + " integer, "
+            + EVENTS_NUMB_OF_PARTICIPANTS + " integer, "
             + EVENTS_DATE_FROM + " date, "
             + EVENTS_DATE_TO + " date, "
             + EVENTS_TIME_FROM + " text, "

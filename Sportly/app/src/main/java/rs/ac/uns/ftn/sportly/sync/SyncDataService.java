@@ -126,6 +126,8 @@ public class SyncDataService extends Service {
                                 valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,eventDTO.getTimeTo().toString());
                                 valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sfUri.getLastPathSegment());
                                 valuesEvent.put(DataBaseTables.SERVER_ID,eventDTO.getId());
+                                valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,eventDTO.getNumOfParticipants());
+
 
                                 if(syncDataDTO.getCreatorEvents().contains(eventDTO.getId())){
                                     valuesEvent.put(DataBaseTables.EVENTS_CREATOR,1);

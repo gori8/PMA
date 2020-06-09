@@ -24,6 +24,8 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private short numbOfPpl;
 
+    private short numOfParticipants;
+
     private double price;
 
     private String curr;

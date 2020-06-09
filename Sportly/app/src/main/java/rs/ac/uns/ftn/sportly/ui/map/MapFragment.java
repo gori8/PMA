@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,6 +61,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,11 +82,12 @@ import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.adapters.EventsAdapter;
+import rs.ac.uns.ftn.sportly.ui.adapters.EventsCursorAdapter;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback{
+public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -100,6 +103,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private HashMap<String,Boolean> filterChecks = new HashMap<>();
     private HashMap<String,ArrayList<Marker>> markersMap = new HashMap<>();
     private Cursor data;
+    private EventsCursorAdapter adapter;
 
     public static MapFragment newInstance() {
 
@@ -400,6 +404,52 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         slidingPanel = view.findViewById(R.id.sliding_layout);
         createMapFragmentAndInflate(view);
 
+        ListView listView = view.findViewById(R.id.events_list);
+
+        listView.setOnItemClickListener((parent, vieww, positionLv, idLv) -> {
+            TextView textView = view.findViewById(R.id.place_info_name);
+            String placeInfoName = (String) textView.getText();
+
+
+            SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yy");
+            Cursor cursor = (Cursor)adapter.getItem(positionLv);
+            String location = placeInfoName;
+            String name = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_NAME));
+            String timeFrom = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_TIME_FROM));
+            String timeTo = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_TIME_TO));
+            String numOfPeople = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PPL));
+            String numOfParticipants = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS));
+            String date = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
+            String price = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_PRICE));
+            String description = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
+            Integer isCreator = cursor.getInt(cursor.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
+
+            Boolean flagIsCreator;
+            if(isCreator==0){
+                flagIsCreator=false;
+            }else{
+                flagIsCreator=true;
+            }
+
+
+
+
+            Intent intent = new Intent(getActivity(), EventActivity.class);
+            intent.putExtra("location", location);
+            intent.putExtra("name", name);
+            intent.putExtra("time", timeFrom+" - "+timeTo);
+            intent.putExtra("people", numOfParticipants+"/"+numOfPeople+" people");
+            intent.putExtra("date", date);
+
+            intent.putExtra("price", price);
+            intent.putExtra("creator", "Pera Perić");
+            intent.putExtra("description", description);
+            intent.putExtra("imageView", R.drawable.djacko);
+            intent.putExtra("isCreator",flagIsCreator);
+            getActivity().startActivity(intent);
+
+        });
+
 
         return view;
     }
@@ -569,7 +619,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             String name = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_NAME));
             Float lat = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LATITUDE));
             Float lng = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LONGITUDE));
-            Log.i("MapFragment","Imeeeeeeeeeeeeeeeeeee:"+name);
+            Integer id = data.getInt(data.getColumnIndex(DataBaseTables.ID));
+
 
             Marker marker = null;
 
@@ -580,7 +631,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }else if (category.equals("tennis")){
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
-            marker.setTag(name);
+            marker.setTag(id);
 
             markersMap.get(category).add(marker);
             data.moveToNext();
@@ -594,8 +645,42 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getTag()!=null) {
+
+                    Bundle args = new Bundle();
+                    args.putInt("sportsFieldsId",(Integer)marker.getTag());
+
+                    if(getLoaderManager().getLoader(0)!=null){
+                        getLoaderManager().restartLoader(0, args, MapFragment.this);
+                    }else{
+                        getLoaderManager().initLoader(0, args, MapFragment.this);
+                    }
+
+
+                    String[] from = new String[] {
+                            DataBaseTables.EVENTS_NAME,
+                            DataBaseTables.EVENTS_DESCRIPTION,
+                            DataBaseTables.EVENTS_NUMB_OF_PPL,
+                            DataBaseTables.EVENTS_TIME_FROM,
+                            DataBaseTables.EVENTS_TIME_TO,
+                            DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
+                    };
+                    int[] to = new int[] {
+                            R.id.list_event_name,
+                            R.id.list_event_description,
+                            R.id.list_event_ppl,
+                            R.id.list_event_time_from,
+                            R.id.list_event_time_to,
+                            R.id.list_event_participants
+                    };
+                    adapter = new EventsCursorAdapter(getActivity(), R.layout.event_item, null, from,
+                            to);
+
+                    ListView listView = (ListView) getView().findViewById(R.id.events_list);
+                    listView.setAdapter(adapter);
+
+
                     TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
-                    tvPlaceName.setText((String)marker.getTag());
+                    tvPlaceName.setText((String)marker.getTitle());
                     slidingPanel.setAnchorPoint(0.5f);
                     slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 }
@@ -649,7 +734,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         locationManager.removeUpdates(this);
     }
 
-    public void onActivityCreated(Bundle savedInstanceState) {
+   /* public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         List<Event> events = new ArrayList<>();
@@ -705,6 +790,50 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         });
 
 
+    }*/
+
+
+
+
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] allColumns = {
+                DataBaseTables.ID,
+                DataBaseTables.EVENTS_NAME,
+                DataBaseTables.EVENTS_CURR,
+                DataBaseTables.EVENTS_DESCRIPTION,
+                DataBaseTables.EVENTS_NUMB_OF_PPL,
+                DataBaseTables.EVENTS_PARTICIPATING,
+                DataBaseTables.EVENTS_PRICE,
+                DataBaseTables.EVENTS_SPORTS_FILED_ID,
+                DataBaseTables.EVENTS_DATE_FROM,
+                DataBaseTables.EVENTS_DATE_TO,
+                DataBaseTables.EVENTS_TIME_FROM,
+                DataBaseTables.EVENTS_TIME_TO,
+                DataBaseTables.EVENTS_CREATOR,
+                DataBaseTables.SERVER_ID,
+                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
+        };
+
+        Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+args.getInt("sportsFieldsId"));
+
+
+        return new CursorLoader(getActivity(), uri, allColumns, null, null, null);
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
+
 
 }

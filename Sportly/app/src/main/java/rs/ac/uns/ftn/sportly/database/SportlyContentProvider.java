@@ -170,6 +170,7 @@ public class SportlyContentProvider extends ContentProvider {
             case EVENTS:{
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_MY_EVENTS), null);
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+values.getAsInteger(DataBaseTables.EVENTS_SPORTS_FILED_ID)), null);
             }break;
         }
 

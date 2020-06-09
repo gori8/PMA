@@ -141,19 +141,24 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                         DataBaseTables.EVENTS_DESCRIPTION,
                         DataBaseTables.EVENTS_NUMB_OF_PPL,
                         DataBaseTables.EVENTS_TIME_FROM,
-                        DataBaseTables.EVENTS_TIME_TO
+                        DataBaseTables.EVENTS_TIME_TO,
+                        DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
                 };
                 int[] to = new int[] {
                         R.id.list_event_name,
                         R.id.list_event_description,
                         R.id.list_event_ppl,
                         R.id.list_event_time_from,
-                        R.id.list_event_time_to
+                        R.id.list_event_time_to,
+                        R.id.list_event_participants
                 };
                 adapter = new EventsCursorAdapter(getActivity(), R.layout.event_item, null, from,
                         to);
                 ListView listView = (ListView) getView().findViewById(R.id.my_events_list);
                 listView.setAdapter(adapter);
+
+
+
 
             }
 
@@ -197,7 +202,8 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                 DataBaseTables.EVENTS_TIME_FROM,
                 DataBaseTables.EVENTS_TIME_TO,
                 DataBaseTables.EVENTS_CREATOR,
-                DataBaseTables.SERVER_ID
+                DataBaseTables.SERVER_ID,
+                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
         };
 
         Uri uri = SportlyContentProvider.CONTENT_URI;
