@@ -42,6 +42,7 @@ public class DataBaseTables {
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_MY_EVENTS = "my_events";
     public static final String TABLE_PARTICIPATING_EVENTS = "participating_events";
+    public static final String SPORTSFIELDS_EVENTS = "sportsfileds_events";
 
     //CREATE SQL
     public static final String FRIENDS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_FRIENDS+"("
