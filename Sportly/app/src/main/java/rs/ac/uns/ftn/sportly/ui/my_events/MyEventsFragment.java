@@ -62,33 +62,18 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+
+    }
+
+        @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        List<Event> events = new ArrayList<>();
 
-        Event event1 = new Event();
-        event1.setLocation("Đačko igralište");
-        event1.setName("FTN Friday Basketball");
-        event1.setDescription("Basket, petak uveče. Dođite posle predavanja na koju partiju 3 na 3 basketa.");
-        event1.setFrom("18:00");
-        event1.setTo("20:00");
-        event1.setSignedUpPlayers((short)2);
-        event1.setTotalPlayers((short)6);
-        event1.setSport("basketball");
-
-        Event event2 = new Event();
-        event1.setLocation("Đačko igralište");
-        event2.setName("Mali fudbal za programere");
-        event2.setDescription("Programeri koji zele posle posla da se druze uz mali fudbal su dobrodosli.");
-        event2.setFrom("20:00");
-        event2.setTo("21:30");
-        event2.setSignedUpPlayers((short)1);
-        event2.setTotalPlayers((short)10);
-        event2.setSport("football");
-
-        events.add(event1);
-        events.add(event2);
 
         /*EventsAdapter adapter = new EventsAdapter(getContext(), events);
 
@@ -122,6 +107,9 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
 
         MyEventsFragment fragment = this;
 
+
+
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -138,9 +126,15 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
 
                 if(getLoaderManager().getLoader(0)!=null){
                     getLoaderManager().restartLoader(0, args, fragment);
+                }else{
+                    args = new Bundle();
+
+                    args.putString("type","creator");
+
+
+                    getLoaderManager().initLoader(0, args, fragment);
                 }
 
-                getLoaderManager().initLoader(0, args, fragment);
 
                 String[] from = new String[] {
                         DataBaseTables.EVENTS_NAME,
@@ -223,6 +217,7 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
     }
+
 
 
     @Override

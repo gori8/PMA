@@ -129,16 +129,20 @@ public class LoginActivity extends AppCompatActivity {
         //to do, sacuvati zadnji login pa iscitati
 
         if(googleAccount != null){
-            // Signed in successfully with google, show authenticated UI.
-            //goToMainActivityIfLoginSuccess(GOOGLE);
-            //userEmail = googleAccount.getEmail();
             loadingView();
-            postGoogleToken(googleAccount.getEmail(), googleAccount.getIdToken());
+            // Signed in successfully with google, show authenticated UI.
+            goToMainActivityIfLoginSuccess(GOOGLE);
+            //userEmail = googleAccount.getEmail();
 
-            System.out.println("GOOGLE: " + userEmail);
+            //postGoogleToken(googleAccount.getEmail(), googleAccount.getIdToken());
+
+            //System.out.println("GOOGLE: " + userEmail);
         }else if(isLoggedInFacebook){
             // Signed in successfully with facebook, show authenticated UI.
-            //goToMainActivityIfLoginSuccess(FACEBOOK);
+
+            loadingView();
+
+            goToMainActivityIfLoginSuccess(FACEBOOK);
             /*
             Map<String, String> facebookInfo = null;
             try {
@@ -151,8 +155,7 @@ public class LoginActivity extends AppCompatActivity {
             userEmail = facebookInfo.get("email");
             System.out.println("FACEBOOK: " + userEmail);
              */
-            loadingView();
-            postFacebookToken(accessToken.getUserId(), accessToken.getToken());
+            //postFacebookToken(accessToken.getUserId(), accessToken.getToken());
         }
     }
 

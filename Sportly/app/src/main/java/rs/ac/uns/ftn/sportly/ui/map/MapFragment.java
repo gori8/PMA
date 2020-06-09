@@ -16,6 +16,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -83,7 +84,7 @@ import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
 
-public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
+public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback{
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -98,6 +99,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private String placeName;
     private HashMap<String,Boolean> filterChecks = new HashMap<>();
     private HashMap<String,ArrayList<Marker>> markersMap = new HashMap<>();
+    private Cursor data;
 
     public static MapFragment newInstance() {
 
@@ -541,100 +543,49 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         LatLng latLngForSearch = new LatLng(45.253513,19.829127);
 
-//        location.setLatitude(latLngForSearch.latitude);
- //       location.setLongitude(latLngForSearch.longitude);
+        String mockLocationProvider = LocationManager.GPS_PROVIDER;
 
+        location = new Location(mockLocationProvider);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        location.setLatitude(latLngForSearch.latitude);
+        location.setLongitude(latLngForSearch.longitude);
 
+        String[] allColumns = {
+                DataBaseTables.ID,
+                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                DataBaseTables.SPORTSFIELDS_LATITUDE,
+                DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_FAVORITE,
+                DataBaseTables.SPORTSFIELDS_CATEGORY
+        };
 
-        //Basketball
-        Call<ResponseBody> call = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"basketball court");
+        data = getActivity().getContentResolver().query(Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),allColumns,null,null,null);
 
-        call.enqueue(new Callback<ResponseBody>() {
-            @SneakyThrows
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 200){
-                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
-                    JsonNode resultsListJSON = responseJSON.get("results");
-                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
-                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
-                    ArrayList<Marker> markers = markersMap.get("basketball");
-                    for (PlaceDTO place : placesList) {
-                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_basketball));
-                        marker.setTag(place);
-                        markers.add(marker);
-                    }
-                }else{
-                    Log.e("MapFragment","Meesage recieved: "+response.code());
-                }
+        data.moveToFirst();
+
+        while (!data.isAfterLast()) {
+            String category = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_CATEGORY));
+            String name = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_NAME));
+            Float lat = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LATITUDE));
+            Float lng = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LONGITUDE));
+            Log.i("MapFragment","Imeeeeeeeeeeeeeeeeeee:"+name);
+
+            Marker marker = null;
+
+            if(category.equals("basketball")) {
+                marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_basketball));
+            }else if (category.equals("football")){
+                marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_football));
+            }else if (category.equals("tennis")){
+                marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
+            marker.setTag(name);
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
-            }
-        });
+            markersMap.get(category).add(marker);
+            data.moveToNext();
+        }
 
-        //Football
-        Call<ResponseBody> footballCall = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"football court");
-
-        footballCall.enqueue(new Callback<ResponseBody>() {
-            @SneakyThrows
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 200){
-                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
-                    JsonNode resultsListJSON = responseJSON.get("results");
-                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
-                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
-                    ArrayList<Marker> markers = markersMap.get("football");
-                    for (PlaceDTO place : placesList) {
-                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_football));
-                        marker.setTag(place);
-                        markers.add(marker);
-                    }
-                }else{
-                    Log.e("MapFragment","Meesage recieved: "+response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
-            }
-        });
-
-        //Tennis
-        Call<ResponseBody> tennisCall = GooglePlacesServiceUtils.placesService.search(API_KEY_PLACES,locationToString(latLngForSearch),10000L,"tennis court");
-
-        tennisCall.enqueue(new Callback<ResponseBody>() {
-            @SneakyThrows
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 200){
-                    JsonNode responseJSON = objectMapper.readTree(response.body().string());
-                    JsonNode resultsListJSON = responseJSON.get("results");
-                    ArrayList<PlaceDTO> placesList = objectMapper.readValue(resultsListJSON.toString(), new TypeReference<ArrayList<PlaceDTO>>() {});
-                    Log.i("MapFragment","***** LISTA SPISAK LISTA SPISAK *****");
-                    ArrayList<Marker> markers = markersMap.get("tennis");
-                    for (PlaceDTO place : placesList) {
-                        Marker marker = addMarker(new LatLng(place.getGeometry().getLocation().getLat(),place.getGeometry().getLocation().getLng()),place.getName(),bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
-                        marker.setTag(place);
-                        markers.add(marker);
-                    }
-                }else{
-                    Log.e("MapFragment","Meesage recieved: "+response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("MapFragment", t.getMessage() != null?t.getMessage():"error");
-            }
-        });
 
 
 
@@ -643,10 +594,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getTag()!=null) {
-                    PlaceDTO placeDTO = (PlaceDTO) marker.getTag();
                     TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
-                    tvPlaceName.setText(placeDTO.getName());
-                    placeName = placeDTO.getName();
+                    tvPlaceName.setText((String)marker.getTag());
                     slidingPanel.setAnchorPoint(0.5f);
                     slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 }
@@ -756,40 +705,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         });
 
 
-    }
-
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] allColumns = {
-                DataBaseTables.ID,
-                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
-                DataBaseTables.SPORTSFIELDS_LATITUDE,
-                DataBaseTables.SPORTSFIELDS_LONGITUDE,
-                DataBaseTables.SPORTSFIELDS_NAME,
-                DataBaseTables.SPORTSFIELDS_FAVORITE
-        };
-
-        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
-                allColumns, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        while (data.moveToNext()) {
-            String type = data.getColumnIndex(DataBaseTables.SPOR)
-
-        }
-    }
-
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        for(ArrayList<Marker> markersList : markersMap.values())   {
-            for(Marker marker : markersList){
-                marker.remove();
-            }
-        }
     }
 
 }

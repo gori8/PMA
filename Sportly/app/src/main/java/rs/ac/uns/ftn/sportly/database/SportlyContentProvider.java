@@ -137,10 +137,11 @@ public class SportlyContentProvider extends ContentProvider {
 
     private long insertOrUpdateById(SQLiteDatabase db, Uri uri,
                                     ContentValues values, String column) throws SQLException {
+        long id;
         try {
-            long id = db.insertOrThrow(uri.getLastPathSegment(), null, values);
+            id = db.insertOrThrow(uri.getLastPathSegment(), null, values);
             getContext().getContentResolver().notifyChange(uri, null);
-            return id;
+
         } catch (SQLiteConstraintException e) {
             int nrRows = update(uri, values, column + "=?",
                     new String[]{values.getAsString(column)});
@@ -151,9 +152,21 @@ public class SportlyContentProvider extends ContentProvider {
                     new String[]{DataBaseTables.ID}, null,null,null);
             cursor.moveToFirst();
 
-            long id = cursor.getLong(0);
-            return id;
+            id = cursor.getLong(0);
         }
+
+        int uriType = sURIMatcher.match(uri);
+        switch(uriType){
+            case SPORTSFIELDS:{
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FAVORITES), null);
+            }break;
+            case EVENTS:{
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_MY_EVENTS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
+            }break;
+        }
+
+        return id;
     }
 
     @Override
