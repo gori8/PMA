@@ -32,6 +32,7 @@ public class SportlyContentProvider extends ContentProvider {
     private static final int MY_EVENTS = 7;
     private static final int PARTICIPATING_EVENTS = 8;
     private static final int FAVORITES = 9;
+    private static final int SPORTSFIELDS_EVENTS = 10;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -49,6 +50,7 @@ public class SportlyContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_MY_EVENTS, MY_EVENTS);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_PARTICIPATING_EVENTS, PARTICIPATING_EVENTS);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FAVORITES, FAVORITES);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.SPORTSFIELDS_EVENTS + "/#", SPORTSFIELDS_EVENTS);
     }
 
     @Override
@@ -102,6 +104,11 @@ public class SportlyContentProvider extends ContentProvider {
                 queryBuilder.appendWhere(DataBaseTables.SPORTSFIELDS_FAVORITE + "="
                         + 1);
                 queryBuilder.setTables(DataBaseTables.TABLE_SPORTSFIELDS);
+                break;
+            case SPORTSFIELDS_EVENTS:
+                queryBuilder.appendWhere(DataBaseTables.EVENTS_SPORTS_FILED_ID + "="
+                        + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
