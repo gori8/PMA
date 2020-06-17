@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "781425400188",
+    "firebase_url": "https://sportly-768ab.firebaseio.com",
+    "project_id": "sportly-768ab",
+    "storage_bucket": "sportly-768ab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781425400188:android:89f06d41497a89b6d3acf9",
+        "android_client_info": {
+          "package_name": "rs.ac.uns.ftn.sportly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "781425400188-038t00nt15r01f823tu81vjml5ssp3sh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYOgY0F_8-6hUdujuwBw6hM9HRhlEM2iM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "781425400188-038t00nt15r01f823tu81vjml5ssp3sh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

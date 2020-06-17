@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_map">
+
+    <fragment
+        android:id="@+id/navigation_friends"
+        android:name="rs.ac.uns.ftn.sportly.ui.friends.FriendsFragment"
+        android:label="@string/title_friends"
+        tools:layout="@layout/fragment_friends" />
+
+    <fragment
+        android:id="@+id/navigation_favorites"
+        android:name="rs.ac.uns.ftn.sportly.ui.favorites.FavoritesFragment"
+        android:label="@string/title_favorites"
+        tools:layout="@layout/fragment_favorites" />
+
+    <fragment
+        android:id="@+id/navigation_map"
+        android:name="rs.ac.uns.ftn.sportly.ui.map.MapFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_map" />
+
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="rs.ac.uns.ftn.sportly.ui.notifications.NotificationsFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_messages"
+        android:name="rs.ac.uns.ftn.sportly.ui.messages.MessagesFragment"
+        android:label="@string/title_messages"
+        tools:layout="@layout/fragment_messages" />
+
+    <fragment
+        android:id="@+id/navigation_profile_management"
+        android:name="rs.ac.uns.ftn.sportly.ui.profile_management.ProfileManagementFragment"
+        android:label="@string/title_profile_management"
+        tools:layout="@layout/fragment_profile_management" />
+
+    <fragment
+        android:id="@+id/navigation_my_events"
+        android:name="rs.ac.uns.ftn.sportly.ui.my_events.MyEventsFragment"
+        android:label="@string/title_my_events"
+        tools:layout="@layout/fragment_my_events" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="rs.ac.uns.ftn.sportly.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

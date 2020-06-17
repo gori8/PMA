@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:background="@color/colorPrimary">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main_drawer_icon"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/stevan_vulic"
+        android:clickable="true"
+        android:onClick="onDrawerIconClick"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/white"/>
+
+    <TextView
+        android:id="@+id/drawer_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:textColor="@color/white"
+        android:text="Stevan Vulic"
+        android:layout_marginTop="30dp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/main_drawer_icon"
+        android:layout_toEndOf="@+id/main_drawer_icon" />
+
+    <TextView android:id="@+id/drawer_subTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stevanvulic96@gmail.com"
+        android:textSize="12sp"
+        android:layout_toRightOf="@+id/main_drawer_icon"
+        android:layout_below="@+id/drawer_title"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/white"/>
+
+</RelativeLayout>
