@@ -209,6 +209,7 @@ public class LoginServiceImpl implements  LoginService{
                 user.setLastName(ret.getIme());
                 user.setEmail(ret.getEmail());
                 user.setPassword(null);
+                user.setEnabled(true);
                 user = userRepository.save(user);
             }else {
                 logger.info("User already exists");
@@ -259,6 +260,7 @@ public class LoginServiceImpl implements  LoginService{
             user.setLastName(ret.getIme());
             user.setEmail(ret.getEmail());
             user.setPassword(null);
+            user.setEnabled(true);
             user = userRepository.save(user);
         }else {
             logger.info("User already exists");

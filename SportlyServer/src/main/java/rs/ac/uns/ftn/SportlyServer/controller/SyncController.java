@@ -47,6 +47,7 @@ public class SyncController {
 
     @RequestMapping(value = "/test/{title}/{body}", method = RequestMethod.POST)
     public ResponseEntity<?> testNotif(@PathVariable("title") String title, @PathVariable("body") String body) {
+        //set to whoever you want to send notification to
         String username = "goriantolovic@gmail.com";
 
         User user = userRepository.findByEmail(username);
@@ -59,7 +60,7 @@ public class SyncController {
         pushNotificationService.sendPushNotificationWithoutData(request);
 
 
-        return new ResponseEntity<>(syncService.getSyncData(username), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
