@@ -13,10 +13,17 @@
         android:theme="@style/AppTheme">
 
         <service android:name="rs.ac.uns.ftn.sportly.sync.SyncDataService" />
-        <service android:name="rs.ac.uns.ftn.sportly.notifications.NotificationService" />
-        <receiver android:name="rs.ac.uns.ftn.sportly.notifications.NotificationReciever" />
+
+        <receiver android:name=".notifications.FCMNotificationReceiver" />
 
 
+        <service
+            android:name="rs.ac.uns.ftn.sportly.notifications.FCMNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
 
         <activity

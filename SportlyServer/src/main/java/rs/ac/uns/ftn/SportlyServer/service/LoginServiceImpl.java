@@ -78,7 +78,7 @@ public class LoginServiceImpl implements  LoginService{
     public UserDTO register(UserDTO userDTO) throws RollbackException {
         User user = new User();
 
-        if(userRepository.findByEmail(userDTO.getUsername()) != null){
+        if(userRepository.findByEmail(userDTO.getEmail()) != null){
             userDTO.setId(null);
             return userDTO;
         }
@@ -201,16 +201,21 @@ public class LoginServiceImpl implements  LoginService{
             ret.setExpiresIn(expiresIn);
             ret.setToken(jwt);
 
-            if(userRepository.findByEmail(ret.getEmail())==null){
-                User user = new User();
+            User user = userRepository.findByEmail(ret.getEmail());
+
+            if(user==null){
+                user = new User();
                 user.setFirstName(ret.getIme());
                 user.setLastName(ret.getIme());
                 user.setEmail(ret.getEmail());
                 user.setPassword(null);
-                userRepository.save(user);
+                user = userRepository.save(user);
             }else {
                 logger.info("User already exists");
             }
+
+            ret.setId(user.getId());
+
 
 
             return ret;
@@ -246,16 +251,20 @@ public class LoginServiceImpl implements  LoginService{
         ret.setExpiresIn(expiresIn);
         ret.setToken(jwt);
 
-        if(userRepository.findByEmail(ret.getEmail())==null){
-            User user = new User();
+        User user = userRepository.findByEmail(ret.getEmail());
+
+        if(user==null){
+            user = new User();
             user.setFirstName(ret.getIme());
             user.setLastName(ret.getIme());
             user.setEmail(ret.getEmail());
             user.setPassword(null);
-            userRepository.save(user);
+            user = userRepository.save(user);
         }else {
             logger.info("User already exists");
         }
+
+        ret.setId(user.getId());
 
         return ret;
     }

@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -17,11 +16,13 @@ import android.widget.Button;
 
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -33,8 +34,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import rs.ac.uns.ftn.sportly.notifications.NotificationReciever;
-import rs.ac.uns.ftn.sportly.notifications.NotificationService;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
@@ -51,16 +50,14 @@ public class MainActivity extends AppCompatActivity {
     NavController navController;
 
     public static String SYNC_DATA = "SYNC_DATA";
-    public static String NOTIFICATION = "NOTIFICATION";
+    public static String NOTIFICATION_INTENT = "NOTIFICATION";
 
 
     private PendingIntent pendingIntent;
 
-    private PendingIntent pendingNotificationIntent;
 
     private AlarmManager manager;
 
-    private NotificationReciever notificationReciever;
 
 
     String name;
@@ -80,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
-        Intent alarmNotificationIntent = new Intent(this, NotificationService.class);
-        pendingNotificationIntent = PendingIntent.getService(this, 889, alarmNotificationIntent, 0);
 
 
 
@@ -154,21 +149,30 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Sign out", new DialogInterface.OnClickListener()                 {
 
                     public void onClick(DialogInterface dialog, int which) {
-                        boolean google = false;
-                        boolean facebook = false;
-                        boolean email = false;
 
-                        if (LoginActivity.signInMethod == LoginActivity.GOOGLE){
-                            google = tryGoogleSignOut();
-                        }else if(LoginActivity.signInMethod == LoginActivity.FACEBOOK){
-                            facebook = tryFacebookSignOut();
-                        }else if(LoginActivity.signInMethod == LoginActivity.EMAIL_ACCOUNT){
-                            email = true;
-                        }
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(JwtTokenUtils.getUserId(MainActivity.this).toString())
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        boolean google = false;
+                                        boolean facebook = false;
+                                        boolean email = false;
 
-                        if(google || facebook || email) {
-                            goToLoginActivity();
-                        }
+                                        if (LoginActivity.signInMethod == LoginActivity.GOOGLE){
+                                            google = tryGoogleSignOut();
+                                        }else if(LoginActivity.signInMethod == LoginActivity.FACEBOOK){
+                                            facebook = tryFacebookSignOut();
+                                        }else if(LoginActivity.signInMethod == LoginActivity.EMAIL_ACCOUNT){
+                                            email = true;
+                                        }
+
+                                        if(google || facebook || email) {
+                                            goToLoginActivity();
+                                        }
+                                    }
+                                });;
+
+
                     }
                 }).setNegativeButton("Cancel", null);
 
@@ -272,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        manager.cancel(pendingNotificationIntent);
         manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 20*1000, pendingIntent);
     }
 
@@ -286,7 +289,6 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("MAIN ACTIVITY","ACTIVITY MAIN PAUSED");
 
-        manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10*1000, pendingNotificationIntent);
 
 
         super.onPause();

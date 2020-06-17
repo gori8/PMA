@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 
@@ -36,7 +37,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -78,6 +85,10 @@ public class LoginActivity extends AppCompatActivity {
     //----------EMAIL----------
     public static final int EMAIL_SIGN_IN = 135;
     public static final String EMAIL_ACCOUNT = "Account";
+
+    //---------FIREBASE---------
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference usersRef = database.getReference("users");
 
 
     @Override
@@ -312,8 +323,18 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Google sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getToken(), LoginActivity.this);
-                    goToMainActivityIfLoginSuccess(GOOGLE);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getToken(), LoginActivity.this);
+
+                    Log.i("GOOGLE SIGN IN","User ID: "+userDTO.getId());
+
+                    FirebaseMessaging.getInstance().subscribeToTopic(userDTO.getId().toString())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    goToMainActivityIfLoginSuccess(GOOGLE);
+                                }
+                            });
+
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
                 }
@@ -416,8 +437,20 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Facebook sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getToken(), LoginActivity.this);
-                    goToMainActivityIfLoginSuccess(FACEBOOK);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getToken(), LoginActivity.this);
+
+
+                    Log.i("FACEBOOK SIGN IN","User ID: "+userDTO.getId());
+
+                    FirebaseMessaging.getInstance().subscribeToTopic(userDTO.getId().toString())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    goToMainActivityIfLoginSuccess(FACEBOOK);
+                                }
+                            });
+
+
                 }else{
                     Log.d("REZ","Meesage recieved: "+response.code());
                 }
