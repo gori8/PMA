@@ -12,5 +12,6 @@
     <color name="background">#fff</color>
     <color name="message">#454545</color>
     <color name="apply">#2889FF</color>
+    <color name="lightGreen">#69A177</color>
 
 </resources>

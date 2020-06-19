@@ -12,6 +12,7 @@ import rs.ac.uns.ftn.SportlyServer.model.User;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 import rs.ac.uns.ftn.SportlyServer.service.PushNotificationService;
 import rs.ac.uns.ftn.SportlyServer.service.SyncService;
+import rs.ac.uns.ftn.SportlyServer.service.UserService;
 
 @Controller
 @RequestMapping("/sync")
@@ -20,6 +21,9 @@ public class SyncController {
 
     @Autowired
     SyncService syncService;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     PushNotificationService pushNotificationService;
@@ -61,6 +65,12 @@ public class SyncController {
 
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/people/{filterText}", method = RequestMethod.GET)
+    public ResponseEntity<?> searchPeople(@PathVariable("filterText") String filterText) {
+
+        return new ResponseEntity<>(userService.searchPeople(filterText), HttpStatus.OK);
     }
 
 }
