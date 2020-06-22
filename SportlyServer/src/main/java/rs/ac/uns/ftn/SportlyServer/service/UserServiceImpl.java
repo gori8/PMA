@@ -26,31 +26,46 @@ public class UserServiceImpl implements UserService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(username);
 
-        List<User> peopleList = userRepository.findByFilterText(filterText, username);
+        String[] wordsList = filterText.split(" ");
+
         System.out.println("Filter text: "+filterText);
         System.out.println("Email: "+username);
+
         List<PeopleDTO> ret = new ArrayList<>();
+        for (String word:wordsList) {
 
-        for(User u : peopleList){
-
-            System.out.println(u.getEmail());
-
-            PeopleDTO dto = new PeopleDTO();
-            dto.setEmail(u.getEmail());
-            dto.setFirstName(u.getFirstName());
-            dto.setId(u.getId());
-            dto.setLastName(u.getLastName());
-            dto.setUsername(u.getUsername());
-
-            if(friendshipService.isFriend(username, u.getEmail())){
-                dto.setFriend(true);
-            }else{
-                dto.setFriend(false);
+            if(word.trim().equals("")){
+                continue;
             }
 
-            ret.add(dto);
+            List<User> peopleList = userRepository.findByFilterText(word, username);
+
+            for(User u : peopleList){
+                if(!containsUser(ret,u.getId())){
+                    System.out.println(u.getEmail());
+
+                    PeopleDTO dto = new PeopleDTO();
+                    dto.setEmail(u.getEmail());
+                    dto.setFirstName(u.getFirstName());
+                    dto.setId(u.getId());
+                    dto.setLastName(u.getLastName());
+                    dto.setUsername(u.getUsername());
+
+                    if(friendshipService.isFriend(username, u.getEmail())){
+                        dto.setFriend(true);
+                    }else{
+                        dto.setFriend(false);
+                    }
+
+                    ret.add(dto);
+                }
+            }
         }
 
         return ret;
+    }
+
+    public boolean containsUser(final List<PeopleDTO> list, final Long id){
+        return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
     }
 }
