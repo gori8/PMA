@@ -193,9 +193,14 @@ public class LoginServiceImpl implements  LoginService{
             logger.info("Familiy name: " + familyName);
             logger.info("Given name: " + givenName);
 
+            String[] split = name.split(" ");
+            String firstName = split[0];
+            String lastName = split[1];
+
             UserDTO ret =new UserDTO();
             ret.setEmail(email);
-            ret.setIme(name);
+            ret.setIme(firstName);
+            ret.setPrezime(lastName);
             String jwt = tokenUtils.generateToken(email);
             int expiresIn = tokenUtils.getExpiredIn();
             ret.setExpiresIn(expiresIn);
@@ -206,7 +211,7 @@ public class LoginServiceImpl implements  LoginService{
             if(user==null){
                 user = new User();
                 user.setFirstName(ret.getIme());
-                user.setLastName(ret.getIme());
+                user.setLastName(ret.getPrezime());
                 user.setEmail(ret.getEmail());
                 user.setPassword(null);
                 user.setEnabled(true);
@@ -243,10 +248,14 @@ public class LoginServiceImpl implements  LoginService{
         logger.info("Name: " + facebookResponse.getName());
         logger.info("Id: " + facebookResponse.getId());
 
+        String[] split = facebookResponse.getName().split(" ");
+        String firstName = split[0];
+        String lastName = split[1];
 
         UserDTO ret =new UserDTO();
         ret.setEmail(facebookResponse.getEmail());
-        ret.setIme(facebookResponse.getName());
+        ret.setIme(firstName);
+        ret.setPrezime(lastName);
         String jwt = tokenUtils.generateToken(facebookResponse.getEmail());
         int expiresIn = tokenUtils.getExpiredIn();
         ret.setExpiresIn(expiresIn);
@@ -257,7 +266,7 @@ public class LoginServiceImpl implements  LoginService{
         if(user==null){
             user = new User();
             user.setFirstName(ret.getIme());
-            user.setLastName(ret.getIme());
+            user.setLastName(ret.getPrezime());
             user.setEmail(ret.getEmail());
             user.setPassword(null);
             user.setEnabled(true);

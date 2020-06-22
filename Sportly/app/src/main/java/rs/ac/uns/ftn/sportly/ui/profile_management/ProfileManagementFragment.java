@@ -451,11 +451,10 @@ public class ProfileManagementFragment extends Fragment {
         return image;
     }
 
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    public void galleryAddPic() {
         File f = new File(currentPhotoPath);
         Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,contentUri);
         this.getContext().sendBroadcast(mediaScanIntent);
     }
 }
