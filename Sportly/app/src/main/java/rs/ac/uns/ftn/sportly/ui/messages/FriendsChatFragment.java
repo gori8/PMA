@@ -46,7 +46,6 @@ public class FriendsChatFragment extends Fragment{
 
     private View mMainView;
 
-    private FriendsCursorRecyclerAdapter adapter;
 
 
     public FriendsChatFragment() {
@@ -67,7 +66,6 @@ public class FriendsChatFragment extends Fragment{
         mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrent_user_id);
         mFriendsDatabase.keepSynced(true);
 
-        adapter=new FriendsCursorRecyclerAdapter(getActivity(),null);
 
 
 
