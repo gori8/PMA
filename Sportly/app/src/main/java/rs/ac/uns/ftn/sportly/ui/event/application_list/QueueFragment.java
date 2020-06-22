@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
-import rs.ac.uns.ftn.sportly.ui.messages.MessagesAdapter;
 
 public class QueueFragment extends Fragment {
     public QueueFragment() {

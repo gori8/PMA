@@ -16,6 +16,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    FriendshipService friendshipService;
+
     @Override
     public List<PeopleDTO> searchPeople(String filterText){
 
@@ -39,7 +42,7 @@ public class UserServiceImpl implements UserService {
             dto.setLastName(u.getLastName());
             dto.setUsername(u.getUsername());
 
-            if(user.containsFriend(u.getEmail())){
+            if(friendshipService.isFriend(username, u.getEmail())){
                 dto.setFriend(true);
             }else{
                 dto.setFriend(false);

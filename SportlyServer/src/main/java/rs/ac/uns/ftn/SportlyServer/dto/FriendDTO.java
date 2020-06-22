@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.SportlyServer.model.User;
 
 @Getter
 @Setter
@@ -18,4 +19,5 @@ public class FriendDTO {
     private String lastName;
 
     private String email;
+
 }

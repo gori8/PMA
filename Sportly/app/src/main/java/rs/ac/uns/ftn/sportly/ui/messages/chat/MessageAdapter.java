@@ -152,7 +152,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     public int getItemViewType(int position) {
-        if(!mMessageList.get(position).getFrom().equals(JwtTokenUtils.getUserId(context).toString())){
+        if(mMessageList.get(position).getFrom().equals(JwtTokenUtils.getUserId(context).toString())){
             return MSG_TYPE_RIGHT;
         }else{
             return MSG_TYPE_LEFT;
