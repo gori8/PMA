@@ -54,10 +54,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if(viewType == MSG_TYPE_LEFT) {
             v=LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.message_single_layout_left, parent, false);
+                        .inflate(R.layout.chat_item_left, parent, false);
         }else{
             v=LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.message_single_layout_right, parent, false);
+                    .inflate(R.layout.chat_item_right, parent, false);
         }
 
 
@@ -69,7 +69,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         public TextView messageText;
         public CircleImageView profileImage;
-        public TextView displayName;
+        //public TextView displayName;
         public TextView timeText;
         public ImageView messageImage;
 
@@ -78,7 +78,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
             profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
-            displayName = (TextView) view.findViewById(R.id.name_text_layout);
+            //displayName = (TextView) view.findViewById(R.id.name_text_layout);
             messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
             timeText = (TextView) view.findViewById(R.id.time_text_layout);
 
@@ -96,16 +96,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
 
-        if(from_user.equals(JwtTokenUtils.getUserId(context).toString())){
-
-            viewHolder.messageText.setBackgroundColor(Color.WHITE);
-            viewHolder.messageText.setTextColor(Color.BLACK);
-
-        }else{
-
-            viewHolder.messageText.setBackgroundResource(R.color.colorPrimaryDark);
-            viewHolder.messageText.setTextColor(Color.WHITE);
-        }
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -114,7 +104,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 String name = dataSnapshot.child("name").getValue().toString();
                 String image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                viewHolder.displayName.setText(name);
+                //viewHolder.displayName.setText(name);
 
                 Picasso.get().load(image)
                         .placeholder(R.drawable.default_avatar).into(viewHolder.profileImage);
