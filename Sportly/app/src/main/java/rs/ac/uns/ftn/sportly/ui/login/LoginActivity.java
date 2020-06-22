@@ -587,7 +587,7 @@ public class LoginActivity extends AppCompatActivity {
             String device_token = FirebaseInstanceId.getInstance().getToken();
 
             HashMap<String, String> userMap = new HashMap<>();
-            userMap.put("name", user.getIme());
+            userMap.put("name", user.getIme() + " " + user.getPrezime());
             userMap.put("status", "Hi there I'm using Lapit Chat App.");
             userMap.put("image", "default");
             userMap.put("thumb_image", "default");
