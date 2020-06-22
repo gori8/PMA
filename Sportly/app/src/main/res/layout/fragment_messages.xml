@@ -12,11 +12,55 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/messages_list"
+        <RadioGroup
+            android:checkedButton="@+id/switch_conv"
+            android:id="@+id/chatlist_switch"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            ></ListView>
+            android:layout_height="30dp"
+            android:layout_marginBottom="25dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/background_outline_switch_chat"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="1dp"
+                android:id="@+id/switch_conv"
+                android:background="@drawable/background_switch_chat"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/switch_conversations"
+                android:textColor="@color/white" />
+
+            <RadioButton
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:id="@+id/switch_friends"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/background_switch_chat"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/switch_friends"
+                android:textColor="@color/white" />
+        </RadioGroup>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/chatlist_container">
+    </LinearLayout>
+
 
     </LinearLayout>
 

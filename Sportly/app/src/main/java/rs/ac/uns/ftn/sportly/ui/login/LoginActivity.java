@@ -39,8 +39,11 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -49,6 +52,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -88,8 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //---------FIREBASE---------
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference usersRef = database.getReference("users");
-
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -331,7 +334,7 @@ public class LoginActivity extends AppCompatActivity {
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    goToMainActivityIfLoginSuccess(GOOGLE);
+                                    registerUserOnFirebase(userDTO, GOOGLE);
                                 }
                             });
 
@@ -446,7 +449,7 @@ public class LoginActivity extends AppCompatActivity {
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    goToMainActivityIfLoginSuccess(FACEBOOK);
+                                    registerUserOnFirebase(userDTO, FACEBOOK);
                                 }
                             });
 
@@ -547,5 +550,61 @@ public class LoginActivity extends AppCompatActivity {
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
+    }
+
+    private void registerUserOnFirebase(UserDTO user, String authType) {
+
+        String id = user.getId().toString();
+
+
+        final boolean[] flagRegistered = {false};
+
+        FirebaseDatabase.getInstance().getReference().child("Users").orderByKey().equalTo(id).addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            flagRegistered[0] = true;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                }
+        );
+
+
+        if (!flagRegistered[0]) {
+
+
+            mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
+
+            String device_token = FirebaseInstanceId.getInstance().getToken();
+
+            HashMap<String, String> userMap = new HashMap<>();
+            userMap.put("name", user.getIme());
+            userMap.put("status", "Hi there I'm using Lapit Chat App.");
+            userMap.put("image", "default");
+            userMap.put("thumb_image", "default");
+            userMap.put("device_token", device_token);
+
+            mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                        goToMainActivityIfLoginSuccess(authType);
+
+                    }
+
+                }
+            });
+        } else {
+            goToMainActivityIfLoginSuccess(authType);
+        }
     }
 }

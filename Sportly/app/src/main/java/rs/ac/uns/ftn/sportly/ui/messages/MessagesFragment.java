@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.messages;
 
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -13,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.ui.friends.FriendsFragment;
 
 public class MessagesFragment extends Fragment {
 
@@ -30,29 +33,31 @@ public class MessagesFragment extends Fragment {
         return root;
     }
 
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
-        List<String> names = new ArrayList<>();
-        names.add("Milan Škrbić");
-        names.add("Stevan Vulić");
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        List<Integer> images = new ArrayList<>();
-        images.add(R.drawable.milan_skrbic);
-        images.add(R.drawable.stevan_vulic);
 
-        List<String> info = new ArrayList<>();
-        info.add("Vazi, mozemo se prijaviti u petak.");
-        info.add("Pozdrav!");
 
-        List<String> time = new ArrayList<>();
-        time.add("20:18");
-        time.add("2d");
+        RadioGroup rg = (RadioGroup) view.findViewById(R.id.chatlist_switch);
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.switch_conv:{
+                        ConversationsFragment conversationsFragment = new ConversationsFragment();
+                        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                        transaction.replace(R.id.chatlist_container, conversationsFragment).commit();
+                    }break;
+                    case R.id.switch_friends:{
+                        FriendsChatFragment friendsChatFragment = new FriendsChatFragment();
+                        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                        transaction.replace(R.id.chatlist_container, friendsChatFragment).commit();
+                    }break;
+                }
+            }
 
-        MessagesAdapter adapter = new MessagesAdapter(getContext(), names, images, info, time);
+        });
 
-        ListView listView = (ListView) getActivity().findViewById(R.id.messages_list);
-        listView.setAdapter(adapter);
     }
-
 }

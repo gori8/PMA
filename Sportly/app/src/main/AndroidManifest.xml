@@ -39,9 +39,6 @@
             android:name=".ui.event.EventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.messages.chat.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".ui.register.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -78,6 +75,10 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.messages.chat.ChatActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChatTheme"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

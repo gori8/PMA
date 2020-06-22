@@ -22,6 +22,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
@@ -66,17 +69,20 @@ public class MainActivity extends AppCompatActivity {
     String email;
     int photoUrl;
 
+    private DatabaseReference mUserRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(JwtTokenUtils.getUserId(this).toString());
+
         Intent alarmIntent = new Intent(this, SyncDataService.class);
         pendingIntent = PendingIntent.getService(this, 888, alarmIntent, 0);
 
         manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
 
 
 
@@ -295,6 +301,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mUserRef.child("online").setValue("true");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+    }
 
 
 }

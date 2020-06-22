@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.sportly.ui.event.application_list;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -16,10 +15,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
-import rs.ac.uns.ftn.sportly.model.Event;
-import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.messages.chat.ChatActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 

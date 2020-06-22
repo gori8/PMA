@@ -40,5 +40,7 @@
     <string name="tennis">Tennis</string>
     <string name="all">All</string>
     <string name="default_notification_channel_id">NOTIFICATIONS_CHANNEL</string>
+    <string name="switch_conversations">Conversations</string>
+    <string name="switch_friends">Friends</string>
 
 </resources>
