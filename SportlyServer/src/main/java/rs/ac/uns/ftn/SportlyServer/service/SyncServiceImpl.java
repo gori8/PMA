@@ -24,24 +24,20 @@ public class SyncServiceImpl implements SyncService {
     @Autowired
     SportsFieldRepository sportsFieldRepository;
 
+    @Autowired
+    FriendshipService friendshipService;
+
     @Override
     public SyncDataDTO getSyncData(String username){
         SyncDataDTO syncDataDTO = new SyncDataDTO();
 
-
         //USER DATA
         User user = userRepository.findByEmail(username);
-
-        for (User friend : user.getFriends()) {
-            FriendDTO friendDTO = new FriendDTO();
-            friendDTO.setId(friend.getId());
-            friendDTO.setUsername(friend.getUsername());
-            friendDTO.setFirstName(friend.getFirstName());
-            friendDTO.setLastName(friend.getLastName());
-            friendDTO.setEmail(friend.getEmail());
-
-            syncDataDTO.getFriends().add(friendDTO);
+        if(user == null){
+            return null;
         }
+
+        syncDataDTO.setFriends(friendshipService.getUserFriends(username));
 
         for (SportsField sportsField : user.getFavourite()){
             syncDataDTO.getFavorite().add(sportsField.getId());

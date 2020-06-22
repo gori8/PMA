@@ -1,10 +1,7 @@
 package rs.ac.uns.ftn.SportlyServer.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -12,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import rs.ac.uns.ftn.SportlyServer.dto.FriendDTO;
 
 
 @Entity
@@ -37,21 +35,11 @@ public class User implements UserDetails {
 
     private Boolean enabled;
 
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(name="friends",
-            joinColumns=@JoinColumn(name="user_id"),
-            inverseJoinColumns=@JoinColumn(name="friend_id")
-    )
-    private List<User> friends;
+    @OneToMany(mappedBy = "friendshipRequester")
+    private List<Friendship> requestedFriendships = new ArrayList<>();
 
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(name="friends",
-            joinColumns=@JoinColumn(name="friend_id"),
-            inverseJoinColumns=@JoinColumn(name="user_id")
-    )
-    private List<User> friendOf;
+    @OneToMany(mappedBy = "friendshipReceiver")
+    private List<Friendship> receivedFriendships = new ArrayList<>();
 
     @ManyToMany
     @JsonIgnore
@@ -125,7 +113,18 @@ public class User implements UserDetails {
         return true;
     }
 
-    public boolean containsFriend(final String email){
-        return friends.stream().filter(o -> o.getEmail().equals(email)).findFirst().isPresent();
+//    public boolean containsFriend(final String email){
+//        return friends.stream().filter(o -> o.getEmail().equals(email)).findFirst().isPresent();
+//        return true;
+//    }
+
+    public FriendDTO createFriendDto(){
+        FriendDTO friend = new FriendDTO();
+        friend.setId(this.getId());
+        friend.setUsername(this.getUsername());
+        friend.setFirstName(this.getFirstName());
+        friend.setLastName(this.getLastName());
+        friend.setEmail(this.getEmail());
+        return friend;
     }
 }
