@@ -28,15 +28,20 @@ public class MessagesFragment extends Fragment {
    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_messages, container, false);
+       View root = inflater.inflate(R.layout.fragment_messages, container, false);
 
-        return root;
+       ConversationsFragment conversationsFragment = new ConversationsFragment();
+       FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+       transaction.replace(R.id.chatlist_container, conversationsFragment).commit();
+
+       return root;
     }
 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
 
 
 
