@@ -24,8 +24,7 @@ public class UserServiceImpl implements UserService {
 
         filterText = filterText.toLowerCase().trim();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(username);
-
+       
         String[] wordsList = filterText.split(" ");
 
         System.out.println("Filter text: "+filterText);
