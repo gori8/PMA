@@ -240,6 +240,9 @@ public class LoginActivity extends AppCompatActivity {
         Button register = findViewById(R.id.register_button);
         register.setVisibility(View.GONE);
 
+        TextView forgotPass = findViewById(R.id.forgot_password_message);
+        forgotPass.setVisibility(View.GONE);
+
         //on sign in view show loading
         findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
