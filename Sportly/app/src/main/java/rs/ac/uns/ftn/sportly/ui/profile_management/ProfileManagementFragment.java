@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.profile_management;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +25,18 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import id.zelory.compressor.Compressor;
 import lombok.SneakyThrows;
+import pub.devrel.easypermissions.EasyPermissions;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
+import rs.ac.uns.ftn.sportly.utils.RealPathUtil;
 
 public class ProfileManagementFragment extends Fragment {
     private String name;
@@ -36,6 +44,12 @@ public class ProfileManagementFragment extends Fragment {
     private String gender;
     private String username;
     private int photoUrl;
+
+    private String[] galleryPermissions = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+    };
 
     private static final int CAMERA = 101;
     private static final int GALLERY = 102;
@@ -104,13 +118,13 @@ public class ProfileManagementFragment extends Fragment {
         surnameEdit.setText("");
         usernameEdit.setText("");
 
-        if(gender.equals("Male")){
+/*        if(gender.equals("Male")){
             genderMale.setChecked(true);
             genderFemale.setChecked(false);
         }else if(gender.equals("Female")){
             genderMale.setChecked(false);
             genderFemale.setChecked(true);
-        }
+        }*/
     }
 
     public void setMessage(String text){
@@ -183,20 +197,28 @@ public class ProfileManagementFragment extends Fragment {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Take Photo"))
-                {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                        startActivityForResult(takePictureIntent, CAMERA);
+
+                if (EasyPermissions.hasPermissions(ProfileManagementFragment.this.getContext(), galleryPermissions)) {
+                    if (options[item].equals("Take Photo"))
+                    {
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            startActivityForResult(takePictureIntent, CAMERA);
+                        }
                     }
-                }
-                else if (options[item].equals("Choose from Gallery"))
-                {
-                    Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, GALLERY);
-                }
-                else if (options[item].equals("Cancel")) {
-                    dialog.dismiss();
+                    else if (options[item].equals("Choose from Gallery"))
+                    {
+                        Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, GALLERY);
+                    }
+                    else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }else {
+                    EasyPermissions.requestPermissions(ProfileManagementFragment.this,
+                            "You need to grant access for storage and camera.",
+                            101,
+                            galleryPermissions);
                 }
             }
         });
@@ -209,12 +231,28 @@ public class ProfileManagementFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == getActivity().RESULT_OK) {
             if (requestCode == CAMERA) {
+
+                //CODE FOR CAMERA IMAGE COMPRESSION
+
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
-                profilePhoto.setImageBitmap(imageBitmap);
+
+                String realPath = RealPathUtil.getRealPathFromBitmap(this.getContext(), imageBitmap);
+                File thumb_file = new File(realPath);
+                Bitmap thumb_image = compressImage(thumb_file);
+                profilePhoto.setImageBitmap(thumb_image);
             } else if (requestCode == GALLERY) {
+
+                //CODE FOR GALLERY IMAGE COMPRESSION
+
                 Uri mImageUri = data.getData();
-                try {
+                String realPath = RealPathUtil.getRealPathFromURI(this.getContext(), mImageUri);
+                File thumb_file = new File(realPath);
+                Bitmap thumb_image = compressImage(thumb_file);
+                profilePhoto.setImageBitmap(thumb_image);
+
+                //OLD CODE FOR GALLERY IMAGE
+                /*try {
                     Image = MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), mImageUri);
                     if (getOrientation(getActivity().getApplicationContext(), mImageUri) != 0) {
                         Matrix matrix = new Matrix();
@@ -222,6 +260,7 @@ public class ProfileManagementFragment extends Fragment {
                         if (rotateImage != null)
                             rotateImage.recycle();
                         rotateImage = Bitmap.createBitmap(Image, 0, 0, Image.getWidth(), Image.getHeight(), matrix,true);
+
                         profilePhoto.setImageBitmap(rotateImage);
                     } else
                         profilePhoto.setImageBitmap(Image);
@@ -229,9 +268,23 @@ public class ProfileManagementFragment extends Fragment {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }
+    }
+
+    public Bitmap compressImage(File imageFile) {
+        Bitmap compressedImage = null;
+        try {
+            compressedImage = new Compressor(this.getContext())
+                    .setMaxHeight(200)
+                    .setMaxWidth(200)
+                    .setQuality(75)
+                    .compressToBitmap(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return compressedImage;
     }
 
     public static int getOrientation(Context context, Uri photoUri) {
@@ -297,5 +350,13 @@ public class ProfileManagementFragment extends Fragment {
             photoUrl = R.drawable.igor_antolovic;
             gender = "Male";
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 }

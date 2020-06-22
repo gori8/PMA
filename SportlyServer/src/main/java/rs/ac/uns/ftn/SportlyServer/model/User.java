@@ -125,4 +125,7 @@ public class User implements UserDetails {
         return true;
     }
 
+    public boolean containsFriend(final String email){
+        return friends.stream().filter(o -> o.getEmail().equals(email)).findFirst().isPresent();
+    }
 }

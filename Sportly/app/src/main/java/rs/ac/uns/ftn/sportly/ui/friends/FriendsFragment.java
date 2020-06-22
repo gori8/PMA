@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,20 +21,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
-import rs.ac.uns.ftn.sportly.database.SportlySQLiteHelper;
+import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
+import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class FriendsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private SimpleCursorAdapter adapter;
+    private FriendsCursorAdapter adapter;
+    private FriendsFilterAdapter filterAdapter;
+
+    List<String> names = new ArrayList<>();
+    List<PeopleDTO> peopleList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +63,31 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
         ImageView searchClose = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         searchClose.setImageResource(R.drawable.ic_clear_24dp);
         super.onCreateOptionsMenu(menu,inflater);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                ListView friendsListView = (ListView) getView().findViewById(R.id.friends_list);
+                ListView peopleListView = (ListView) getView().findViewById(R.id.people_list);
+
+                if(newText.equals("")) {
+                    friendsListView.setVisibility(View.VISIBLE);
+                    peopleListView.setVisibility(View.GONE);
+                }else{
+                    searchPeople(newText);
+                    friendsListView.setVisibility(View.GONE);
+                    peopleListView.setVisibility(View.VISIBLE);
+                }
+
+                return false;
+            }
+        });
     }
 
 
@@ -68,15 +102,15 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        //CURSOR ADAPTER
         getLoaderManager().initLoader(0, null, this);
         String[] from = new String[] { DataBaseTables.FRIENDS_FIRST_NAME, DataBaseTables.FRIENDS_LAST_NAME };
-        int[] to = new int[] {R.id.firstName, R.id.lastName};
-        adapter = new SimpleCursorAdapter(getActivity(), R.layout.friend_item, null, from,
-                to, 0);
-        ListView listView = (ListView) getView().findViewById(R.id.friends_list);
-        listView.setAdapter(adapter);
+        int[] to = new int[] {R.id.name};
+        adapter = new FriendsCursorAdapter(getActivity(), R.layout.friend_item, null, from, to);
+        ListView friendsListView = (ListView) getView().findViewById(R.id.friends_list);
+        friendsListView.setAdapter(adapter);
 
-        listView.setOnItemClickListener((parent, view, position, id) -> {
+        friendsListView.setOnItemClickListener((parent, view, position, id) -> {
             Cursor cursor = (Cursor)adapter.getItem(position);
             String name = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_FIRST_NAME));
             String surname = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_LAST_NAME));
@@ -88,6 +122,47 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
             mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
         });
 
+        //FILTER ADAPTER
+        filterAdapter = new FriendsFilterAdapter(FriendsFragment.this.getContext(), peopleList, names);
+
+        ListView peopleListView = (ListView) getView().findViewById(R.id.people_list);
+        peopleListView.setAdapter(filterAdapter);
+    }
+
+    private void searchPeople(String filterText){
+
+        String jwt = JwtTokenUtils.getJwtToken(this.getContext());
+        String authHeader = "Bearer " + jwt;
+        Call<List<PeopleDTO>> call = SportlyServerServiceUtils.sportlyServerService.searchPeople(authHeader,filterText);
+
+        call.enqueue(new Callback<List<PeopleDTO>>() {
+             @Override
+             public void onResponse(Call<List<PeopleDTO>> call, Response<List<PeopleDTO>> response) {
+                 if (response.code() == 200){
+
+                     peopleList = response.body();
+                     filterAdapter.setPeopleList(peopleList);
+                     names.clear();
+
+                     for (PeopleDTO p : peopleList) {
+                        names.add(p.getFirstName() + " " + p.getLastName());
+                     }
+
+                     filterAdapter.notifyDataSetChanged();
+
+                     Log.d("SEARCH PEOPLE", "CALL TO SERVER SUCCESSFUL");
+                     Log.d("SEARCH PEOPLE", "RESPONSE SIZE: "+response.body().size());
+                 }else{
+                     Log.d("SEARCH PEOPLE", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<List<PeopleDTO>> call, Throwable t) {
+                 Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
+                 Log.d("SEARCH PEOPLE", "CALL TO SERVER FAILED");
+             }
+         });
     }
 
     @NonNull

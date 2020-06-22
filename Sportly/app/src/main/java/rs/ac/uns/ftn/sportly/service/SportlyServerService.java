@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.sportly.service;
 
+import java.util.List;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -8,9 +10,11 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 
@@ -33,4 +37,6 @@ public interface SportlyServerService {
     @POST("/auth/facebook/login")
     Call<UserDTO> postFacebookToken(@Body FacebookRequestDTO facebookRequestDTO);
 
+    @GET("/sync/people/{filterText}")
+    Call<List<PeopleDTO>> searchPeople(@Header("Authorization") String authHeader, @Path("filterText") String filterText);
 }
