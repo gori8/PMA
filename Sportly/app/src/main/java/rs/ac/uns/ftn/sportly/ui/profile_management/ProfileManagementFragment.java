@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.sportly.ui.profile_management;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -19,24 +21,42 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import id.zelory.compressor.Compressor;
 import lombok.SneakyThrows;
 import pub.devrel.easypermissions.EasyPermissions;
+import rs.ac.uns.ftn.sportly.BuildConfig;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.RealPathUtil;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ProfileManagementFragment extends Fragment {
     private String name;
@@ -44,6 +64,15 @@ public class ProfileManagementFragment extends Fragment {
     private String gender;
     private String username;
     private int photoUrl;
+    private Uri mImageUri;
+
+    private String currentPhotoPath;
+
+    private StorageReference mImageStorage;
+    private DatabaseReference mUserDatabase;
+    private Long current_user_id;
+
+    private ProgressDialog mProgressDialog;
 
     private String[] galleryPermissions = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -54,8 +83,6 @@ public class ProfileManagementFragment extends Fragment {
     private static final int CAMERA = 101;
     private static final int GALLERY = 102;
     ImageView profilePhoto;
-    private static Bitmap Image = null;
-    private static Bitmap rotateImage = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
@@ -94,6 +121,11 @@ public class ProfileManagementFragment extends Fragment {
 
         Button saveButton = getView().findViewById(R.id.edit_profile_save_button);
         setSaveButtonClickEvent(saveButton);
+
+        current_user_id = JwtTokenUtils.getUserId(ProfileManagementFragment.this.getContext());
+
+        mImageStorage = FirebaseStorage.getInstance().getReference();
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_user_id.toString());
 
         fillDataBasedOnEmail();
 
@@ -195,13 +227,21 @@ public class ProfileManagementFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Edit profile photo");
         builder.setItems(options, new DialogInterface.OnClickListener() {
+            @SneakyThrows
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
                 if (EasyPermissions.hasPermissions(ProfileManagementFragment.this.getContext(), galleryPermissions)) {
                     if (options[item].equals("Take Photo"))
                     {
+
+                        File file = createImageFile();
+                        mImageUri = FileProvider.getUriForFile(ProfileManagementFragment.this.getContext(), BuildConfig.APPLICATION_ID + ".fileprovider",file);
+
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+                        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                             startActivityForResult(takePictureIntent, CAMERA);
                         }
@@ -229,47 +269,82 @@ public class ProfileManagementFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        Bitmap thumb_bitmap=null;
+        Bitmap image_bitmap=null;
+
         if (resultCode == getActivity().RESULT_OK) {
+
+            mProgressDialog = new ProgressDialog(this.getContext());
+            mProgressDialog.setTitle("Uploading Image...");
+            mProgressDialog.setMessage("Please wait while we upload and process the image.");
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.show();
+
+            String realPath = "";
+
             if (requestCode == CAMERA) {
-
-                //CODE FOR CAMERA IMAGE COMPRESSION
-
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-                String realPath = RealPathUtil.getRealPathFromBitmap(this.getContext(), imageBitmap);
-                File thumb_file = new File(realPath);
-                Bitmap thumb_image = compressImage(thumb_file);
-                profilePhoto.setImageBitmap(thumb_image);
+                galleryAddPic();
+                realPath = currentPhotoPath;
+                System.out.println("PAAAAAAAAAAATH "+realPath);
             } else if (requestCode == GALLERY) {
-
-                //CODE FOR GALLERY IMAGE COMPRESSION
-
-                Uri mImageUri = data.getData();
-                String realPath = RealPathUtil.getRealPathFromURI(this.getContext(), mImageUri);
-                File thumb_file = new File(realPath);
-                Bitmap thumb_image = compressImage(thumb_file);
-                profilePhoto.setImageBitmap(thumb_image);
-
-                //OLD CODE FOR GALLERY IMAGE
-                /*try {
-                    Image = MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), mImageUri);
-                    if (getOrientation(getActivity().getApplicationContext(), mImageUri) != 0) {
-                        Matrix matrix = new Matrix();
-                        matrix.postRotate(getOrientation(getActivity().getApplicationContext(), mImageUri));
-                        if (rotateImage != null)
-                            rotateImage.recycle();
-                        rotateImage = Bitmap.createBitmap(Image, 0, 0, Image.getWidth(), Image.getHeight(), matrix,true);
-
-                        profilePhoto.setImageBitmap(rotateImage);
-                    } else
-                        profilePhoto.setImageBitmap(Image);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
+                mImageUri = data.getData();
+                realPath = RealPathUtil.getRealPathFromURI(this.getContext(), mImageUri);
             }
+            File thumb_file = new File(realPath);
+            thumb_bitmap = compressImage(thumb_file);
+            profilePhoto.setImageBitmap(thumb_bitmap);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            final byte[] thumb_byte = baos.toByteArray();
+
+            StorageReference filepath = mImageStorage.child("profile_images").child(current_user_id + ".jpg");
+            final StorageReference thumb_filepath = mImageStorage.child("profile_images").child("thumbs").child(current_user_id + ".jpg");
+
+            filepath.putFile(mImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                    if(task.isSuccessful()){
+
+                        final String download_url = filepath.getDownloadUrl().toString();
+
+                        UploadTask uploadTask = thumb_filepath.putBytes(thumb_byte);
+                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+
+                                String thumb_downloadUrl = thumb_filepath.getDownloadUrl().toString();
+
+                                if(thumb_task.isSuccessful()){
+
+                                    Map update_hashMap = new HashMap();
+                                    update_hashMap.put("image", download_url);
+                                    update_hashMap.put("thumb_image", thumb_downloadUrl);
+
+                                    mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                mProgressDialog.dismiss();
+                                                Toast.makeText(ProfileManagementFragment.this.getContext(), "Success Uploading.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    Toast.makeText(ProfileManagementFragment.this.getContext(), "Error in uploading thumbnail.", Toast.LENGTH_LONG).show();
+                                    mProgressDialog.dismiss();
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(ProfileManagementFragment.this.getContext(), "Error in uploading.", Toast.LENGTH_LONG).show();
+                        mProgressDialog.dismiss();
+                    }
+                }
+            });
         }
     }
 
@@ -358,5 +433,29 @@ public class ProfileManagementFragment extends Fragment {
 
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = this.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+    );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.getContext().sendBroadcast(mediaScanIntent);
     }
 }
