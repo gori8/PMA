@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 
 import java.util.ArrayList;
@@ -163,6 +164,9 @@ public class ChatActivity extends AppCompatActivity {
                     mLastSeenView.setText(lastSeenTime);
 
                 }
+
+                Picasso.get().load(image)
+                        .placeholder(R.drawable.default_avatar).into(mProfileImage);
 
             }
 

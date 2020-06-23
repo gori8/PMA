@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DatabaseReference;
@@ -308,30 +309,52 @@ public class ProfileManagementFragment extends Fragment {
 
                     if(task.isSuccessful()){
 
-                        final String download_url = filepath.getDownloadUrl().toString();
+                        final String[] download_url = new String[1];
+
+                         task.getResult().getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
+                         {
+                             @Override
+                             public void onSuccess(Uri downloadUrl)
+                             {
+                                 download_url[0] =downloadUrl.toString();
+                             }
+                         });
 
                         UploadTask uploadTask = thumb_filepath.putBytes(thumb_byte);
                         uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                String thumb_downloadUrl = thumb_filepath.getDownloadUrl().toString();
+
 
                                 if(thumb_task.isSuccessful()){
 
-                                    Map update_hashMap = new HashMap();
-                                    update_hashMap.put("image", download_url);
-                                    update_hashMap.put("thumb_image", thumb_downloadUrl);
+                                    final String[] thumb_downloadUrl = new String[1];
 
-                                    mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                    thumb_task.getResult().getMetadata().getReference().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
+                                    {
                                         @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
-                                                mProgressDialog.dismiss();
-                                                Toast.makeText(ProfileManagementFragment.this.getContext(), "Success Uploading.", Toast.LENGTH_LONG).show();
-                                            }
+                                        public void onSuccess(Uri downloadUrl)
+                                        {
+                                            thumb_downloadUrl[0] =downloadUrl.toString();
+                                            Map update_hashMap = new HashMap();
+                                            update_hashMap.put("image", download_url[0]);
+                                            update_hashMap.put("thumb_image", thumb_downloadUrl[0]);
+
+                                            mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        mProgressDialog.dismiss();
+                                                        Toast.makeText(ProfileManagementFragment.this.getContext(), "Success Uploading.", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
                                         }
                                     });
+
+
 
                                 } else {
                                     Toast.makeText(ProfileManagementFragment.this.getContext(), "Error in uploading thumbnail.", Toast.LENGTH_LONG).show();

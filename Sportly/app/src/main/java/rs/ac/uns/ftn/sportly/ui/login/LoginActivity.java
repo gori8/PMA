@@ -560,27 +560,9 @@ public class LoginActivity extends AppCompatActivity {
         String id = user.getId().toString();
 
 
-        final boolean[] flagRegistered = {false};
 
-        FirebaseDatabase.getInstance().getReference().child("Users").orderByKey().equalTo(id).addValueEventListener(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            flagRegistered[0] = true;
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                }
-        );
-
-
-        if (!flagRegistered[0]) {
-
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
+        if (databaseReference.getKey() == null) {
 
             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
 
@@ -606,8 +588,18 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
+
         } else {
+
             goToMainActivityIfLoginSuccess(authType);
+
         }
+
+
+
+
+
+
+
     }
 }
