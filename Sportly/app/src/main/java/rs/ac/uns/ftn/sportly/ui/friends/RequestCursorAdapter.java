@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.sportly.ui.friends;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -144,7 +146,52 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
             }
         });
 
-        Button deleteButton = view.findViewById(R.id.delete_button);
+        Button removeButton = view.findViewById(R.id.delete_button);
+
+        removeButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new MaterialAlertDialogBuilder(context)
+                        .setTitle("Remove friend")
+                        .setMessage("Do you really want to remove this friend?")
+                        .setIcon(R.drawable.ic_delete_black_24dp)
+                        .setNegativeButton("NO", null)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                FriendshipRequestDto request = new FriendshipRequestDto();
+                                String email = cursor.getString(emailIndex);
+                                request.setRecEmail(email);
+
+                                Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteFriend(authHeader,request);
+
+                                call.enqueue(new Callback<FriendshipDTO>() {
+                                    @Override
+                                    public void onResponse(Call<FriendshipDTO> call, Response<FriendshipDTO> response) {
+                                        if (response.code() == 200){
+
+                                            Log.i("REMOVE FRIEND", "CALL TO SERVER SUCCESSFUL");
+
+                                            context.getContentResolver().delete(
+                                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                                    DataBaseTables.FRIENDS_EMAIL+" = '"+email+"'",
+                                                    null);
+                                        }else{
+                                            Log.i("REMOVE FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<FriendshipDTO> call, Throwable t) {
+                                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                                        Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
+                                    }
+                                });
+                            }})
+                        .show();
+            }
+        });
+
 
     }
 }

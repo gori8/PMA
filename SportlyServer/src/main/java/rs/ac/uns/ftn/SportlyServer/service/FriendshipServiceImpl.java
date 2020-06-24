@@ -152,6 +152,11 @@ public class FriendshipServiceImpl implements FriendshipService {
             return null;
 
         Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req.getId(), rec.getId());
+
+        if(friendship == null){
+            friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(rec.getId(),req.getId());
+        }
+
         if(friendship == null || friendship.getFriendshipType().equals(FriendshipTypeEnum.DELETED)){
             //ne postoji prijateljstvo sa statusom PENDING ili CONFIRMED, zato se zahtev ne moze poslati
             return null;
@@ -173,6 +178,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     public boolean isFriend(String userEmail, String friendEmail) {
         List<FriendDTO> friends = getUserFriends(userEmail);
         friends.addAll(getFriendRequests(userEmail));
+        friends.addAll(getPendingFriends(userEmail));
         for(FriendDTO friend : friends){
             if(friend.getEmail().equals(friendEmail)){
                 return true;

@@ -5,8 +5,10 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -45,4 +47,12 @@ public interface SportlyServerService {
 
     @PUT("/friendship/confirmRequest")
     Call<FriendshipDTO> confirmRequest(@Header("Authorization") String authHeader, @Body FriendshipRequestDto request);
+
+    @POST("/friendship/sendRequest")
+    Call<FriendshipDTO> addFriend(@Header("Authorization") String authHeader, @Body FriendshipRequestDto request);
+
+    @HTTP(method = "DELETE", path = "/friendship/deleteFriendship", hasBody = true)
+    Call<FriendshipDTO> deleteFriend(@Header("Authorization") String authHeader, @Body FriendshipRequestDto request);
+
+
 }

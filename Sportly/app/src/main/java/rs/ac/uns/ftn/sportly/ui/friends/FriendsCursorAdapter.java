@@ -1,18 +1,23 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,8 +28,16 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
+import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filterable {
 
@@ -78,6 +91,57 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+
+        String jwt = JwtTokenUtils.getJwtToken(context);
+        String authHeader = "Bearer " + jwt;
+
+        ImageButton removeButton = view.findViewById(R.id.imageButton);
+        int emailIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_EMAIL);
+
+        removeButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new MaterialAlertDialogBuilder(context)
+                        .setTitle("Remove friend")
+                        .setMessage("Do you really want to remove this friend?")
+                        .setIcon(R.drawable.ic_delete_black_24dp)
+                        .setNegativeButton("NO", null)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                FriendshipRequestDto request = new FriendshipRequestDto();
+                                String email = cursor.getString(emailIndex);
+                                request.setRecEmail(email);
+
+                                Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteFriend(authHeader,request);
+
+                                call.enqueue(new Callback<FriendshipDTO>() {
+                                    @Override
+                                    public void onResponse(Call<FriendshipDTO> call, Response<FriendshipDTO> response) {
+                                        if (response.code() == 200){
+
+                                            Log.i("REMOVE FRIEND", "CALL TO SERVER SUCCESSFUL");
+
+                                            context.getContentResolver().delete(
+                                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                                    DataBaseTables.FRIENDS_EMAIL+" = '"+email+"'",
+                                                    null);
+                                        }else{
+                                            Log.i("REMOVE FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<FriendshipDTO> call, Throwable t) {
+                                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                                        Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
+                                    }
+                                });
+                            }})
+                        .show();
             }
         });
     }

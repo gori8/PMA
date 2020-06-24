@@ -13,7 +13,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findAllByFriendshipReceiver(User user);
     List<Friendship> findAllByFriendshipRequester(User user);
 
-    @Query("SELECT f from Friendship f WHERE f.friendshipRequester.id = ?1 AND f.friendshipReceiver.id = ?2")
+    @Query("SELECT f from Friendship f WHERE f.friendshipRequester.id = ?1 AND f.friendshipReceiver.id = ?2 AND f.friendshipType <> 'DELETED'")
     Friendship findByFriendshipRequesterAndFriendshipReceiver(Long reqId, Long recId);
 
     Friendship getById(Long id);
