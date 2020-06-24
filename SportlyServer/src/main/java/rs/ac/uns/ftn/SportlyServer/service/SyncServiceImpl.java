@@ -27,6 +27,9 @@ public class SyncServiceImpl implements SyncService {
     @Autowired
     FriendshipService friendshipService;
 
+    @Autowired
+    EventService eventService;
+
     @Override
     public SyncDataDTO getSyncData(String username){
         SyncDataDTO syncDataDTO = new SyncDataDTO();
@@ -55,13 +58,19 @@ public class SyncServiceImpl implements SyncService {
 
         Collections.sort(syncDataDTO.getNotifications(), Collections.reverseOrder());
 
-        for (Event event : user.getCreatorEvents()){
-            syncDataDTO.getCreatorEvents().add(event.getId());
+        List<EventDTO> creatorEventDTOs = eventService.getCreatorEvents(username);
+        List<Long> creatorEventIDs = new ArrayList<>();
+        for(EventDTO event : creatorEventDTOs){
+            creatorEventIDs.add(event.getId());
         }
+        syncDataDTO.setCreatorEvents(creatorEventIDs);
 
-        for (Event event : user.getParticipantEvents()){
-            syncDataDTO.getParticipantEvents().add(event.getId());
+        List<EventDTO> participantEventDTOs = eventService.getParticipantEvents(username);
+        List<Long> participantEventIDs = new ArrayList<>();
+        for(EventDTO event : participantEventDTOs){
+            participantEventIDs.add(event.getId());
         }
+        syncDataDTO.setParticipantEvents(participantEventIDs);
 
         //SPORTS FIELDS DATA
 
@@ -80,19 +89,7 @@ public class SyncServiceImpl implements SyncService {
 
             for (Event event : sportsField.getEvents()){
                 if(event.getDateFrom().after(new Date())){
-                    EventDTO eventDTO = new EventDTO();
-                    eventDTO.setId(event.getId());
-                    eventDTO.setName(event.getName());
-                    eventDTO.setDateFrom(event.getDateFrom());
-                    eventDTO.setDateTo(event.getDateTo());
-                    eventDTO.setTimeFrom(event.getTimeFrom());
-                    eventDTO.setTimeTo(event.getTimeTo());
-                    eventDTO.setPrice(event.getPrice());
-                    eventDTO.setNumbOfPpl(event.getNumbOfPpl());
-                    eventDTO.setCurr(event.getCurr());
-                    eventDTO.setDescription(event.getDescription());
-                    eventDTO.setNumOfParticipants((short)(event.getParticipants().size()+1));
-
+                    EventDTO eventDTO = event.createEventDTO();
                     sfDTO.getEvents().add(eventDTO);
                 }
 

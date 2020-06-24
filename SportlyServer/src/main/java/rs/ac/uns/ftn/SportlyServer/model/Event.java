@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.SportlyServer.dto.EventDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class Event {
 
     private String description;
 
+    private boolean isDeleted;
+
     @ManyToOne(fetch = FetchType.EAGER)
     protected User creator;
 
@@ -45,4 +48,20 @@ public class Event {
 
     @ManyToMany(mappedBy = "participantEvents")
     private List<User> participants = new ArrayList<>();
+
+    public EventDTO createEventDTO(){
+        EventDTO dto = new EventDTO();
+        dto.setId(this.getId());
+        dto.setName(this.getName());
+        dto.setDateFrom(this.getDateFrom());
+        dto.setDateTo(this.getDateTo());
+        dto.setTimeFrom(this.getTimeFrom());
+        dto.setTimeTo(this.getTimeTo());
+        dto.setNumbOfPpl(this.getNumbOfPpl());
+        dto.setNumOfParticipants((short)(this.getParticipants().size()+1));
+        dto.setPrice(this.getPrice());
+        dto.setCurr(this.getCurr());
+        dto.setDescription(this.getDescription());
+        return dto;
+    }
 }
