@@ -25,7 +25,7 @@ public class FriendshipController {
     UserService userService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<?> getFriends(@PathVariable Long id) {
+    public ResponseEntity<?> getFriend(@PathVariable Long id) {
         Friendship friendship = friendshipService.getFriendshipById(id);
         if(friendship == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

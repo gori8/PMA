@@ -2,11 +2,13 @@ package rs.ac.uns.ftn.SportlyServer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rs.ac.uns.ftn.SportlyServer.dto.EventDTO;
+import rs.ac.uns.ftn.SportlyServer.dto.*;
 import rs.ac.uns.ftn.SportlyServer.model.Event;
+import rs.ac.uns.ftn.SportlyServer.model.EventRequest;
 import rs.ac.uns.ftn.SportlyServer.model.SportsField;
 import rs.ac.uns.ftn.SportlyServer.model.User;
 import rs.ac.uns.ftn.SportlyServer.repository.EventRepository;
+import rs.ac.uns.ftn.SportlyServer.repository.EventRequestRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.SportsFieldRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 
@@ -25,6 +27,9 @@ public class EventServiceImpl implements EventService {
 
     @Autowired
     SportsFieldRepository spRepository;
+
+    @Autowired
+    EventRequestRepository erRepository;
 
     @Override
     public List<EventDTO> getCreatorEvents(String email) {
@@ -97,13 +102,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDTO createEvent(String creatorEmail, Long sportFieldId, EventDTO eventDTO) {
+    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO) {
 
         User creator = userRepository.findByEmail(creatorEmail);
         if(creator == null)
             return null;
 
-        SportsField sp = spRepository.getOne(sportFieldId);
+        SportsField sp = spRepository.getOne(eventDTO.getSportsFieldId());
         if(sp == null)
             return null;
 
@@ -154,5 +159,132 @@ public class EventServiceImpl implements EventService {
         event.setDeleted(true);
         eventRepository.save(event);
         return event.createEventDTO();
+    }
+
+    @Override
+    public List<UserDTO> getEventParticipants(Long id) {
+        Event event = eventRepository.getById(id);
+        if(event == null || event.isDeleted())
+            return null;
+
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for(User user : event.getParticipants()){
+            UserDTO userDTO = new UserDTO();
+            userDTO.setIme(user.getFirstName());
+            userDTO.setPrezime(user.getLastName());
+            userDTO.setEmail(user.getEmail());
+            userDTOs.add(userDTO);
+        }
+
+        return userDTOs;
+    }
+
+    @Override
+    public UserDTO getEventCreator(Long id) {
+        Event event = eventRepository.getById(id);
+        if(event == null || event.isDeleted())
+            return null;
+
+        User user = event.getCreator();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setIme(user.getFirstName());
+        userDTO.setPrezime(user.getLastName());
+        userDTO.setEmail(user.getEmail());
+
+        return userDTO;
+    }
+
+    @Override
+    public EventRequestDTO getEventRequest(Long id) {
+        EventRequest eventRequest = erRepository.getById(id);
+        if(eventRequest == null || eventRequest.isDeleted())
+            return null;
+
+        EventRequestDTO eventRequestDTO = eventRequest.createEventRequestDTO();
+        return eventRequestDTO;
+
+    }
+
+    @Override
+    public List<EventRequestDTO> getAllEventRequestsByEvent(Long eventId) {
+        Event event = eventRepository.getById(eventId);
+        if(event == null || event.isDeleted())
+            return null;
+
+        List<EventRequestDTO> eventRequestDTOs = new ArrayList<>();
+        for(EventRequest eventRequest : event.getEventRequests()){
+            if(!eventRequest.isDeleted())
+                eventRequestDTOs.add(eventRequest.createEventRequestDTO());
+        }
+
+        return eventRequestDTOs;
+    }
+
+    @Override
+    public List<EventRequestDTO> getAllEventRequestsByEmail(String userEmail) {
+        User user = userRepository.findByEmail(userEmail);
+        if(user == null)
+            return null;
+
+        List<EventRequestDTO> eventRequestDTOs = new ArrayList<>();
+        for(EventRequest eventRequest : user.getEventRequests()){
+            if(!eventRequest.isDeleted())
+                eventRequestDTOs.add(eventRequest.createEventRequestDTO());
+        }
+
+        return eventRequestDTOs;
+    }
+
+    @Override
+    public EventRequestDTO createEventRequest(EventRequestRequest request, EventRequestTypeEnum eventRequestType) {
+        Event event = eventRepository.getById(request.getEventId());
+        if(event == null || event.isDeleted())
+            return null;
+
+        User user = userRepository.findByEmail(request.getUserEmail());
+        if(user == null)
+            return null;
+
+        EventRequest eventRequest = new EventRequest();
+        eventRequest.setUser(user);
+        eventRequest.setEvent(event);
+        eventRequest.setEventRequestType(eventRequestType);
+        eventRequest.setDeleted(false);
+
+        erRepository.save(eventRequest);
+        return eventRequest.createEventRequestDTO();
+    }
+
+    @Override
+    public EventRequestDTO acceptEventRequest(Long id) {
+        EventRequest eventRequest = erRepository.getById(id);
+        if(eventRequest == null || eventRequest.isDeleted())
+            return null;
+
+        User user = eventRequest.getUser();
+        if(user == null)
+            return null;
+
+        Event event = eventRequest.getEvent();
+        if(event == null || event.isDeleted())
+            return null;
+
+        event.getParticipants().add(user); //dodamo usera u listu participanta eventa
+        eventRequest.setDeleted(true); //obrisemo request
+        eventRepository.save(event);
+        erRepository.save(eventRequest);
+
+        return eventRequest.createEventRequestDTO();
+    }
+
+    @Override
+    public EventRequestDTO rejectEventRequest(Long id) {
+        EventRequest eventRequest = erRepository.getById(id);
+        if (eventRequest == null || eventRequest.isDeleted())
+            return null;
+
+        eventRequest.setDeleted(true); //obrisemo request
+        erRepository.save(eventRequest);
+        return eventRequest.createEventRequestDTO();
     }
 }

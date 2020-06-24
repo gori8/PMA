@@ -33,6 +33,8 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String description;
 
+    private Long sportsFieldId;
+
     @Override
     public int compareTo(EventDTO e) {
         return getDateFrom().compareTo(e.getDateFrom());

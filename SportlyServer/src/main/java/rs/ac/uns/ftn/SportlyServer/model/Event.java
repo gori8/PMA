@@ -49,6 +49,9 @@ public class Event {
     @ManyToMany(mappedBy = "participantEvents")
     private List<User> participants = new ArrayList<>();
 
+    @OneToMany(mappedBy = "event")
+    private List<EventRequest> eventRequests = new ArrayList<>();
+
     public EventDTO createEventDTO(){
         EventDTO dto = new EventDTO();
         dto.setId(this.getId());
@@ -62,6 +65,7 @@ public class Event {
         dto.setPrice(this.getPrice());
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
+        dto.setSportsFieldId(this.sportsField.getId());
         return dto;
     }
 }
