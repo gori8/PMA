@@ -38,6 +38,7 @@ public class SyncServiceImpl implements SyncService {
         }
 
         syncDataDTO.setFriends(friendshipService.getUserFriends(username));
+        syncDataDTO.getFriends().addAll(friendshipService.getFriendRequests(username));
 
         for (SportsField sportsField : user.getFavourite()){
             syncDataDTO.getFavorite().add(sportsField.getId());

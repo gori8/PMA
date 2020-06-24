@@ -19,11 +19,77 @@
             android:visibility="gone"
             />
 
-        <ListView
-            android:id="@+id/friends_list"
+        <ScrollView
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/friends_scroll_view"
+            android:fillViewport="true"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/friend_header_layout"
+                    android:background="@color/colorPrimaryDark">
+
+                    <TextView
+                        android:layout_marginTop="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Friends"
+                        android:textStyle="bold"
+                        android:textSize="20dp"
+                        android:paddingLeft="15dp"
+                        android:layout_marginBottom="10dp"
+                        android:textColor="@color/white"
+                        />
+
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/friends_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/friend_header_layout"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/request_header_layout"
+                    android:layout_below="@id/friends_list"
+                    android:background="@color/colorPrimaryDark">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Requests"
+                        android:layout_marginTop="10dp"
+                        android:textStyle="bold"
+                        android:textSize="20dp"
+                        android:paddingLeft="15dp"
+                        android:layout_marginBottom="10dp"
+                        android:textColor="@color/white"
+                        />
+
+                </LinearLayout>
+
+                <ListView
+                    android:layout_below="@id/request_header_layout"
+                    android:id="@+id/requests_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+            </RelativeLayout>
+        </ScrollView>
+
+
 
     </LinearLayout>
 

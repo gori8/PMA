@@ -66,11 +66,4 @@ public class SyncController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @RequestMapping(value = "/people/{filterText}", method = RequestMethod.GET)
-    public ResponseEntity<?> searchPeople(@PathVariable("filterText") String filterText) {
-
-        return new ResponseEntity<>(userService.searchPeople(filterText), HttpStatus.OK);
-    }
-
 }

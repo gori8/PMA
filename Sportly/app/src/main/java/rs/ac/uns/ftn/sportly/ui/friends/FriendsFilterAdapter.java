@@ -13,6 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +36,7 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
 
     private Context context;
     private List<PeopleDTO> peopleList;
+    private DatabaseReference mUserDatabase;
 
     FriendsFilterAdapter(Context c, List<PeopleDTO> pl, List<String> names){
         super(c, R.layout.friend_item, R.id.name, names);
@@ -42,6 +50,7 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = layoutInflater.inflate(R.layout.friend_item, parent, false);
         TextView textView = row.findViewById(R.id.name);
+        ImageView imageView = row.findViewById(R.id.friend_image);
 
         textView.setText(peopleList.get(position).getFirstName()+" "+peopleList.get(position).getLastName());
 
@@ -52,6 +61,26 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
             deleteButton.setVisibility(View.GONE);
             addButton.setVisibility(View.VISIBLE);
         }
+
+        String userId = peopleList.get(position).getId().toString();
+
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
+
+        mUserDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String image = dataSnapshot.child("thumb_image").getValue().toString();
+
+                Picasso.get().load(image)
+                        .placeholder(R.drawable.default_avatar).into(imageView);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         return row;
     }

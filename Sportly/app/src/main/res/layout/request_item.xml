@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/request_item">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/request_image"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:focusable="false"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_person_black_24dp"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textColor="@color/name"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textSize="25dp"
+                android:paddingLeft="10dp"
+                android:id="@+id/name"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginLeft="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="10dp"
+                android:text="Confirm"
+                android:id="@+id/confirm_button"
+                />
+
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="40dp"
+                android:text="Delete"
+                android:textColor="@color/quantum_black_100"
+                android:backgroundTint="@color/gray"
+                android:id="@+id/delete_button"
+                />
+            
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

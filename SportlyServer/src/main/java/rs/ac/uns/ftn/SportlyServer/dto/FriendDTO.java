@@ -20,4 +20,6 @@ public class FriendDTO {
 
     private String email;
 
+    private String friendType;
+
 }

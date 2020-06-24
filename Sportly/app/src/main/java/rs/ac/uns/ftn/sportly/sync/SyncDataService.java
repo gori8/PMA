@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,6 +55,35 @@ public class SyncDataService extends Service {
                     if (response.code() == 200){
                         SyncDataDTO syncDataDTO = response.body();
                         Log.d("SERVICE", "SYNC IS OK");
+
+                        Cursor friendsCursor = getContentResolver().query(
+                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                new String[]{DataBaseTables.SERVER_ID},
+                                null,
+                                null,
+                                null
+                        );
+
+                        friendsCursor.moveToFirst();
+
+                        while(!friendsCursor.isAfterLast()){
+
+                            Long friendId = friendsCursor.getLong(friendsCursor.getColumnIndex(DataBaseTables.SERVER_ID));
+
+                            System.out.println(friendId + " LONG ID FOUND IN SQLITE");
+
+                            if(!userIsFriend(syncDataDTO.getFriends(), friendId)){
+
+                                System.out.println(friendId + " LONG ID IS NOT IN FRINED DTO LIST");
+
+                                getContentResolver().delete(Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                        DataBaseTables.SERVER_ID + "=" + friendId,
+                                        null);
+                            }
+
+                            friendsCursor.moveToNext();
+                        }
+
                         for(FriendDTO friendDTO : syncDataDTO.getFriends()){
 
                             System.out.println("---FRIEND---");
@@ -60,6 +91,7 @@ public class SyncDataService extends Service {
                             System.out.println("LAST NAME:"+friendDTO.getLastName());
                             System.out.println("EMAIL:"+friendDTO.getEmail());
                             System.out.println("USERNAME:"+friendDTO.getUsername());
+                            System.out.println("FRIEND TYPE:"+friendDTO.getFriendType());
                             System.out.println("SERVER ID:"+friendDTO.getId());
 
                             ContentValues values = new ContentValues();
@@ -67,6 +99,7 @@ public class SyncDataService extends Service {
                             values.put(DataBaseTables.FRIENDS_LAST_NAME,friendDTO.getLastName());
                             values.put(DataBaseTables.FRIENDS_EMAIL,friendDTO.getEmail());
                             values.put(DataBaseTables.FRIENDS_USERNAME,friendDTO.getUsername());
+                            values.put(DataBaseTables.FRINEDS_TYPE,friendDTO.getFriendType());
                             values.put(DataBaseTables.SERVER_ID,friendDTO.getId());
 
                            getContentResolver().insert(
@@ -174,5 +207,9 @@ public class SyncDataService extends Service {
         return null;
     }
 
+
+    public boolean userIsFriend(final List<FriendDTO> list, final Long id){
+        return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
+    }
 
 }

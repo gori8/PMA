@@ -31,13 +31,19 @@ public class FriendshipServiceImpl implements FriendshipService {
         List<FriendDTO> friends = new ArrayList<>();
 
         for(Friendship friendship : requestedFriendships){
-            if(friendship.getFriendshipType() == FriendshipTypeEnum.CONFIRMED)
-                friends.add(friendship.getFriendshipReceiver().createFriendDto());
+            if(friendship.getFriendshipType() == FriendshipTypeEnum.CONFIRMED){
+                FriendDTO dto = friendship.getFriendshipReceiver().createFriendDto();
+                dto.setFriendType("CONFIRMED");
+                friends.add(dto);
+            }
         }
 
         for(Friendship friendship : receivedFriendships){
-            if(friendship.getFriendshipType() == FriendshipTypeEnum.CONFIRMED)
-                friends.add(friendship.getFriendshipRequester().createFriendDto());
+            if(friendship.getFriendshipType() == FriendshipTypeEnum.CONFIRMED){
+                FriendDTO dto = friendship.getFriendshipRequester().createFriendDto();
+                dto.setFriendType("CONFIRMED");
+                friends.add(dto);
+            }
         }
 
         return friends;
@@ -68,8 +74,11 @@ public class FriendshipServiceImpl implements FriendshipService {
         List<FriendDTO> friends = new ArrayList<>();
 
         for(Friendship friendship : receivedFriendships){
-            if(friendship.getFriendshipType() == FriendshipTypeEnum.PENDING)
-                friends.add(friendship.getFriendshipRequester().createFriendDto());
+            if(friendship.getFriendshipType() == FriendshipTypeEnum.PENDING){
+                FriendDTO dto = friendship.getFriendshipRequester().createFriendDto();
+                dto.setFriendType("PENDING");
+                friends.add(dto);
+            }
         }
 
         return friends;
@@ -83,13 +92,13 @@ public class FriendshipServiceImpl implements FriendshipService {
         if(req == null || rec == null)
             return null;
 
-        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req, rec);
+        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req.getId(), rec.getId());
         if(friendship != null && !friendship.getFriendshipType().equals(FriendshipTypeEnum.DELETED)){
             //postoji prijateljstvo sa statusom pending ili confirmed, zato se zahtev ne moze poslati
             return null;
         }
 
-        Friendship reverseFriendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(rec, req);
+        Friendship reverseFriendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(rec.getId(), req.getId());
         if(reverseFriendship != null && !reverseFriendship.getFriendshipType().equals(FriendshipTypeEnum.DELETED)){
             //postoji obrnuto prijateljstvo sa statusom pending ili confirmed, zato se zahtev ne moze poslati
             return null;
@@ -111,9 +120,21 @@ public class FriendshipServiceImpl implements FriendshipService {
         if(req == null || rec == null)
             return null;
 
-        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req, rec);
-        if(friendship == null || !friendship.getFriendshipType().equals(FriendshipTypeEnum.PENDING)){
+        System.out.println("Emails are correct");
+
+        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req.getId(), rec.getId());
+
+        System.out.println("REQ "+req.getId());
+        System.out.println("REC "+rec.getId());
+
+        if(friendship == null){
+            System.out.println("Friendship is NULL");
+            return null;
+        }
+
+        if(!friendship.getFriendshipType().equals(FriendshipTypeEnum.PENDING)){
             //ne postoji prijateljstvo sa statusom PENDING, zato se zahtev ne moze poslati
+            System.out.println("Friendship is not in pending state");
             return null;
         }
 
@@ -130,7 +151,7 @@ public class FriendshipServiceImpl implements FriendshipService {
         if(req == null || rec == null)
             return null;
 
-        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req, rec);
+        Friendship friendship = friendshipRepository.findByFriendshipRequesterAndFriendshipReceiver(req.getId(), rec.getId());
         if(friendship == null || friendship.getFriendshipType().equals(FriendshipTypeEnum.DELETED)){
             //ne postoji prijateljstvo sa statusom PENDING ili CONFIRMED, zato se zahtev ne moze poslati
             return null;
@@ -151,6 +172,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     @Override
     public boolean isFriend(String userEmail, String friendEmail) {
         List<FriendDTO> friends = getUserFriends(userEmail);
+        friends.addAll(getFriendRequests(userEmail));
         for(FriendDTO friend : friends){
             if(friend.getEmail().equals(friendEmail)){
                 return true;

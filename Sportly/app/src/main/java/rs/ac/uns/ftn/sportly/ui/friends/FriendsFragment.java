@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
 
     private FriendsCursorAdapter adapter;
     private FriendsFilterAdapter filterAdapter;
+    private RequestCursorAdapter requestAdapter;
 
     List<String> names = new ArrayList<>();
     List<PeopleDTO> peopleList = new ArrayList<>();
@@ -73,15 +75,15 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public boolean onQueryTextChange(String newText) {
 
-                ListView friendsListView = (ListView) getView().findViewById(R.id.friends_list);
+                ScrollView friendsScrollView = (ScrollView) getView().findViewById(R.id.friends_scroll_view);
                 ListView peopleListView = (ListView) getView().findViewById(R.id.people_list);
 
                 if(newText.equals("")) {
-                    friendsListView.setVisibility(View.VISIBLE);
+                    friendsScrollView.setVisibility(View.VISIBLE);
                     peopleListView.setVisibility(View.GONE);
                 }else{
                     searchPeople(newText);
-                    friendsListView.setVisibility(View.GONE);
+                    friendsScrollView.setVisibility(View.GONE);
                     peopleListView.setVisibility(View.VISIBLE);
                 }
 
@@ -122,11 +124,20 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
             mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
         });
 
+        //REQUEST ADAPTER
+        getLoaderManager().initLoader(1, null, this);
+        String[] fromRequest = new String[] { DataBaseTables.FRIENDS_FIRST_NAME, DataBaseTables.FRIENDS_LAST_NAME };
+        int[] toRequest = new int[] {R.id.name};
+        requestAdapter = new RequestCursorAdapter(getActivity(), R.layout.request_item, null, fromRequest, toRequest);
+        ListView requestsListView = (ListView) getView().findViewById(R.id.requests_list);
+        requestsListView.setAdapter(requestAdapter);
+
         //FILTER ADAPTER
         filterAdapter = new FriendsFilterAdapter(FriendsFragment.this.getContext(), peopleList, names);
 
         ListView peopleListView = (ListView) getView().findViewById(R.id.people_list);
         peopleListView.setAdapter(filterAdapter);
+
     }
 
     private void searchPeople(String filterText){
@@ -168,27 +179,56 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS);
+        String selection = DataBaseTables.FRINEDS_TYPE+" = ";
         String[] allColumns = {
                 DataBaseTables.ID,
                 DataBaseTables.FRIENDS_FIRST_NAME,
                 DataBaseTables.FRIENDS_LAST_NAME,
                 DataBaseTables.FRIENDS_EMAIL,
                 DataBaseTables.FRIENDS_USERNAME,
+                DataBaseTables.FRINEDS_TYPE,
                 DataBaseTables.SERVER_ID
         };
 
-        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
-                allColumns, null, null, null);
+        switch (id) {
+            case 0:
+                selection = selection + "'CONFIRMED'";
+                break;
+            case 1:
+                selection = selection + "'PENDING'";
+                break;
+        }
+
+        return new CursorLoader(getActivity(), uri,
+                allColumns, selection, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
+
+        switch (loader.getId()) {
+            case 0:
+                adapter.swapCursor(data);
+                break;
+            case 1:
+                requestAdapter.swapCursor(data);
+                break;
+        }
     }
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        switch (loader.getId()) {
+            case 0:
+                adapter.swapCursor(null);
+                break;
+            case 1:
+                requestAdapter.swapCursor(null);
+                break;
+        }
     }
+
 }
