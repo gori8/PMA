@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -51,6 +55,9 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
     private Cursor cr;
     private final LayoutInflater inflater;
     private DatabaseReference mUserDatabase;
+    private DatabaseReference mMyDatabase;
+    private DatabaseReference mFriendsDatabase;
+
 
     public RequestCursorAdapter(Context context,int layout, Cursor c,String[] from,int[] to) {
         super(context,layout,c,new String[]{from[0]},to);
@@ -82,6 +89,9 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
         String userId = cursor.getString(serverIdIndex);
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
+        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(userId).child(JwtTokenUtils.getUserId(context).toString());
+        mMyDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(JwtTokenUtils.getUserId(context).toString()).child(userId);
+
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -122,14 +132,42 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
 
                             Log.i("CONFIRM FRIEND", "CALL TO SERVER SUCCESSFUL");
 
-                            ContentValues values = new ContentValues();
-                            values.put(DataBaseTables.FRINEDS_TYPE,"CONFIRMED");
 
-                            context.getContentResolver().update(
-                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
-                                    values,
-                                    DataBaseTables.FRIENDS_EMAIL + " = '"+ email +"'",
-                                    null);
+                            HashMap<String, String> dataMap = new HashMap<>();
+                            dataMap.put("date", new Date().toString());
+
+                            mMyDatabase.setValue(dataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if (task.isSuccessful()) {
+
+                                        mFriendsDatabase.setValue(dataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task1) {
+
+                                                if (task1.isSuccessful()) {
+
+                                                    ContentValues values = new ContentValues();
+                                                    values.put(DataBaseTables.FRINEDS_TYPE,"CONFIRMED");
+
+                                                    context.getContentResolver().update(
+                                                            Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                                            values,
+                                                            DataBaseTables.FRIENDS_EMAIL + " = '"+ email +"'",
+                                                            null);
+
+                                                }
+
+                                            }
+                                        });
+                                    }
+
+                                }
+                            });
+
 
                         }else{
                             Log.i("CONFIRM FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
