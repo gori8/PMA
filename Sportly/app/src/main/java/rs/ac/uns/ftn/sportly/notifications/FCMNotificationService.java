@@ -63,6 +63,8 @@ public class FCMNotificationService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             //sendNotification(remoteMessage.getNotification().getTitle(),remoteMessage.getNotification().getBody());
 
+            //TODO save Data to DB
+
             Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);
 
             ints.putExtra("title",remoteMessage.getNotification().getTitle());
