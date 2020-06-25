@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -8,9 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -31,15 +32,18 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.database.SportlySQLiteHelper;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
+import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
-public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filterable {
+public class RequestCursorAdapter extends SimpleCursorAdapter {
 
     private Context mContext;
     private Context appContext;
@@ -48,7 +52,7 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
     private final LayoutInflater inflater;
     private DatabaseReference mUserDatabase;
 
-    public FriendsCursorAdapter(Context context,int layout, Cursor c,String[] from,int[] to) {
+    public RequestCursorAdapter(Context context,int layout, Cursor c,String[] from,int[] to) {
         super(context,layout,c,new String[]{from[0]},to);
         this.layout=layout;
         this.mContext = context;
@@ -66,11 +70,12 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
         super.bindView(view, context, cursor);
 
         TextView nameText = (TextView)view.findViewById(R.id.name);
-        ImageView imageView = (ImageView)view.findViewById(R.id.friend_image);
+        ImageView imageView = (ImageView)view.findViewById(R.id.request_image);
 
         int firstNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_FIRST_NAME);
         int lastNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_LAST_NAME);
         int serverIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID);
+        int emailIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_EMAIL);
 
         nameText.setText(cursor.getString(firstNameIndex)+" "+cursor.getString(lastNameIndex));
 
@@ -98,8 +103,50 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
         String jwt = JwtTokenUtils.getJwtToken(context);
         String authHeader = "Bearer " + jwt;
 
-        ImageButton removeButton = view.findViewById(R.id.imageButton);
-        int emailIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_EMAIL);
+        Button confirmButton = view.findViewById(R.id.confirm_button);
+
+        confirmButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FriendshipRequestDto request = new FriendshipRequestDto();
+                String email = cursor.getString(emailIndex);
+                request.setRecEmail(email);
+
+                Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.confirmRequest(authHeader,request);
+
+                call.enqueue(new Callback<FriendshipDTO>() {
+                    @Override
+                    public void onResponse(Call<FriendshipDTO> call, Response<FriendshipDTO> response) {
+                        if (response.code() == 200){
+
+                            Log.i("CONFIRM FRIEND", "CALL TO SERVER SUCCESSFUL");
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.FRINEDS_TYPE,"CONFIRMED");
+
+                            context.getContentResolver().update(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
+                                    values,
+                                    DataBaseTables.FRIENDS_EMAIL + " = '"+ email +"'",
+                                    null);
+
+                        }else{
+                            Log.i("CONFIRM FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<FriendshipDTO> call, Throwable t) {
+                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                        Log.i("CONFIRM FRIEND", "CALL TO SERVER FAILED");
+                    }
+                });
+
+            }
+        });
+
+        Button removeButton = view.findViewById(R.id.delete_button);
 
         removeButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -144,5 +191,7 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
                         .show();
             }
         });
+
+
     }
 }

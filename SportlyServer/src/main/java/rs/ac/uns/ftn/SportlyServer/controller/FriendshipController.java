@@ -11,6 +11,7 @@ import rs.ac.uns.ftn.SportlyServer.dto.FriendshipDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.SportlyServer.model.Friendship;
 import rs.ac.uns.ftn.SportlyServer.service.FriendshipService;
+import rs.ac.uns.ftn.SportlyServer.service.UserService;
 
 import java.util.List;
 
@@ -20,8 +21,11 @@ public class FriendshipController {
     @Autowired
     FriendshipService friendshipService;
 
+    @Autowired
+    UserService userService;
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<?> getFriends(@PathVariable Long id) {
+    public ResponseEntity<?> getFriend(@PathVariable Long id) {
         Friendship friendship = friendshipService.getFriendshipById(id);
         if(friendship == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -74,7 +78,8 @@ public class FriendshipController {
     @RequestMapping(value = "/confirmRequest", method = RequestMethod.PUT)
     public ResponseEntity<?> acceptFriendRequest(@RequestBody FriendshipRequestDto request) {
         String reqEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Friendship friendship = friendshipService.confirmFriendship(reqEmail, request.getRecEmail());
+        Friendship friendship = friendshipService.confirmFriendship(request.getRecEmail(),reqEmail);
+        System.out.println("CONFIRM REQUEST ENDPOINT");
         if(friendship == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -93,4 +98,9 @@ public class FriendshipController {
         return new ResponseEntity<>(friendshipDTO, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/people/{filterText}", method = RequestMethod.GET)
+    public ResponseEntity<?> searchPeople(@PathVariable("filterText") String filterText) {
+
+        return new ResponseEntity<>(userService.searchPeople(filterText), HttpStatus.OK);
+    }
 }

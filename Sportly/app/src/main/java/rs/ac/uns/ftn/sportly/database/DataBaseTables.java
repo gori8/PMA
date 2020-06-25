@@ -10,6 +10,7 @@ public class DataBaseTables {
     public static final String FRIENDS_LAST_NAME = "last_name";
     public static final String FRIENDS_EMAIL = "email";
     public static final String FRIENDS_USERNAME = "username";
+    public static final String FRINEDS_TYPE = "friends_type";
 
 
     public static final String TABLE_NOTIFICATIONS = "notifications";
@@ -52,6 +53,7 @@ public class DataBaseTables {
             + FRIENDS_LAST_NAME + " text, "
             + FRIENDS_USERNAME + " text, "
             + FRIENDS_EMAIL + " text, "
+            + FRINEDS_TYPE + " text, "
             + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"))";
 
     public static final String SPORTSFIELDS_CREATE = "CREATE TABLE "+TABLE_SPORTSFIELDS+"("

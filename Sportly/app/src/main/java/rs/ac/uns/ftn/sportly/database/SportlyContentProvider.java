@@ -179,8 +179,18 @@ public class SportlyContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase sqlDB = database.getWritableDatabase();
+        sqlDB.delete(uri.getLastPathSegment(), selection, selectionArgs);
 
-       return 1;
+        int uriType = sURIMatcher.match(uri);
+
+        switch(uriType){
+            case FRIENDS:
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS), null);
+                break;
+        }
+
+        return 0;
     }
 
     @Override

@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.SportlyServer.model.Event;
 
 import java.util.Date;
 @Getter
@@ -31,6 +32,8 @@ public class EventDTO implements Comparable<EventDTO> {
     private String curr;
 
     private String description;
+
+    private Long sportsFieldId;
 
     @Override
     public int compareTo(EventDTO e) {

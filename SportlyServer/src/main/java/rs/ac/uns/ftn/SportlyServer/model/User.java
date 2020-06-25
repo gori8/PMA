@@ -58,6 +58,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<FieldRating> fieldRatings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<EventRequest> eventRequests = new ArrayList<>();
+
     @ManyToMany
     @JsonIgnore
     @JoinTable(
