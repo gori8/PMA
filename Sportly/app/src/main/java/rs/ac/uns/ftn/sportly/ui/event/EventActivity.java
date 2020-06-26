@@ -46,6 +46,7 @@ public class EventActivity extends AppCompatActivity {
         String price = myIntent.getStringExtra("price");
         String creator = myIntent.getStringExtra("creator");
         String description = myIntent.getStringExtra("description");
+        Long eventId = myIntent.getLongExtra("eventId",-1);
         int image = myIntent.getIntExtra("imageView",R.drawable.ic_location_on_black_24dp);
         boolean isCreator = myIntent.getBooleanExtra("isCreator",false);
 
@@ -83,6 +84,7 @@ public class EventActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent intent = new Intent(v.getContext(), ApplicationListActivity.class);
+                intent.putExtra("eventId",eventId);
                 intent.putExtra("eventName", name);
                 startActivity(intent);
             }

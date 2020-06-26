@@ -141,21 +141,6 @@ public class SyncServiceImpl implements SyncService {
 
                         eventDTO.setApplicationStatus("QUEUE");
 
-                        for(User u : event.getParticipants()){
-
-                            System.out.println("PARTICIPANT "+u.getId());
-
-                            ApplierDTO applier = new ApplierDTO();
-
-                            applier.setId(u.getId());
-                            applier.setFirstName(u.getFirstName());
-                            applier.setLastName(u.getLastName());
-                            applier.setUsername(u.getUsername());
-                            applier.setEmail(u.getEmail());
-                            applier.setStatus("PARTICIPATING");
-
-                            eventDTO.getApplicationList().add(applier);
-                        }
                     }else{
                         eventDTO.setApplicationStatus("NONE");
                     }

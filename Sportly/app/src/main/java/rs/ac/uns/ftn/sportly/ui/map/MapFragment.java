@@ -422,12 +422,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             String date = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
             String price = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_PRICE));
             String description = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
+            Long eventId = cursor.getLong(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
             Boolean flagIsCreator=false;
             if(cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_APPLICATION_STATUS)).equals("CREATOR")){
                 flagIsCreator=true;
             }
 
             Intent intent = new Intent(getActivity(), EventActivity.class);
+            intent.putExtra("eventId", eventId);
             intent.putExtra("location", location);
             intent.putExtra("name", name);
             intent.putExtra("time", timeFrom+" - "+timeTo);
