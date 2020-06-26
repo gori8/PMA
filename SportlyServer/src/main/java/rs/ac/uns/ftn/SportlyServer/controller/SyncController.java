@@ -38,11 +38,11 @@ public class SyncController {
         User user = userRepository.findByEmail(username);
 
         //testing notifications purpose
-        PushNotificationRequest request = new PushNotificationRequest();
+        /*PushNotificationRequest request = new PushNotificationRequest();
         request.setMessage("Your data just synced - "+username);
         request.setTitle("Sync");
         request.setTopic(user.getId().toString());
-        pushNotificationService.sendPushNotificationWithoutData(request);
+        pushNotificationService.sendPushNotificationWithoutData(request);*/
 
 
         return new ResponseEntity<>(syncService.getSyncData(username), HttpStatus.OK);

@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.SportlyServer.dto.FriendDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.FriendshipTypeEnum;
+import rs.ac.uns.ftn.SportlyServer.dto.PushNotificationRequest;
 import rs.ac.uns.ftn.SportlyServer.model.Friendship;
 import rs.ac.uns.ftn.SportlyServer.model.User;
 import rs.ac.uns.ftn.SportlyServer.repository.FriendshipRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FriendshipServiceImpl implements FriendshipService {
@@ -20,6 +23,9 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PushNotificationService pushNotificationService;
 
     @Override
     public List<FriendDTO> getUserFriends(String email) {
@@ -110,6 +116,23 @@ public class FriendshipServiceImpl implements FriendshipService {
         newFriendship.setFriendshipType(FriendshipTypeEnum.PENDING);
 
         friendshipRepository.save(newFriendship);
+
+        Map<String,String> data = new HashMap<>();
+        data.put("id",req.getId().toString());
+        data.put("firstName",req.getFirstName());
+        data.put("lastName",req.getLastName());
+        data.put("email",req.getEmail());
+        data.put("username",req.getUsername());
+        data.put("notificationType","REQUEST");
+        data.put("title","Friend Request");
+        data.put("message",req.getFirstName() + " " + req.getLastName() + " wants to be friends with you on Sportly.");
+
+        PushNotificationRequest request = new PushNotificationRequest();
+        request.setMessage(req.getFirstName() + " " + req.getLastName() + " wants to be friends with you on Sportly.");
+        request.setTitle("Friend Request");
+        request.setTopic(rec.getId().toString());
+        pushNotificationService.sendPushNotification(request,data);
+
         return newFriendship;
     }
 
@@ -140,6 +163,22 @@ public class FriendshipServiceImpl implements FriendshipService {
 
         friendship.setFriendshipType(FriendshipTypeEnum.CONFIRMED);
         friendshipRepository.save(friendship);
+
+        Map<String,String> data = new HashMap<>();
+        data.put("id",rec.getId().toString());
+        data.put("firstName",rec.getFirstName());
+        data.put("lastName",rec.getLastName());
+        data.put("email",rec.getEmail());
+        data.put("username",rec.getUsername());
+        data.put("notificationType","CONFIRMATION");
+        data.put("title","Friendship Confirmed");
+        data.put("message",rec.getFirstName() + " " + rec.getLastName() + " has confirmed that you're friends on Sportly.");
+
+        PushNotificationRequest request = new PushNotificationRequest();
+        request.setMessage(rec.getFirstName() + " " + rec.getLastName() + " has confirmed that you're friends on Sportly.");
+        request.setTitle("Friendship Confirmed");
+        request.setTopic(req.getId().toString());
+        pushNotificationService.sendPushNotification(request,data);
 
         return friendship;
     }

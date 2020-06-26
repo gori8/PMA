@@ -69,6 +69,14 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     private List<Event> participantEvents = new ArrayList<>();
 
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+            name = "queue",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> queueEvents = new ArrayList<>();
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_authority",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),

@@ -8,12 +8,13 @@ public class JwtTokenUtils {
     private static String MyPrefrences = "Sportly.xml";
     private static Integer Mode = Context.MODE_PRIVATE;
 
-    public static boolean saveJwtToken(Long userId, String jwtToken, Context context){
+    public static boolean saveJwtToken(Long userId,String name, String jwtToken, Context context){
         try {
             SharedPreferences sharedpreferences = context.getSharedPreferences(MyPrefrences, Mode);
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.putString("jwt", jwtToken);
             editor.putLong("userId",userId);
+            editor.putString("name",name);
             editor.commit();
             return true;
         }catch (Exception e){
@@ -28,6 +29,7 @@ public class JwtTokenUtils {
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.remove("jwt");
             editor.remove("userId");
+            editor.remove("name");
             editor.commit();
             return true;
         }catch (Exception e){
@@ -44,5 +46,10 @@ public class JwtTokenUtils {
     public static Long getUserId(Context context){
         SharedPreferences sharedpreferences = context.getSharedPreferences(MyPrefrences, Mode);
         return sharedpreferences.getLong("userId",-1);
+    }
+
+    public static String getName(Context context){
+        SharedPreferences sharedpreferences = context.getSharedPreferences(MyPrefrences, Mode);
+        return sharedpreferences.getString("name","Name");
     }
 }

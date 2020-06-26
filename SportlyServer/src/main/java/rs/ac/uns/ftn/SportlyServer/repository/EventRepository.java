@@ -14,4 +14,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Event getById(Long id);
     List<Event> findByDateFromAfterAndDateToBefore(Date dateFrom , Date dateTo);
     List<Event> findByNameContains(String name);
+
+    @Query("SELECT e.participants FROM Event e WHERE e.id = ?1")
+    List<User> findParticipantListByEventId(Long eventId);
 }

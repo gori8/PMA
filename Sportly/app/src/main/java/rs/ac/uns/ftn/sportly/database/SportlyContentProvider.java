@@ -33,6 +33,8 @@ public class SportlyContentProvider extends ContentProvider {
     private static final int PARTICIPATING_EVENTS = 8;
     private static final int FAVORITES = 9;
     private static final int SPORTSFIELDS_EVENTS = 10;
+    private static final int APPLICATION_LIST = 11;
+    private static final int APPLICATION_LIST_SERVER_ID = 12;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -51,6 +53,8 @@ public class SportlyContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_PARTICIPATING_EVENTS, PARTICIPATING_EVENTS);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FAVORITES, FAVORITES);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.SPORTSFIELDS_EVENTS + "/#", SPORTSFIELDS_EVENTS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST, APPLICATION_LIST);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST + "/*", APPLICATION_LIST_SERVER_ID);
     }
 
     @Override
@@ -90,14 +94,22 @@ public class SportlyContentProvider extends ContentProvider {
             case EVENTS:
                 queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
                 break;
+            case APPLICATION_LIST_SERVER_ID:
+                queryBuilder.appendWhere(DataBaseTables.SERVER_ID + "="
+                        + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_APPLICATION_LIST);
+                break;
+            case APPLICATION_LIST:
+                queryBuilder.setTables(DataBaseTables.TABLE_APPLICATION_LIST);
+                break;
             case MY_EVENTS:
-                queryBuilder.appendWhere(DataBaseTables.EVENTS_CREATOR + "="
-                        + 1);
+                queryBuilder.appendWhere(DataBaseTables.EVENTS_APPLICATION_STATUS + "="
+                        + "'CREATOR'");
                 queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
                 break;
             case PARTICIPATING_EVENTS:
-                queryBuilder.appendWhere(DataBaseTables.EVENTS_PARTICIPATING + "="
-                        + 1);
+                queryBuilder.appendWhere(DataBaseTables.EVENTS_APPLICATION_STATUS + "="
+                        + "'PARTICIPANT'");
                 queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
                 break;
             case FAVORITES:
@@ -155,7 +167,15 @@ public class SportlyContentProvider extends ContentProvider {
             if (nrRows == 0)
                 throw e;
 
-            Cursor cursor = query(Uri.parse(uri+"/"+values.getAsString(column)),
+            //IF SERVER ID IS NOT NUMBER PUT '' BECAUSE OF DATABASE SYNTAX
+            String arg = values.getAsString(column);
+            try{
+                Integer.parseInt(arg);
+            }catch (Exception ex){
+                 arg = "'"+arg+"'";
+            }
+
+            Cursor cursor = query(Uri.parse(uri+"/"+arg),
                     new String[]{DataBaseTables.ID}, null,null,null);
             cursor.moveToFirst();
 

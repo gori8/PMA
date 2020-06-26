@@ -338,19 +338,12 @@ public class ProfileManagementFragment extends Fragment {
                                         public void onSuccess(Uri downloadUrl)
                                         {
                                             thumb_downloadUrl[0] =downloadUrl.toString();
-                                            Map update_hashMap = new HashMap();
-                                            update_hashMap.put("image", download_url[0]);
-                                            update_hashMap.put("thumb_image", thumb_downloadUrl[0]);
 
-                                            mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if(task.isSuccessful()){
-                                                        mProgressDialog.dismiss();
-                                                        Toast.makeText(ProfileManagementFragment.this.getContext(), "Success Uploading.", Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-                                            });
+                                            mUserDatabase.child("image").setValue(download_url[0]);
+                                            mUserDatabase.child("thumb_image").setValue(thumb_downloadUrl[0]);
+
+                                            mProgressDialog.dismiss();
+                                            Toast.makeText(ProfileManagementFragment.this.getContext(), "Success Uploading.", Toast.LENGTH_LONG).show();
                                         }
                                     });
 

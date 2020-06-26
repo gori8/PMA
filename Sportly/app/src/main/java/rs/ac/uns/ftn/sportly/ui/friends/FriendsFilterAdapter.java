@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -105,10 +106,14 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
 
         ImageButton addButton = row.findViewById(R.id.addButton);
         ImageButton removeButton = row.findViewById(R.id.imageButton);
+        ProgressBar loadingCircle = row.findViewById(R.id.loadingCircle);
 
         addButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                addButton.setVisibility(View.GONE);
+                loadingCircle.setVisibility(View.VISIBLE);
 
                 FriendshipRequestDto request = new FriendshipRequestDto();
                 String email = peopleList.get(position).getEmail();
@@ -123,11 +128,13 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
 
                             Log.i("ADD FRIEND", "CALL TO SERVER SUCCESSFUL");
 
-                            addButton.setVisibility(View.GONE);
+                            loadingCircle.setVisibility(View.GONE);
                             removeButton.setVisibility(View.VISIBLE);
 
                         }else{
                             Log.i("ADD FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            loadingCircle.setVisibility(View.GONE);
+                            addButton.setVisibility(View.VISIBLE);
                         }
                     }
 
@@ -135,6 +142,8 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
                     public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                         Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                         Log.i("ADD FRIEND", "CALL TO SERVER FAILED");
+                        loadingCircle.setVisibility(View.GONE);
+                        addButton.setVisibility(View.VISIBLE);
                     }
                 });
             }
@@ -152,6 +161,10 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
                         .setNegativeButton("NO", null)
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                removeButton.setVisibility(View.GONE);
+                                loadingCircle.setVisibility(View.VISIBLE);
+
                                 FriendshipRequestDto request = new FriendshipRequestDto();
                                 String email = peopleList.get(position).getEmail();
                                 request.setRecEmail(email);
@@ -170,11 +183,13 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
                                                     DataBaseTables.SERVER_ID+" = "+peopleList.get(position).getId(),
                                                     null);
 
+                                            loadingCircle.setVisibility(View.GONE);
                                             addButton.setVisibility(View.VISIBLE);
-                                            removeButton.setVisibility(View.GONE);
 
                                         }else{
                                             Log.i("REMOVE FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                            loadingCircle.setVisibility(View.GONE);
+                                            removeButton.setVisibility(View.VISIBLE);
                                         }
                                     }
 
@@ -182,6 +197,8 @@ public class FriendsFilterAdapter extends ArrayAdapter<String> {
                                     public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                                         Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                                         Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
+                                        loadingCircle.setVisibility(View.GONE);
+                                        removeButton.setVisibility(View.VISIBLE);
                                     }
                                 });
                             }})

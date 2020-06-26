@@ -194,14 +194,13 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                 DataBaseTables.EVENTS_CURR,
                 DataBaseTables.EVENTS_DESCRIPTION,
                 DataBaseTables.EVENTS_NUMB_OF_PPL,
-                DataBaseTables.EVENTS_PARTICIPATING,
                 DataBaseTables.EVENTS_PRICE,
                 DataBaseTables.EVENTS_SPORTS_FILED_ID,
                 DataBaseTables.EVENTS_DATE_FROM,
                 DataBaseTables.EVENTS_DATE_TO,
                 DataBaseTables.EVENTS_TIME_FROM,
                 DataBaseTables.EVENTS_TIME_TO,
-                DataBaseTables.EVENTS_CREATOR,
+                DataBaseTables.EVENTS_APPLICATION_STATUS,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
         };

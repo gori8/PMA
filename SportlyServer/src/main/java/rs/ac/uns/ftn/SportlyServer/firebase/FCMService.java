@@ -43,9 +43,7 @@ public class FCMService {
     private AndroidConfig getAndroidConfig(String topic) {
         return AndroidConfig.builder()
                 .setTtl(Duration.ofMinutes(2).toMillis()).setCollapseKey(topic)
-                .setPriority(AndroidConfig.Priority.HIGH)
-                .setNotification(AndroidNotification.builder().setSound(NotificationParameter.SOUND.getValue())
-                        .setColor(NotificationParameter.COLOR.getValue()).setTag(topic).build()).build();
+                .setPriority(AndroidConfig.Priority.HIGH).build();
     }
 
     private ApnsConfig getApnsConfig(String topic) {
@@ -72,8 +70,7 @@ public class FCMService {
         AndroidConfig androidConfig = getAndroidConfig(request.getTopic());
         ApnsConfig apnsConfig = getApnsConfig(request.getTopic());
         return Message.builder()
-                .setApnsConfig(apnsConfig).setAndroidConfig(androidConfig).setNotification(
-                        new Notification(request.getTitle(), request.getMessage()));
+                .setApnsConfig(apnsConfig).setAndroidConfig(androidConfig);
     }
 
 

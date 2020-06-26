@@ -5,7 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.uns.ftn.SportlyServer.model.Event;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +37,10 @@ public class EventDTO implements Comparable<EventDTO> {
     private String description;
 
     private Long sportsFieldId;
+
+    private List<ApplierDTO> applicationList = new ArrayList<>();
+
+    private String applicationStatus;
 
     @Override
     public int compareTo(EventDTO e) {

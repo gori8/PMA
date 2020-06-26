@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.sportly.notifications;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,8 +17,12 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
+
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 
 public class FCMNotificationService extends FirebaseMessagingService {
 
@@ -58,20 +63,46 @@ public class FCMNotificationService extends FirebaseMessagingService {
 
         }
 
+        Map<String,String> data = remoteMessage.getData();
+        if(!data.isEmpty()){
+            if(data.get("notificationType").equals("REQUEST")){
+                ContentValues values = new ContentValues();
+                values.put(DataBaseTables.FRIENDS_FIRST_NAME,data.get("firstName"));
+                values.put(DataBaseTables.FRIENDS_LAST_NAME,data.get("lastName"));
+                values.put(DataBaseTables.FRIENDS_EMAIL,data.get("email"));
+                values.put(DataBaseTables.FRIENDS_USERNAME,data.get("username"));
+                values.put(DataBaseTables.FRINEDS_TYPE,"PENDING");
+                values.put(DataBaseTables.SERVER_ID,data.get("id"));
+
+                getContentResolver().insert(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
+                        values);
+            }else if(data.get("notificationType").equals("CONFIRMATION")){
+                ContentValues values = new ContentValues();
+                values.put(DataBaseTables.FRIENDS_FIRST_NAME,data.get("firstName"));
+                values.put(DataBaseTables.FRIENDS_LAST_NAME,data.get("lastName"));
+                values.put(DataBaseTables.FRIENDS_EMAIL,data.get("email"));
+                values.put(DataBaseTables.FRIENDS_USERNAME,data.get("username"));
+                values.put(DataBaseTables.FRINEDS_TYPE,"CONFIRMED");
+                values.put(DataBaseTables.SERVER_ID,data.get("id"));
+
+                getContentResolver().insert(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
+                        values);
+            }
+
+            Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);
+
+            ints.putExtra("title",data.get("title"));
+            ints.putExtra("body",data.get("message"));
+
+            sendBroadcast(ints);
+        }
+
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             //sendNotification(remoteMessage.getNotification().getTitle(),remoteMessage.getNotification().getBody());
-
-            //TODO save Data to DB
-
-            Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);
-
-            ints.putExtra("title",remoteMessage.getNotification().getTitle());
-            ints.putExtra("body",remoteMessage.getNotification().getBody());
-
-            sendBroadcast(ints);
-
         }
 
     }
@@ -94,4 +125,6 @@ public class FCMNotificationService extends FirebaseMessagingService {
             unregisterReceiver(notifReceiver);
         }
     }
+
+
 }

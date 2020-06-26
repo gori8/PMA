@@ -37,14 +37,23 @@ public class DataBaseTables {
     public static final String EVENTS_TIME_FROM = "time_from";
     public static final String EVENTS_TIME_TO = "time_to";
     public static final String EVENTS_SPORTS_FILED_ID = "sports_field_id";
-    public static final String EVENTS_CREATOR = "creator";
-    public static final String EVENTS_PARTICIPATING = "participating";
+    public static final String EVENTS_APPLICATION_STATUS = "application_status";
     public static final String EVENTS_NUMB_OF_PARTICIPANTS = "num_of_participants";
 
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_MY_EVENTS = "my_events";
     public static final String TABLE_PARTICIPATING_EVENTS = "participating_events";
     public static final String SPORTSFIELDS_EVENTS = "sportsfileds_events";
+
+    //APPLICATION LIST
+    public static final String TABLE_APPLICATION_LIST = "application_list";
+    public static final String APPLICATION_LIST_EVENT_SERVER_ID = "event_id";
+    public static final String APPLICATION_LIST_APPLIER_SERVER_ID = "applier_id";
+    public static final String APPLICATION_LIST_FIRST_NAME = "first_name";
+    public static final String APPLICATION_LIST_LAST_NAME = "last_name";
+    public static final String APPLICATION_LIST_EMAIL = "email";
+    public static final String APPLICATION_LIST_USERNAME = "username";
+    public static final String APPLICATION_LIST_STATUS = "status";
 
     //CREATE SQL
     public static final String FRIENDS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_FRIENDS+"("
@@ -80,8 +89,19 @@ public class DataBaseTables {
             + EVENTS_TIME_FROM + " text, "
             + EVENTS_TIME_TO + " text, "
             + EVENTS_SPORTS_FILED_ID + " integer, "
-            + EVENTS_CREATOR + " BOOLEAN NOT NULL CHECK ("+EVENTS_CREATOR+" IN (0,1)), "
-            + EVENTS_PARTICIPATING + " BOOLEAN NOT NULL CHECK ("+EVENTS_PARTICIPATING+" IN (0,1)), "
+            + EVENTS_APPLICATION_STATUS + " text, "
             + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"), "
             + "FOREIGN KEY ("+EVENTS_SPORTS_FILED_ID+") REFERENCES "+TABLE_SPORTSFIELDS+"("+ID+"))";
+
+    public static final String APPLICATION_LIST_CREATE = "CREATE TABLE "+TABLE_APPLICATION_LIST+"("
+            + ID + " integer primary key autoincrement ,"
+            + APPLICATION_LIST_EVENT_SERVER_ID + " integer, "
+            + APPLICATION_LIST_APPLIER_SERVER_ID + " integer, "
+            + APPLICATION_LIST_FIRST_NAME + " text, "
+            + APPLICATION_LIST_LAST_NAME + " text, "
+            + APPLICATION_LIST_USERNAME + " text, "
+            + APPLICATION_LIST_EMAIL + " text, "
+            + APPLICATION_LIST_STATUS + " text, "
+            + SERVER_ID + " TEXT NOT NULL, UNIQUE("+SERVER_ID+"), "
+            + "FOREIGN KEY ("+APPLICATION_LIST_EVENT_SERVER_ID+") REFERENCES "+TABLE_EVENTS+"("+SERVER_ID+"))";
 }

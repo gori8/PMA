@@ -38,9 +38,16 @@ public class EventServiceImpl implements EventService {
             return null;
 
         List<EventDTO> eventDTOs = new ArrayList<>();
+
+        System.out.println("getCreatorEvents SIZE: "+user.getCreatorEvents().size());
+
         for(Event event : user.getCreatorEvents()){
-            if(!event.isDeleted())
-                eventDTOs.add(event.createEventDTO());
+            if(!event.isDeleted()){
+
+                EventDTO eventDTO = event.createEventDTO();
+
+                eventDTOs.add(eventDTO);
+            }
         }
 
         return eventDTOs;
@@ -54,8 +61,12 @@ public class EventServiceImpl implements EventService {
 
         List<EventDTO> eventDTOs = new ArrayList<>();
         for(Event event : user.getParticipantEvents()){
-            if(!event.isDeleted())
-                eventDTOs.add(event.createEventDTO());
+            if(!event.isDeleted()) {
+
+                EventDTO eventDTO = event.createEventDTO();
+
+                eventDTOs.add(eventDTO);
+            }
         }
 
         return eventDTOs;

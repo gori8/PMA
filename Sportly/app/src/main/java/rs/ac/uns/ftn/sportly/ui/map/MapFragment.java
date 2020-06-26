@@ -422,17 +422,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             String date = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
             String price = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_PRICE));
             String description = cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
-            Integer isCreator = cursor.getInt(cursor.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
-
-            Boolean flagIsCreator;
-            if(isCreator==0){
-                flagIsCreator=false;
-            }else{
+            Boolean flagIsCreator=false;
+            if(cursor.getString(cursor.getColumnIndex(DataBaseTables.EVENTS_APPLICATION_STATUS)).equals("CREATOR")){
                 flagIsCreator=true;
             }
-
-
-
 
             Intent intent = new Intent(getActivity(), EventActivity.class);
             intent.putExtra("location", location);
@@ -805,14 +798,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 DataBaseTables.EVENTS_CURR,
                 DataBaseTables.EVENTS_DESCRIPTION,
                 DataBaseTables.EVENTS_NUMB_OF_PPL,
-                DataBaseTables.EVENTS_PARTICIPATING,
                 DataBaseTables.EVENTS_PRICE,
                 DataBaseTables.EVENTS_SPORTS_FILED_ID,
                 DataBaseTables.EVENTS_DATE_FROM,
                 DataBaseTables.EVENTS_DATE_TO,
                 DataBaseTables.EVENTS_TIME_FROM,
                 DataBaseTables.EVENTS_TIME_TO,
-                DataBaseTables.EVENTS_CREATOR,
+                DataBaseTables.EVENTS_APPLICATION_STATUS,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
         };

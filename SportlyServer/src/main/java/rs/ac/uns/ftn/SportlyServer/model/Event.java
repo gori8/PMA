@@ -49,6 +49,9 @@ public class Event {
     @ManyToMany(mappedBy = "participantEvents")
     private List<User> participants = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "queueEvents")
+    private List<User> queue = new ArrayList<>();
+
     @OneToMany(mappedBy = "event")
     private List<EventRequest> eventRequests = new ArrayList<>();
 

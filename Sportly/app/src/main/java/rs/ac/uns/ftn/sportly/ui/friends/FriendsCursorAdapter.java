@@ -12,6 +12,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -101,6 +102,7 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
         ImageButton removeButton = view.findViewById(R.id.imageButton);
         int emailIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_EMAIL);
 
+        ProgressBar loadingCircle = view.findViewById(R.id.loadingCircle);
         removeButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +114,10 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
                         .setNegativeButton("NO", null)
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                removeButton.setVisibility(View.GONE);
+                                loadingCircle.setVisibility(View.VISIBLE);
+
                                 FriendshipRequestDto request = new FriendshipRequestDto();
                                 String email = cursor.getString(emailIndex);
                                 request.setRecEmail(email);
@@ -131,6 +137,8 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
                                                     null);
                                         }else{
                                             Log.i("REMOVE FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                            loadingCircle.setVisibility(View.GONE);
+                                            removeButton.setVisibility(View.VISIBLE);
                                         }
                                     }
 
@@ -138,6 +146,8 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
                                     public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                                         Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                                         Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
+                                        loadingCircle.setVisibility(View.GONE);
+                                        removeButton.setVisibility(View.VISIBLE);
                                     }
                                 });
                             }})

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SportlySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "sportly.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 20;
 
     public SportlySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -18,6 +18,7 @@ public class SportlySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(DataBaseTables.FRIENDS_CREATE);
         db.execSQL(DataBaseTables.SPORTSFIELDS_CREATE);
         db.execSQL(DataBaseTables.EVENTS_CREATE);
+        db.execSQL(DataBaseTables.APPLICATION_LIST_CREATE);
     }
 
    @Override
@@ -25,6 +26,7 @@ public class SportlySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DataBaseTables.TABLE_FRIENDS);
         db.execSQL("DROP TABLE IF EXISTS " + DataBaseTables.TABLE_SPORTSFIELDS);
         db.execSQL("DROP TABLE IF EXISTS " + DataBaseTables.TABLE_EVENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + DataBaseTables.TABLE_APPLICATION_LIST);
         onCreate(db);
     }
 }

@@ -9,8 +9,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -19,10 +21,13 @@ import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.ApplierDTO;
 import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendDTO;
+import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
+import rs.ac.uns.ftn.sportly.model.firebase.Friends;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
@@ -56,34 +61,11 @@ public class SyncDataService extends Service {
                         SyncDataDTO syncDataDTO = response.body();
                         Log.d("SERVICE", "SYNC IS OK");
 
-                        Cursor friendsCursor = getContentResolver().query(
-                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
-                                new String[]{DataBaseTables.SERVER_ID},
-                                null,
-                                null,
-                                null
-                        );
+                        List<Long> allFriends = new ArrayList<>();
+                        List<Long> allEvents = new ArrayList<>();
+                        List<String> allApplicationLists = new ArrayList<>();
 
-                        friendsCursor.moveToFirst();
-
-                        while(!friendsCursor.isAfterLast()){
-
-                            Long friendId = friendsCursor.getLong(friendsCursor.getColumnIndex(DataBaseTables.SERVER_ID));
-
-                            System.out.println(friendId + " LONG ID FOUND IN SQLITE");
-
-                            if(!userIsFriend(syncDataDTO.getFriends(), friendId)){
-
-                                System.out.println(friendId + " LONG ID IS NOT IN FRINED DTO LIST");
-
-                                getContentResolver().delete(Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FRIENDS),
-                                        DataBaseTables.SERVER_ID + "=" + friendId,
-                                        null);
-                            }
-
-                            friendsCursor.moveToNext();
-                        }
-
+                        //FRIENDS
                         for(FriendDTO friendDTO : syncDataDTO.getFriends()){
 
                             System.out.println("---FRIEND---");
@@ -105,8 +87,17 @@ public class SyncDataService extends Service {
                            getContentResolver().insert(
                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
                                    values);
+
+                           allFriends.add(friendDTO.getId());
                         }
 
+                        deleteIfNotOnServer(
+                                Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
+                                allFriends,
+                                "LONG"
+                        );
+
+                        //SPORTSFIELDS
                         for(SportsFieldDTO sportsFieldDTO : syncDataDTO.getAllSportsFields()){
 
                             System.out.println("---SPORTSFIELD---");
@@ -135,6 +126,7 @@ public class SyncDataService extends Service {
                                     Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_SPORTSFIELDS),
                                     values);
 
+                            //EVENTS
                             for(EventDTO eventDTO : sportsFieldDTO.getEvents()){
 
                                 System.out.println("---EVENT---");
@@ -145,6 +137,7 @@ public class SyncDataService extends Service {
                                 System.out.println("TIME FROM:"+eventDTO.getTimeFrom());
                                 System.out.println("TIME TO:"+eventDTO.getTimeTo());
                                 System.out.println("SPORTS FIELD ID:"+sfUri.getLastPathSegment());
+                                System.out.println("APPLICATION STATUS"+eventDTO.getApplicationStatus());
                                 System.out.println("SERVER ID:"+eventDTO.getId());
 
                                 ContentValues valuesEvent = new ContentValues();
@@ -160,26 +153,57 @@ public class SyncDataService extends Service {
                                 valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sfUri.getLastPathSegment());
                                 valuesEvent.put(DataBaseTables.SERVER_ID,eventDTO.getId());
                                 valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,eventDTO.getNumOfParticipants());
-
-
-                                if(syncDataDTO.getCreatorEvents().contains(eventDTO.getId())){
-                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,1);
-                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,0);
-                                }
-                                else if(syncDataDTO.getParticipantEvents().contains(eventDTO.getId())){
-                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,1);
-                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,0);
-                                }
-                                else{
-                                    valuesEvent.put(DataBaseTables.EVENTS_CREATOR,0);
-                                    valuesEvent.put(DataBaseTables.EVENTS_PARTICIPATING,0);
-                                }
+                                valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,eventDTO.getApplicationStatus());
 
                                 getContentResolver().insert(
                                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
                                         valuesEvent);
+
+                                allEvents.add(eventDTO.getId());
+
+                                //APPLICATION LIST
+                                for(ApplierDTO applier : eventDTO.getApplicationList()){
+
+                                    System.out.println("---APPLICATION LIST---");
+                                    System.out.println("EVENT SERVER ID:"+eventDTO.getId());
+                                    System.out.println("APPLIER SERVER ID:"+applier.getId());
+                                    System.out.println("FIRST NAME:"+applier.getFirstName());
+                                    System.out.println("LAST NAME:"+applier.getLastName());
+                                    System.out.println("USERNAME:"+applier.getUsername());
+                                    System.out.println("EMAIL:"+applier.getEmail());
+                                    System.out.println("STATUS:"+applier.getStatus());
+                                    System.out.println("SERVER ID:"+"E"+eventDTO.getId()+"A"+applier.getId());
+
+                                    ContentValues valuesApplicationList = new ContentValues();
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EVENT_SERVER_ID,eventDTO.getId());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_APPLIER_SERVER_ID,applier.getId());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_FIRST_NAME,applier.getFirstName());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_LAST_NAME,applier.getLastName());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_USERNAME,applier.getUsername());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EMAIL,applier.getEmail());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_STATUS,applier.getStatus());
+                                    valuesApplicationList.put(DataBaseTables.SERVER_ID,"E"+eventDTO.getId()+"A"+applier.getId()+"");
+
+                                    getContentResolver().insert(
+                                            Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),
+                                            valuesApplicationList);
+
+                                    allApplicationLists.add("E"+eventDTO.getId()+"A"+applier.getId());
+                                }
                             }
                         }
+
+                        deleteIfNotOnServer(
+                                Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),
+                                allApplicationLists,
+                                "STRING"
+                        );
+
+                        deleteIfNotOnServer(
+                                Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
+                                allEvents,
+                                "LONG"
+                        );
 
                     }else{
                         Log.d("REZ","Meesage recieved: "+response.code());
@@ -209,7 +233,55 @@ public class SyncDataService extends Service {
 
 
     public boolean userIsFriend(final List<FriendDTO> list, final Long id){
+
         return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
     }
 
+    public boolean eventInList(final List<EventDTO> list, final Long id){
+
+        return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
+    }
+
+    private void deleteIfNotOnServer(Uri uri, List<?> list, String idType){
+        Cursor cursor = getContentResolver().query(
+                uri,
+                new String[]{DataBaseTables.SERVER_ID},
+                null,
+                null,
+                null
+        );
+
+        cursor.moveToFirst();
+
+        while(!cursor.isAfterLast()){
+
+            Long serverId = -1L;
+            String serverIdString = "";
+            if(idType.equals("LONG")){
+                serverId = cursor.getLong(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+            }else if(idType.equals("STRING")){
+                serverIdString = cursor.getString(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+            }
+
+            if(!list.isEmpty()){
+                if(list.get(0).getClass() == Long.class){
+                    if(!((List<FriendDTO>) list).contains(serverId)){
+                        getContentResolver().delete(
+                                uri,
+                                DataBaseTables.SERVER_ID + "=" + serverId,
+                                null);
+                    }
+                }
+                }else{
+                    if(!((List<String>) list).contains(serverIdString)){
+                        getContentResolver().delete(
+                                uri,
+                                DataBaseTables.SERVER_ID + "='" + serverId+"'",
+                                null);
+                    }
+                }
+            cursor.moveToNext();
+        }
+    }
 }
+

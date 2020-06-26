@@ -58,19 +58,6 @@ public class SyncServiceImpl implements SyncService {
 
         Collections.sort(syncDataDTO.getNotifications(), Collections.reverseOrder());
 
-        List<EventDTO> creatorEventDTOs = eventService.getCreatorEvents(username);
-        List<Long> creatorEventIDs = new ArrayList<>();
-        for(EventDTO event : creatorEventDTOs){
-            creatorEventIDs.add(event.getId());
-        }
-        syncDataDTO.setCreatorEvents(creatorEventIDs);
-
-        List<EventDTO> participantEventDTOs = eventService.getParticipantEvents(username);
-        List<Long> participantEventIDs = new ArrayList<>();
-        for(EventDTO event : participantEventDTOs){
-            participantEventIDs.add(event.getId());
-        }
-        syncDataDTO.setParticipantEvents(participantEventIDs);
 
         //SPORTS FIELDS DATA
 
@@ -89,7 +76,90 @@ public class SyncServiceImpl implements SyncService {
 
             for (Event event : sportsField.getEvents()){
                 if(event.getDateFrom().after(new Date())){
+
                     EventDTO eventDTO = event.createEventDTO();
+
+                    if(event.getCreator().getId() == user.getId()){
+
+                        eventDTO.setApplicationStatus("CREATOR");
+
+                        for(User u : event.getParticipants()){
+
+                            System.out.println("PARTICIPANT "+u.getId());
+
+                            ApplierDTO applier = new ApplierDTO();
+
+                            applier.setId(u.getId());
+                            applier.setFirstName(u.getFirstName());
+                            applier.setLastName(u.getLastName());
+                            applier.setUsername(u.getUsername());
+                            applier.setEmail(u.getEmail());
+                            applier.setStatus("PARTICIPATING");
+
+                            eventDTO.getApplicationList().add(applier);
+                        }
+
+                        for(User u : event.getQueue()){
+
+                            System.out.println("QUEUE "+u.getId());
+
+                            ApplierDTO applier = new ApplierDTO();
+
+                            applier.setId(u.getId());
+                            applier.setFirstName(u.getFirstName());
+                            applier.setLastName(u.getLastName());
+                            applier.setUsername(u.getUsername());
+                            applier.setEmail(u.getEmail());
+                            applier.setStatus("QUEUE");
+
+                            eventDTO.getApplicationList().add(applier);
+                        }
+                    }
+
+                    else if(containsUserInEventList(event.getParticipants(),user.getId())){
+
+                        eventDTO.setApplicationStatus("PARTICIPANT");
+
+                        for(User u : event.getParticipants()){
+
+                            System.out.println("PARTICIPANT "+u.getId());
+
+                            ApplierDTO applier = new ApplierDTO();
+
+                            applier.setId(u.getId());
+                            applier.setFirstName(u.getFirstName());
+                            applier.setLastName(u.getLastName());
+                            applier.setUsername(u.getUsername());
+                            applier.setEmail(u.getEmail());
+                            applier.setStatus("PARTICIPATING");
+
+                            eventDTO.getApplicationList().add(applier);
+                        }
+                    }
+
+                    else if(containsUserInEventList(event.getQueue(),user.getId())){
+
+                        eventDTO.setApplicationStatus("QUEUE");
+
+                        for(User u : event.getParticipants()){
+
+                            System.out.println("PARTICIPANT "+u.getId());
+
+                            ApplierDTO applier = new ApplierDTO();
+
+                            applier.setId(u.getId());
+                            applier.setFirstName(u.getFirstName());
+                            applier.setLastName(u.getLastName());
+                            applier.setUsername(u.getUsername());
+                            applier.setEmail(u.getEmail());
+                            applier.setStatus("PARTICIPATING");
+
+                            eventDTO.getApplicationList().add(applier);
+                        }
+                    }else{
+                        eventDTO.setApplicationStatus("NONE");
+                    }
+
                     sfDTO.getEvents().add(eventDTO);
                 }
 
@@ -100,5 +170,10 @@ public class SyncServiceImpl implements SyncService {
         }
 
         return syncDataDTO;
+    }
+
+
+    public boolean containsUserInEventList(final List<User> list, final Long userId){
+        return list.stream().filter(o -> o.getId().equals(userId)).findFirst().isPresent();
     }
 }
