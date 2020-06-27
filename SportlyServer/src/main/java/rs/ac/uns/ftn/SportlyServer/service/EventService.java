@@ -24,4 +24,5 @@ public interface EventService {
     public EventRequestDTO createEventRequest(EventRequestRequest request, EventRequestTypeEnum eventRequestType);
     public EventRequestDTO acceptEventRequest(Long id);
     public EventRequestDTO rejectEventRequest(Long id);
+    public EventRequestDTO deleteEventRequest(Long id);
 }

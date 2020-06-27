@@ -61,21 +61,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<EventRequest> eventRequests = new ArrayList<>();
 
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(
-            name = "participant_events",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> participantEvents = new ArrayList<>();
-
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(
-            name = "queue",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> queueEvents = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Participation> participationList = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_authority",

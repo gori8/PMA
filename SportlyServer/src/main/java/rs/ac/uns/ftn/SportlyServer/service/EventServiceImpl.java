@@ -2,19 +2,12 @@ package rs.ac.uns.ftn.SportlyServer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import retrofit.http.DELETE;
 import rs.ac.uns.ftn.SportlyServer.dto.*;
-import rs.ac.uns.ftn.SportlyServer.model.Event;
-import rs.ac.uns.ftn.SportlyServer.model.EventRequest;
-import rs.ac.uns.ftn.SportlyServer.model.SportsField;
-import rs.ac.uns.ftn.SportlyServer.model.User;
-import rs.ac.uns.ftn.SportlyServer.repository.EventRepository;
-import rs.ac.uns.ftn.SportlyServer.repository.EventRequestRepository;
-import rs.ac.uns.ftn.SportlyServer.repository.SportsFieldRepository;
-import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
+import rs.ac.uns.ftn.SportlyServer.model.*;
+import rs.ac.uns.ftn.SportlyServer.repository.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -30,6 +23,12 @@ public class EventServiceImpl implements EventService {
 
     @Autowired
     EventRequestRepository erRepository;
+
+    @Autowired
+    ParticipationRepository participationRepository;
+
+    @Autowired
+    PushNotificationService pushNotificationService;
 
     @Override
     public List<EventDTO> getCreatorEvents(String email) {
@@ -60,12 +59,17 @@ public class EventServiceImpl implements EventService {
             return null;
 
         List<EventDTO> eventDTOs = new ArrayList<>();
-        for(Event event : user.getParticipantEvents()){
-            if(!event.isDeleted()) {
+        for(Participation participation : user.getParticipationList()){
+            if(!participation.isDeleted()){
 
-                EventDTO eventDTO = event.createEventDTO();
+                Event event = participation.getEvent();
 
-                eventDTOs.add(eventDTO);
+                if(!event.isDeleted()) {
+
+                    EventDTO eventDTO = event.createEventDTO();
+
+                    eventDTOs.add(eventDTO);
+                }
             }
         }
 
@@ -179,12 +183,17 @@ public class EventServiceImpl implements EventService {
             return null;
 
         List<UserDTO> userDTOs = new ArrayList<>();
-        for(User user : event.getParticipants()){
-            UserDTO userDTO = new UserDTO();
-            userDTO.setIme(user.getFirstName());
-            userDTO.setPrezime(user.getLastName());
-            userDTO.setEmail(user.getEmail());
-            userDTOs.add(userDTO);
+        for(Participation participation : event.getParticipationList()){
+            if(!participation.isDeleted()){
+
+                User user = participation.getUser();
+
+                UserDTO userDTO = new UserDTO();
+                userDTO.setIme(user.getFirstName());
+                userDTO.setPrezime(user.getLastName());
+                userDTO.setEmail(user.getEmail());
+                userDTOs.add(userDTO);
+            }
         }
 
         return userDTOs;
@@ -208,7 +217,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventRequestDTO getEventRequest(Long id) {
         EventRequest eventRequest = erRepository.getById(id);
-        if(eventRequest == null || eventRequest.isDeleted())
+        if(eventRequest == null || eventRequest.getStatus() != EventStatusEnum.PENDING)
             return null;
 
         EventRequestDTO eventRequestDTO = eventRequest.createEventRequestDTO();
@@ -224,7 +233,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventRequestDTO> eventRequestDTOs = new ArrayList<>();
         for(EventRequest eventRequest : event.getEventRequests()){
-            if(!eventRequest.isDeleted())
+            if(eventRequest.getStatus() == EventStatusEnum.PENDING)
                 eventRequestDTOs.add(eventRequest.createEventRequestDTO());
         }
 
@@ -239,7 +248,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventRequestDTO> eventRequestDTOs = new ArrayList<>();
         for(EventRequest eventRequest : user.getEventRequests()){
-            if(!eventRequest.isDeleted())
+            if(eventRequest.getStatus() == EventStatusEnum.PENDING)
                 eventRequestDTOs.add(eventRequest.createEventRequestDTO());
         }
 
@@ -260,16 +269,38 @@ public class EventServiceImpl implements EventService {
         eventRequest.setUser(user);
         eventRequest.setEvent(event);
         eventRequest.setEventRequestType(eventRequestType);
-        eventRequest.setDeleted(false);
+        eventRequest.setStatus(EventStatusEnum.PENDING);
 
         erRepository.save(eventRequest);
+
+        if(eventRequestType == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
+            Map<String,String> data = new HashMap<>();
+            data.put("eventId",event.getId().toString());
+            data.put("applierId",user.getId().toString());
+            data.put("firstName",user.getFirstName());
+            data.put("lastName",user.getLastName());
+            data.put("email",user.getEmail());
+            data.put("username",user.getUsername());
+            data.put("status","QUEUE");
+            data.put("notificationType","APPLY_FOR_EVENT");
+            data.put("title","New application for your event");
+            data.put("message",user.getFirstName() + " " + user.getLastName() + " applied for the event "+event.getName()+".");
+
+            PushNotificationRequest notificationRequest = new PushNotificationRequest();
+            notificationRequest.setMessage(user.getFirstName() + " " + user.getLastName() + " applied for the event "+event.getName()+".");
+            notificationRequest.setTitle("New application for your event");
+            notificationRequest.setTopic(event.getCreator().getId().toString());
+            pushNotificationService.sendPushNotification(notificationRequest,data);
+        }
+
+
         return eventRequest.createEventRequestDTO();
     }
 
     @Override
     public EventRequestDTO acceptEventRequest(Long id) {
         EventRequest eventRequest = erRepository.getById(id);
-        if(eventRequest == null || eventRequest.isDeleted())
+        if(eventRequest == null || eventRequest.getStatus()!=EventStatusEnum.PENDING)
             return null;
 
         User user = eventRequest.getUser();
@@ -280,8 +311,15 @@ public class EventServiceImpl implements EventService {
         if(event == null || event.isDeleted())
             return null;
 
-        event.getParticipants().add(user); //dodamo usera u listu participanta eventa
-        eventRequest.setDeleted(true); //obrisemo request
+        Participation participation = new Participation();
+        participation.setUser(user);
+        participation.setEvent(event);
+        participation.setDeleted(false);
+
+        event.getParticipationList().add(participation); //dodamo usera u listu participanta eventa
+        eventRequest.setStatus(EventStatusEnum.CONFIRMED);
+
+        participationRepository.save(participation);
         eventRepository.save(event);
         erRepository.save(eventRequest);
 
@@ -291,10 +329,21 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventRequestDTO rejectEventRequest(Long id) {
         EventRequest eventRequest = erRepository.getById(id);
-        if (eventRequest == null || eventRequest.isDeleted())
+        if (eventRequest == null || eventRequest.getStatus()!=EventStatusEnum.PENDING)
             return null;
 
-        eventRequest.setDeleted(true); //obrisemo request
+        eventRequest.setStatus(EventStatusEnum.REJECTED);
+        erRepository.save(eventRequest);
+        return eventRequest.createEventRequestDTO();
+    }
+
+    @Override
+    public EventRequestDTO deleteEventRequest(Long id) {
+        EventRequest eventRequest = erRepository.getById(id);
+        if (eventRequest == null || eventRequest.getStatus()!=EventStatusEnum.PENDING)
+            return null;
+
+        eventRequest.setStatus(EventStatusEnum.DELETED);
         erRepository.save(eventRequest);
         return eventRequest.createEventRequestDTO();
     }

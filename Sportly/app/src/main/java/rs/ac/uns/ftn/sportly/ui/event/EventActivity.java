@@ -8,10 +8,13 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 import android.app.ActionBar;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,12 +26,19 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
+import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
+import rs.ac.uns.ftn.sportly.model.Event;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.ApplicationListActivity;
 import rs.ac.uns.ftn.sportly.ui.event.edit_event.EditEventActivity;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class EventActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -44,6 +54,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private TextView tvDescription;
     private RoundedImageView imageView;
     private String eventName;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,62 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 intent.putExtra("eventId",eventId);
                 intent.putExtra("eventName", eventName);
                 startActivity(intent);
+            }
+        });
+
+        String jwt = JwtTokenUtils.getJwtToken(this);
+        String authHeader = "Bearer " + jwt;
+
+        Button cancelButton = findViewById(R.id.cancelButton);
+        Button applyButton = findViewById(R.id.applyButton);
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mProgressDialog = new ProgressDialog(EventActivity.this);
+                mProgressDialog.setTitle("Applying for the event...");
+                mProgressDialog.setMessage("Please wait while we are processing your application.");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
+
+                EventRequestRequest request = new EventRequestRequest();
+                request.setEventId(eventId);
+
+                Call<EventRequestDTO> call = SportlyServerServiceUtils.sportlyServerService.applyForEvent(authHeader,request);
+
+                call.enqueue(new Callback<EventRequestDTO>() {
+                    @Override
+                    public void onResponse(Call<EventRequestDTO> call, Response<EventRequestDTO> response) {
+                        if (response.code() == 200){
+
+                            Log.i("APPLY FOR EVENT", "CALL TO SERVER SUCCESSFUL");
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"QUEUE");
+
+                            EventActivity.this.getContentResolver().update(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
+                                    values,
+                                    DataBaseTables.SERVER_ID + " = "+eventId,
+                                    null);
+
+
+                            applyButton.setVisibility(View.GONE);
+                            cancelButton.setVisibility(View.VISIBLE);
+                        }else{
+                            Log.i("APPLY FOR EVENT", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                        }
+                        mProgressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Call<EventRequestDTO> call, Throwable t) {
+                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                        Log.i("APPLY FOR EVENT", "CALL TO SERVER FAILED");
+                        mProgressDialog.dismiss();
+                    }
+                });
+
             }
         });
 

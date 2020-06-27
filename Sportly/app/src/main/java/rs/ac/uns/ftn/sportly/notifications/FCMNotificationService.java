@@ -89,6 +89,20 @@ public class FCMNotificationService extends FirebaseMessagingService {
                 getContentResolver().insert(
                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
                         values);
+            }else if(data.get("notificationType").equals("APPLY_FOR_EVENT")){
+                ContentValues valuesApplicationList = new ContentValues();
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EVENT_SERVER_ID,data.get("eventId"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_APPLIER_SERVER_ID,data.get("applierId"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_FIRST_NAME,data.get("firstName"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_LAST_NAME,data.get("lastName"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_USERNAME,data.get("username"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EMAIL,data.get("email"));
+                valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_STATUS,data.get("status"));
+                valuesApplicationList.put(DataBaseTables.SERVER_ID,"E"+data.get("eventId")+"A"+data.get("applierId")+"");
+
+                getContentResolver().insert(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),
+                        valuesApplicationList);
             }
 
             Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);

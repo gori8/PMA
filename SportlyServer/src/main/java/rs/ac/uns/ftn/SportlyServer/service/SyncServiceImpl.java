@@ -3,10 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.SportlyServer.dto.*;
-import rs.ac.uns.ftn.SportlyServer.model.Event;
-import rs.ac.uns.ftn.SportlyServer.model.Notification;
-import rs.ac.uns.ftn.SportlyServer.model.SportsField;
-import rs.ac.uns.ftn.SportlyServer.model.User;
+import rs.ac.uns.ftn.SportlyServer.model.*;
 import rs.ac.uns.ftn.SportlyServer.repository.SportsFieldRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 
@@ -83,61 +80,70 @@ public class SyncServiceImpl implements SyncService {
 
                         eventDTO.setApplicationStatus("CREATOR");
 
-                        for(User u : event.getParticipants()){
+                        for(Participation participation : event.getParticipationList()){
 
-                            System.out.println("PARTICIPANT "+u.getId());
+                            if(!participation.isDeleted()){
+                                User u = participation.getUser();
 
-                            ApplierDTO applier = new ApplierDTO();
+                                ApplierDTO applier = new ApplierDTO();
 
-                            applier.setId(u.getId());
-                            applier.setFirstName(u.getFirstName());
-                            applier.setLastName(u.getLastName());
-                            applier.setUsername(u.getUsername());
-                            applier.setEmail(u.getEmail());
-                            applier.setStatus("PARTICIPATING");
+                                applier.setId(u.getId());
+                                applier.setFirstName(u.getFirstName());
+                                applier.setLastName(u.getLastName());
+                                applier.setUsername(u.getUsername());
+                                applier.setEmail(u.getEmail());
+                                applier.setStatus("PARTICIPATING");
 
-                            eventDTO.getApplicationList().add(applier);
+                                eventDTO.getApplicationList().add(applier);
+                            }
                         }
 
-                        for(User u : event.getQueue()){
+                        for(EventRequest eventRequest : event.getEventRequests()){
+                            if(eventRequest.getStatus() == EventStatusEnum.PENDING){
+                                User u = eventRequest.getUser();
 
-                            System.out.println("QUEUE "+u.getId());
+                                ApplierDTO applier = new ApplierDTO();
 
-                            ApplierDTO applier = new ApplierDTO();
+                                applier.setId(u.getId());
+                                applier.setFirstName(u.getFirstName());
+                                applier.setLastName(u.getLastName());
+                                applier.setUsername(u.getUsername());
+                                applier.setEmail(u.getEmail());
 
-                            applier.setId(u.getId());
-                            applier.setFirstName(u.getFirstName());
-                            applier.setLastName(u.getLastName());
-                            applier.setUsername(u.getUsername());
-                            applier.setEmail(u.getEmail());
-                            applier.setStatus("QUEUE");
+                                if(eventRequest.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
+                                    applier.setStatus("QUEUE");
+                                }else{
+                                    applier.setStatus("INVITED");
+                                }
 
-                            eventDTO.getApplicationList().add(applier);
+                                eventDTO.getApplicationList().add(applier);
+                            }
                         }
                     }
 
-                    else if(containsUserInEventList(event.getParticipants(),user.getId())){
+                    else if(containsUserInParticipationList(event.getParticipationList(),user.getId())){
 
                         eventDTO.setApplicationStatus("PARTICIPANT");
 
-                        for(User u : event.getParticipants()){
+                        for(Participation participation : event.getParticipationList()){
+                            if(!participation.isDeleted()){
+                                User u = participation.getUser();
 
-                            System.out.println("PARTICIPANT "+u.getId());
+                                ApplierDTO applier = new ApplierDTO();
 
-                            ApplierDTO applier = new ApplierDTO();
+                                applier.setId(u.getId());
+                                applier.setFirstName(u.getFirstName());
+                                applier.setLastName(u.getLastName());
+                                applier.setUsername(u.getUsername());
+                                applier.setEmail(u.getEmail());
+                                applier.setStatus("PARTICIPATING");
 
-                            applier.setId(u.getId());
-                            applier.setFirstName(u.getFirstName());
-                            applier.setLastName(u.getLastName());
-                            applier.setUsername(u.getUsername());
-                            applier.setEmail(u.getEmail());
-                            applier.setStatus("PARTICIPATING");
-
-                            eventDTO.getApplicationList().add(applier);
+                                eventDTO.getApplicationList().add(applier);
+                            }
                         }
                     }
 
-                    else if(containsUserInEventList(event.getQueue(),user.getId())){
+                    else if(containsUserInEventRequests(event.getEventRequests(),user.getId())){
 
                         eventDTO.setApplicationStatus("QUEUE");
 
@@ -160,5 +166,13 @@ public class SyncServiceImpl implements SyncService {
 
     public boolean containsUserInEventList(final List<User> list, final Long userId){
         return list.stream().filter(o -> o.getId().equals(userId)).findFirst().isPresent();
+    }
+
+    public boolean containsUserInParticipationList(final List<Participation> list, final Long userId){
+        return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.isDeleted()==false).findFirst().isPresent();
+    }
+
+    public boolean containsUserInEventRequests(final List<EventRequest> list, final Long userId){
+        return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING).findFirst().isPresent();
     }
 }

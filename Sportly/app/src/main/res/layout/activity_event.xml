@@ -291,10 +291,23 @@
             <android.widget.Button
                 android:textColor="@color/white"
                 android:layout_width="0dp"
+                android:id="@+id/applyButton"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:visibility="visible"
                 android:background="@color/colorPrimary"
                 android:text="Apply"/>
+
+            <android.widget.Button
+                android:textColor="@color/white"
+                android:layout_width="0dp"
+                android:id="@+id/cancelButton"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:background="@color/red"
+                android:text="Cancel Application"/>
+
 
         </LinearLayout>
 

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.uns.ftn.SportlyServer.dto.EventRequestDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.EventRequestTypeEnum;
+import rs.ac.uns.ftn.SportlyServer.dto.EventStatusEnum;
 
 import javax.persistence.*;
 
@@ -26,7 +27,7 @@ public class EventRequest {
     @Enumerated(EnumType.STRING)
     private EventRequestTypeEnum eventRequestType;
 
-    private boolean isDeleted;
+    private EventStatusEnum status;
 
     public EventRequestDTO createEventRequestDTO(){
         EventRequestDTO erDTO = new EventRequestDTO();

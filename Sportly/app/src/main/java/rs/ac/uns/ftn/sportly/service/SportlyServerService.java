@@ -15,6 +15,8 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
 import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
@@ -53,6 +55,9 @@ public interface SportlyServerService {
 
     @HTTP(method = "DELETE", path = "/friendship/deleteFriendship", hasBody = true)
     Call<FriendshipDTO> deleteFriend(@Header("Authorization") String authHeader, @Body FriendshipRequestDto request);
+
+    @POST("/event/eventRequest/create/participant")
+    Call<EventRequestDTO> applyForEvent(@Header("Authorization") String authHeader, @Body EventRequestRequest request);
 
 
 }

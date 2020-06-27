@@ -140,6 +140,10 @@ public class EventController {
 
     @RequestMapping(value = "/eventRequest/create/participant", method = RequestMethod.POST)
     public ResponseEntity<?> createEventRequestByParticipant(@RequestBody EventRequestRequest request) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        request.setUserEmail(email);
+
         EventRequestDTO eventRequestDTO = eventService.createEventRequest(request, EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT);
         if(eventRequestDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -161,6 +165,16 @@ public class EventController {
     @RequestMapping(value = "/eventRequest/{id}/reject", method = RequestMethod.PUT)
     public ResponseEntity<?> rejectEventRequest(@PathVariable Long id) {
         EventRequestDTO eventRequestDTO = eventService.rejectEventRequest(id);
+        if(eventRequestDTO == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(eventRequestDTO, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/eventRequest/{id}/delete", method = RequestMethod.PUT)
+    public ResponseEntity<?> deleteEventRequest(@PathVariable Long id) {
+        EventRequestDTO eventRequestDTO = eventService.deleteEventRequest(id);
         if(eventRequestDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

@@ -46,14 +46,11 @@ public class Event {
     @ManyToOne(fetch = FetchType.EAGER)
     protected SportsField sportsField;
 
-    @ManyToMany(mappedBy = "participantEvents")
-    private List<User> participants = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "queueEvents")
-    private List<User> queue = new ArrayList<>();
-
     @OneToMany(mappedBy = "event")
     private List<EventRequest> eventRequests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event")
+    private List<Participation> participationList = new ArrayList<>();
 
     public EventDTO createEventDTO(){
         EventDTO dto = new EventDTO();
@@ -64,7 +61,7 @@ public class Event {
         dto.setTimeFrom(this.getTimeFrom());
         dto.setTimeTo(this.getTimeTo());
         dto.setNumbOfPpl(this.getNumbOfPpl());
-        dto.setNumOfParticipants((short)(this.getParticipants().size()+1));
+        dto.setNumOfParticipants((short)(this.getParticipationList().size()+1));
         dto.setPrice(this.getPrice());
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
