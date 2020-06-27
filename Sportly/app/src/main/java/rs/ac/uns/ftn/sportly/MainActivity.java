@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 20*1000, pendingIntent);
+        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 30*1000, pendingIntent);
     }
 
 

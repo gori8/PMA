@@ -37,7 +37,7 @@
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/imageView"
+                    android:id="@+id/eventSportsfieldImage"
                     android:src="@drawable/ic_location_on_black_24dp"
                     android:scaleType="fitCenter"
                     app:riv_corner_radius="5dip"

@@ -42,6 +42,8 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String applicationStatus;
 
+    private String creator;
+
     @Override
     public int compareTo(EventDTO e) {
         return getDateFrom().compareTo(e.getDateFrom());

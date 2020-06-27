@@ -430,7 +430,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
             Intent intent = new Intent(getActivity(), EventActivity.class);
             intent.putExtra("eventId", eventId);
-            intent.putExtra("location", location);
+            /*intent.putExtra("location", location);
             intent.putExtra("name", name);
             intent.putExtra("time", timeFrom+" - "+timeTo);
             intent.putExtra("people", numOfParticipants+"/"+numOfPeople+" people");
@@ -440,7 +440,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             intent.putExtra("creator", "Pera Perić");
             intent.putExtra("description", description);
             intent.putExtra("imageView", R.drawable.djacko);
-            intent.putExtra("isCreator",flagIsCreator);
+            intent.putExtra("isCreator",flagIsCreator);*/
             getActivity().startActivity(intent);
 
         });

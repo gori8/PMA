@@ -139,6 +139,8 @@ public class SyncDataService extends Service {
                                 System.out.println("SPORTS FIELD ID:"+sfUri.getLastPathSegment());
                                 System.out.println("APPLICATION STATUS"+eventDTO.getApplicationStatus());
                                 System.out.println("SERVER ID:"+eventDTO.getId());
+                                System.out.println("EVENT CREATOR:"+eventDTO.getCreator());
+
 
                                 ContentValues valuesEvent = new ContentValues();
                                 valuesEvent.put(DataBaseTables.EVENTS_NAME,eventDTO.getName());
@@ -154,6 +156,8 @@ public class SyncDataService extends Service {
                                 valuesEvent.put(DataBaseTables.SERVER_ID,eventDTO.getId());
                                 valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,eventDTO.getNumOfParticipants());
                                 valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,eventDTO.getApplicationStatus());
+                                valuesEvent.put(DataBaseTables.EVENTS_CREATOR,eventDTO.getCreator());
+
 
                                 getContentResolver().insert(
                                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
