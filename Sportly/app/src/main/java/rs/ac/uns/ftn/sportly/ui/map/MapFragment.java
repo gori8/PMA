@@ -43,6 +43,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -69,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -104,12 +106,27 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private HashMap<String,ArrayList<Marker>> markersMap = new HashMap<>();
     private Cursor data;
     private EventsCursorAdapter adapter;
+    private Long selectedSportsFieldServerId;
+    private Long selectedSportsFieldId;
+
 
     public static MapFragment newInstance() {
 
         MapFragment mpf = new MapFragment();
 
         return mpf;
+    }
+
+    public class MarkerData{
+
+        public Long sportsFieldId;
+        public Long sportsFieldServerId;
+
+        public MarkerData(Long sportsFieldId, Long sportsFieldServerId) {
+            this.sportsFieldId = sportsFieldId;
+            this.sportsFieldServerId = sportsFieldServerId;
+
+        }
     }
 
     /**
@@ -210,6 +227,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                 Intent intent = new Intent(mainActivity, CreateEventActivity.class);
                 intent.putExtra("location", placeName);
+                intent.putExtra("sportsFieldServerId", MapFragment.this.selectedSportsFieldServerId);
+                intent.putExtra("sportsFieldId", MapFragment.this.selectedSportsFieldId);
+
 
                 mainActivity.startActivity(intent);
             }
@@ -602,7 +622,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 DataBaseTables.SPORTSFIELDS_LONGITUDE,
                 DataBaseTables.SPORTSFIELDS_NAME,
                 DataBaseTables.SPORTSFIELDS_FAVORITE,
-                DataBaseTables.SPORTSFIELDS_CATEGORY
+                DataBaseTables.SPORTSFIELDS_CATEGORY,
+                DataBaseTables.SERVER_ID
         };
 
         data = getActivity().getContentResolver().query(Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),allColumns,null,null,null);
@@ -614,7 +635,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             String name = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_NAME));
             Float lat = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LATITUDE));
             Float lng = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LONGITUDE));
-            Integer id = data.getInt(data.getColumnIndex(DataBaseTables.ID));
+            Long sportsFieldServerId = data.getLong(data.getColumnIndex(DataBaseTables.SERVER_ID));
+            Long id = data.getLong(data.getColumnIndex(DataBaseTables.ID));
 
 
             Marker marker = null;
@@ -626,7 +648,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }else if (category.equals("tennis")){
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
-            marker.setTag(id);
+
+            MarkerData markerData = new MarkerData(id,sportsFieldServerId);
+            marker.setTag(markerData);
 
             markersMap.get(category).add(marker);
             data.moveToNext();
@@ -641,8 +665,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getTag()!=null) {
 
+                    MarkerData markerData = (MarkerData)marker.getTag();
+
                     Bundle args = new Bundle();
-                    args.putInt("sportsFieldsId",(Integer)marker.getTag());
+                    args.putLong("sportsFieldsId",markerData.sportsFieldId);
+                    MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
+                    MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
+
 
                     if(getLoaderManager().getLoader(0)!=null){
                         getLoaderManager().restartLoader(0, args, MapFragment.this);
@@ -811,7 +840,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
         };
 
-        Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+args.getInt("sportsFieldsId"));
+
+
+        Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+args.getLong("sportsFieldsId"));
 
 
         return new CursorLoader(getActivity(), uri, allColumns, null, null, null);

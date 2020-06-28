@@ -15,6 +15,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
 import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
@@ -58,6 +59,9 @@ public interface SportlyServerService {
 
     @POST("/event/eventRequest/create/participant")
     Call<EventRequestDTO> applyForEvent(@Header("Authorization") String authHeader, @Body EventRequestRequest request);
+
+    @POST("/event/create")
+    Call<EventDTO> createEvent(@Header("Authorization") String authHeader, @Body EventDTO event);
 
 
 }

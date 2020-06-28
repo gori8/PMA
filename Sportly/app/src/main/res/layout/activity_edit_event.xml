@@ -19,12 +19,10 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_layout"
         android:orientation="vertical"
-        android:layout_above="@id/buttonLayout"
         android:fillViewport="true">
 
         <LinearLayout
@@ -49,13 +47,13 @@
                         android:src="@drawable/ic_location_gray"/>
 
                     <TextView
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/location"
-                        android:text="Location"
+                        android:text="@string/label_location"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="12dp"/>
+                        android:textSize="12sp"/>
 
                 </LinearLayout>
 
@@ -77,6 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -88,7 +87,8 @@
                             android:layout_height="wrap_content"
                             android:imeOptions="actionDone"
                             android:singleLine="true"
-                            android:hint="Event name"/>
+                            android:hint="@string/label_event_name"
+                            android:inputType="textCapSentences"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -113,7 +113,7 @@
                             android:focusableInTouchMode="false"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Date"/>
+                            android:hint="@string/label_date"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -137,7 +137,7 @@
                             android:layout_width="match_parent"
                             android:focusableInTouchMode="false"
                             android:layout_height="wrap_content"
-                            android:hint="Starting time"/>
+                            android:hint="@string/label_starting_time"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
@@ -160,7 +160,7 @@
                             android:focusableInTouchMode="false"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Ending time"/>
+                            android:hint="@string/label_ending_time"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -177,11 +177,11 @@
                         android:layout_height="wrap_content">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/people"
+                            android:id="@+id/num_of_people"
                             android:inputType="number"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Number of people"/>
+                            android:hint="@string/label_number_of_people"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -190,20 +190,41 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/currency"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:imeOptions="actionDone"
+                            android:singleLine="true"
+                            android:hint="@string/label_currency"
+                            android:maxLength="3"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/price"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:imeOptions="actionDone"
                             android:singleLine="true"
-                            android:hint="Price"/>
+                            android:hint="@string/label_price"
+                            android:layout_width="match_parent"
+                            android:inputType="numberDecimal"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -223,9 +244,43 @@
                             android:id="@+id/description"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Description"/>
+                            android:hint="@string/label_description"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:id="@+id/buttonLayout"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <android.widget.Button
+                        android:textColor="@color/white"
+                        android:layout_width="200dp"
+                        android:id="@+id/confirmButton"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_button_round_corners_cp"
+                        android:text="@string/confirm"
+                        android:layout_marginTop="20dp"
+                        android:layout_gravity="center"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="5dp"/>
+
+                    <android.widget.Button
+                        android:textColor="@color/white"
+                        android:layout_width="200dp"
+                        android:id="@+id/cancelCEButton"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_button_round_corners_ccancel"
+                        android:text="@string/cancel"
+                        android:layout_margin="10dp"
+                        android:layout_gravity="center"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="5dp"/>
 
                 </LinearLayout>
 
@@ -234,25 +289,5 @@
         </LinearLayout>
 
     </ScrollView>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_weight="1"
-        android:id="@+id/buttonLayout"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center|bottom"
-        android:orientation="horizontal">
-
-        <android.widget.Button
-            android:textColor="@color/white"
-            android:layout_width="0dp"
-            android:id="@+id/doneButton"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:text="Done"/>
-
-    </LinearLayout>
 
 </RelativeLayout>

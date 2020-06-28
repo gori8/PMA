@@ -141,7 +141,9 @@ public class EventServiceImpl implements EventService {
         newEvent.setDescription(eventDTO.getDescription());
         newEvent.setDeleted(false);
 
-        eventRepository.save(newEvent);
+        Event event = eventRepository.save(newEvent);
+
+        eventDTO.setId(event.getId());
         return eventDTO;
     }
 

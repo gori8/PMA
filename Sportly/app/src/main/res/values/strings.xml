@@ -42,5 +42,17 @@
     <string name="default_notification_channel_id">NOTIFICATIONS_CHANNEL</string>
     <string name="switch_conversations">Conversations</string>
     <string name="switch_friends">Friends</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="label_location">Location</string>
+    <string name="label_event_name">Event name</string>
+    <string name="label_date">Date</string>
+    <string name="label_currency">Currency</string>
+    <string name="label_price">Price</string>
+    <string name="label_description">Description</string>
+    <string name="label_starting_time">Starting time</string>
+    <string name="label_ending_time">Ending time</string>
+    <string name="label_number_of_people">Number of people</string>
+    <string name="confirm">Confirm</string>
 
 </resources>

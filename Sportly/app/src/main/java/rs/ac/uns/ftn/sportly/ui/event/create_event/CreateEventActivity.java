@@ -6,9 +6,12 @@ import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -19,12 +22,38 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import lombok.SneakyThrows;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.EventDTO;
+import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.time_picker.TimePickerFragment;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class CreateEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     private int selectedTimePicker;
+
+
+    private TextView tvLocation;
+    private TextInputEditText etName;
+    private TextInputEditText etStartingTime;
+    private TextInputEditText etEndingTime;
+    private TextInputEditText etDate;
+    private TextInputEditText etPrice;
+    private TextInputEditText etDescription;
+    private TextInputEditText etCurrency;
+    private TextInputEditText etNumOfPpl;
+    private Button confirmBtn;
+
+    private Long sportsFieldServerId;
+    private Long sportsFieldId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +65,102 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
         setTitle("Create event");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        sportsFieldServerId = getIntent().getExtras().getLong("sportsFieldServerId");
+        sportsFieldId = getIntent().getExtras().getLong("sportsFieldId");
+
+        String locationText = getIntent().getExtras().getString("location");
+
+
+        confirmBtn = findViewById(R.id.confirmButton);
+
+        tvLocation = findViewById(R.id.location);
+        tvLocation.setText(locationText);
+
+        etName = findViewById(R.id.name);
+        etStartingTime = findViewById(R.id.startingTime);
+        etEndingTime = findViewById(R.id.endingTime);
+        etDate = findViewById(R.id.date);
+        etPrice = findViewById(R.id.price);
+        etDescription = findViewById(R.id.description);
+        etCurrency = findViewById(R.id.currency);
+        etNumOfPpl = findViewById(R.id.num_of_people);
+
+
+        confirmBtn.setOnClickListener(new View.OnClickListener() {
+
+            @SneakyThrows
+            @Override
+            public void onClick(View v) {
+
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
+
+                EventDTO eventDTO = new EventDTO();
+
+                eventDTO.setName(etName.getText().toString());
+                eventDTO.setDateFrom(dateFormatter.parse(etDate.getText().toString()));
+                eventDTO.setDateTo(dateFormatter.parse(etDate.getText().toString()));
+                eventDTO.setTimeFrom(etStartingTime.getText().toString());
+                eventDTO.setTimeTo(etEndingTime.getText().toString());
+                eventDTO.setCurr(etCurrency.getText().toString());
+                eventDTO.setPrice(Double.parseDouble(etPrice.getText().toString()));
+                eventDTO.setDescription(etDescription.getText().toString());
+                eventDTO.setNumbOfPpl(Short.parseShort(etNumOfPpl.getText().toString()));
+                eventDTO.setSportsFieldId(sportsFieldServerId);
+
+                String jwt = JwtTokenUtils.getJwtToken(CreateEventActivity.this);
+                String authHeader = "Bearer " + jwt;
+
+                Call<EventDTO> call = SportlyServerServiceUtils.sportlyServerService.createEvent(authHeader,eventDTO);
+
+                call.enqueue(new Callback<EventDTO>() {
+
+
+                    @Override
+                    public void onResponse(Call<EventDTO> call, Response<EventDTO> response) {
+                        if(response.code()==201){
+
+                            EventDTO respEventDTO = response.body();
+
+                            ContentValues valuesEvent = new ContentValues();
+                            valuesEvent.put(DataBaseTables.EVENTS_NAME,respEventDTO.getName());
+                            valuesEvent.put(DataBaseTables.EVENTS_CURR,respEventDTO.getCurr());
+                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PPL,respEventDTO.getNumbOfPpl());
+                            valuesEvent.put(DataBaseTables.EVENTS_PRICE,respEventDTO.getPrice());
+                            valuesEvent.put(DataBaseTables.EVENTS_DESCRIPTION,respEventDTO.getDescription());
+                            valuesEvent.put(DataBaseTables.EVENTS_DATE_FROM,respEventDTO.getDateFrom().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_DATE_TO,respEventDTO.getDateTo().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_TIME_FROM,respEventDTO.getTimeFrom().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,respEventDTO.getTimeTo().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sportsFieldId);
+                            valuesEvent.put(DataBaseTables.SERVER_ID,respEventDTO.getId());
+                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,respEventDTO.getNumOfParticipants());
+                            valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"CREATOR");
+                            valuesEvent.put(DataBaseTables.EVENTS_CREATOR,respEventDTO.getCreator());
+
+
+
+                            getContentResolver().insert(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
+                                    valuesEvent);
+
+                            Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
+                            intent.putExtra("eventId", respEventDTO.getId());
+
+                            CreateEventActivity.this.startActivity(intent);
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EventDTO> call, Throwable t) {
+
+                    }
+                });
+
+            }
+        });
     }
 
     @Override
@@ -47,12 +172,11 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
 
         tvLocation.setText(myIntent.getStringExtra("location"));
 
-        TextInputEditText tvStartingTime = findViewById(R.id.startingTime);
-        TextInputEditText tvEndingTime = findViewById(R.id.endingTime);
+
 
         setUpDatePicker();
-        setUpTimePicker(tvStartingTime);
-        setUpTimePicker(tvEndingTime);
+        setUpTimePicker(etStartingTime);
+        setUpTimePicker(etEndingTime);
     }
 
     @Override

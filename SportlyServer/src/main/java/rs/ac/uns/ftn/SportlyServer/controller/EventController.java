@@ -35,7 +35,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+        return new ResponseEntity<>(eventDTO, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
