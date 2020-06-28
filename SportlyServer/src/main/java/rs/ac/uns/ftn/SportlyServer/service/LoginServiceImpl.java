@@ -167,6 +167,8 @@ public class LoginServiceImpl implements  LoginService{
                 .build();
 
 
+        System.out.println("GOOGLE TOKEN: "+googleRequest.getIdToken());
+
         GoogleIdToken idToken = verifier.verify(googleRequest.getIdToken());
         if (idToken != null) {
             GoogleIdToken.Payload payload = idToken.getPayload();

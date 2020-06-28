@@ -25,4 +25,5 @@ public interface EventService {
     public EventRequestDTO acceptEventRequest(Long id);
     public EventRequestDTO rejectEventRequest(Long id);
     public EventRequestDTO deleteEventRequest(Long id);
+    public ParticipationDTO deleteParticipation(Long id);
 }

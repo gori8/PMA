@@ -76,27 +76,11 @@ public class SyncServiceImpl implements SyncService {
 
                     EventDTO eventDTO = event.createEventDTO();
 
+                    short numOfParticipants = 1;
+
                     if(event.getCreator().getId() == user.getId()){
 
                         eventDTO.setApplicationStatus("CREATOR");
-
-                        for(Participation participation : event.getParticipationList()){
-
-                            if(!participation.isDeleted()){
-                                User u = participation.getUser();
-
-                                ApplierDTO applier = new ApplierDTO();
-
-                                applier.setId(u.getId());
-                                applier.setFirstName(u.getFirstName());
-                                applier.setLastName(u.getLastName());
-                                applier.setUsername(u.getUsername());
-                                applier.setEmail(u.getEmail());
-                                applier.setStatus("PARTICIPATING");
-
-                                eventDTO.getApplicationList().add(applier);
-                            }
-                        }
 
                         for(EventRequest eventRequest : event.getEventRequests()){
                             if(eventRequest.getStatus() == EventStatusEnum.PENDING){
@@ -109,6 +93,8 @@ public class SyncServiceImpl implements SyncService {
                                 applier.setLastName(u.getLastName());
                                 applier.setUsername(u.getUsername());
                                 applier.setEmail(u.getEmail());
+                                applier.setRequestId(eventRequest.getId());
+                                applier.setParticipationId(null);
 
                                 if(eventRequest.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
                                     applier.setStatus("QUEUE");
@@ -125,31 +111,39 @@ public class SyncServiceImpl implements SyncService {
 
                         eventDTO.setApplicationStatus("PARTICIPANT");
 
-                        for(Participation participation : event.getParticipationList()){
-                            if(!participation.isDeleted()){
-                                User u = participation.getUser();
-
-                                ApplierDTO applier = new ApplierDTO();
-
-                                applier.setId(u.getId());
-                                applier.setFirstName(u.getFirstName());
-                                applier.setLastName(u.getLastName());
-                                applier.setUsername(u.getUsername());
-                                applier.setEmail(u.getEmail());
-                                applier.setStatus("PARTICIPATING");
-
-                                eventDTO.getApplicationList().add(applier);
-                            }
-                        }
                     }
 
                     else if(containsUserInEventRequests(event.getEventRequests(),user.getId())){
 
                         eventDTO.setApplicationStatus("QUEUE");
 
+
                     }else{
                         eventDTO.setApplicationStatus("NONE");
                     }
+
+                    for(Participation participation : event.getParticipationList()){
+                        if(!participation.isDeleted()){
+                            User u = participation.getUser();
+
+                            ApplierDTO applier = new ApplierDTO();
+
+                            applier.setId(u.getId());
+                            applier.setFirstName(u.getFirstName());
+                            applier.setLastName(u.getLastName());
+                            applier.setUsername(u.getUsername());
+                            applier.setEmail(u.getEmail());
+                            applier.setStatus("PARTICIPATING");
+                            applier.setRequestId(null);
+                            applier.setParticipationId(participation.getId());
+
+                            eventDTO.getApplicationList().add(applier);
+
+                            numOfParticipants++;
+                        }
+                    }
+
+                    eventDTO.setNumOfParticipants(numOfParticipants);
 
                     sfDTO.getEvents().add(eventDTO);
                 }

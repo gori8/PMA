@@ -20,4 +20,8 @@ public class ApplierDTO {
     private String email;
 
     private String status;
+
+    private Long requestId;
+
+    private Long participationId;
 }

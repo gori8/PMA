@@ -56,7 +56,7 @@ public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().initLoader(0, null, this);
         String[] from = new String[] { DataBaseTables.APPLICATION_LIST_FIRST_NAME, DataBaseTables.APPLICATION_LIST_LAST_NAME };
         int[] to = new int[] {R.id.name};
-        adapter = new AcceptedCursorAdapter(getActivity(), R.layout.accepted_item, null, from, to);
+        adapter = new AcceptedCursorAdapter(getActivity(), R.layout.accepted_item, null, from, to,eventId);
         ListView listView = (ListView) getActivity().findViewById(R.id.accepted_list);
         listView.setAdapter(adapter);
     }
@@ -80,6 +80,8 @@ public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCa
                 DataBaseTables.APPLICATION_LIST_USERNAME,
                 DataBaseTables.APPLICATION_LIST_EMAIL,
                 DataBaseTables.APPLICATION_LIST_STATUS,
+                DataBaseTables.APPLICATION_LIST_REQUEST_ID,
+                DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID,
                 DataBaseTables.SERVER_ID
         };
 
