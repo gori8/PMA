@@ -7,6 +7,8 @@ import rs.ac.uns.ftn.SportlyServer.dto.*;
 import rs.ac.uns.ftn.SportlyServer.model.*;
 import rs.ac.uns.ftn.SportlyServer.repository.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -117,7 +119,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO) {
+    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO) throws ParseException {
 
         User creator = userRepository.findByEmail(creatorEmail);
         if(creator == null)
@@ -127,12 +129,15 @@ public class EventServiceImpl implements EventService {
         if(sp == null)
             return null;
 
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
+
+
         Event newEvent = new Event();
         newEvent.setCreator(creator);
         newEvent.setSportsField(sp);
         newEvent.setName(eventDTO.getName());
-        newEvent.setDateFrom(eventDTO.getDateFrom());
-        newEvent.setDateTo(eventDTO.getDateTo());
+        newEvent.setDateFrom(dateFormatter.parse(eventDTO.getDateFrom()));
+        newEvent.setDateTo(dateFormatter.parse(eventDTO.getDateTo()));
         newEvent.setTimeFrom(eventDTO.getTimeFrom());
         newEvent.setTimeTo(eventDTO.getTimeTo());
         newEvent.setNumbOfPpl(eventDTO.getNumbOfPpl());
@@ -143,19 +148,22 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventRepository.save(newEvent);
 
-        eventDTO.setId(event.getId());
-        return eventDTO;
+        EventDTO ret = event.createEventDTO();
+        return ret;
     }
 
     @Override
-    public EventDTO editEvent(EventDTO eventDTO) {
+    public EventDTO editEvent(EventDTO eventDTO) throws ParseException {
         Event event = eventRepository.getById(eventDTO.getId());
         if(event == null || event.isDeleted())
             return null;
 
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
+
+
         event.setName(eventDTO.getName());
-        event.setDateFrom(eventDTO.getDateFrom());
-        event.setDateTo(eventDTO.getDateTo());
+        event.setDateFrom(dateFormatter.parse(eventDTO.getDateFrom()));
+        event.setDateTo(dateFormatter.parse(eventDTO.getDateTo()));
         event.setTimeFrom(eventDTO.getTimeFrom());
         event.setTimeTo(eventDTO.getTimeTo());
         event.setNumbOfPpl(eventDTO.getNumbOfPpl());

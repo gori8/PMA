@@ -59,7 +59,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private String eventStatus;
     private Button applyButton;
     private Button cancelButton;
-    Integer numOfParticipants;
+    private Integer numOfParticipants;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -302,22 +303,31 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
             @Override
             public void onClick(View v) {
 
-                /*Intent intent = new Intent(v.getContext(), EditEventActivity.class);
-                intent.putExtra("name", name);
-                intent.putExtra("date", date);
 
-                String numberOfPeople = people.split("/")[1].split(" ")[0];
+                Intent intent = new Intent(v.getContext(), EditEventActivity.class);
 
-                intent.putExtra("people", numberOfPeople);
+                intent.putExtra("eventId", EventActivity.this.eventId);
+
+                intent.putExtra("name", tvName.getText().toString());
+                intent.putExtra("date", tvDate.getText().toString());
+
+                String numOfPpl = tvPeople.getText().toString().split("/")[1];
+
+                intent.putExtra("num_of_people", numOfPpl);
+
+                String price = tvPrice.getText().toString().split(" ")[0];
+                String currency = tvPrice.getText().toString().split(" ")[1];
+
                 intent.putExtra("price", price);
-                intent.putExtra("description", description);
-                intent.putExtra("location", location);
+                intent.putExtra("currency", currency);
+                intent.putExtra("description", tvDescription.getText().toString());
+                intent.putExtra("location", tvLocation.getText().toString());
 
-                String[] timeArray = time.split("-");
+                String[] timeArray = tvTime.getText().toString().split("-");
 
                 intent.putExtra("startingTime", timeArray[0].trim());
                 intent.putExtra("endingTime", timeArray[1].trim());
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
     }
@@ -407,6 +417,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
 
         Double price = data.getDouble(data.getColumnIndex(DataBaseTables.EVENTS_PRICE));
 
+        String currency = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CURR));
+
         String creator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
 
         String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
@@ -436,7 +448,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         tvTime.setText(time);
         tvPeople.setText(people);
         tvDate.setText(date);
-        tvPrice.setText(price.toString());
+        tvPrice.setText(price.toString() + " " + currency);
         tvCreator.setText(creator);
         tvDescription.setText(description);
 

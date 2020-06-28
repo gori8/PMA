@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.SportlyServer.dto.*;
 import rs.ac.uns.ftn.SportlyServer.service.EventService;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class EventController {
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<?> createEvent(@RequestBody EventDTO request) {
+    public ResponseEntity<?> createEvent(@RequestBody EventDTO request) throws ParseException {
         String reqEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         EventDTO eventDTO = eventService.createEvent(reqEmail, request);
         if(eventDTO == null){
@@ -39,7 +40,7 @@ public class EventController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
-    public ResponseEntity<?> editEvent(@RequestBody EventDTO request) {
+    public ResponseEntity<?> editEvent(@RequestBody EventDTO request) throws ParseException {
         EventDTO eventDTO = eventService.editEvent(request);
         if(eventDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

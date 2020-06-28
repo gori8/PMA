@@ -98,8 +98,8 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
                 EventDTO eventDTO = new EventDTO();
 
                 eventDTO.setName(etName.getText().toString());
-                eventDTO.setDateFrom(dateFormatter.parse(etDate.getText().toString()));
-                eventDTO.setDateTo(dateFormatter.parse(etDate.getText().toString()));
+                eventDTO.setDateFrom(etDate.getText().toString());
+                eventDTO.setDateTo(etDate.getText().toString());
                 eventDTO.setTimeFrom(etStartingTime.getText().toString());
                 eventDTO.setTimeTo(etEndingTime.getText().toString());
                 eventDTO.setCurr(etCurrency.getText().toString());

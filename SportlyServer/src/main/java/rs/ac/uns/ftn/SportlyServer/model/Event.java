@@ -6,6 +6,7 @@ import lombok.Setter;
 import rs.ac.uns.ftn.SportlyServer.dto.EventDTO;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,11 +54,14 @@ public class Event {
     private List<Participation> participationList = new ArrayList<>();
 
     public EventDTO createEventDTO(){
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
+
         EventDTO dto = new EventDTO();
         dto.setId(this.getId());
         dto.setName(this.getName());
-        dto.setDateFrom(this.getDateFrom());
-        dto.setDateTo(this.getDateTo());
+        dto.setDateFrom(dateFormatter.format(this.getDateFrom()));
+        dto.setDateTo(dateFormatter.format(this.getDateTo()));
         dto.setTimeFrom(this.getTimeFrom());
         dto.setTimeTo(this.getTimeTo());
         dto.setNumbOfPpl(this.getNumbOfPpl());

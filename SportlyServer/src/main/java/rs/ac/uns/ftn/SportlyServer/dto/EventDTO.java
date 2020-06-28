@@ -18,9 +18,9 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String name;
 
-    private Date dateFrom;
+    private String dateFrom;
 
-    private Date dateTo;
+    private String dateTo;
 
     private String timeFrom;
 
