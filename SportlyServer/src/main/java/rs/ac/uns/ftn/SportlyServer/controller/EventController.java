@@ -162,7 +162,7 @@ public class EventController {
         return new ResponseEntity<>(eventRequestDTO, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/eventRequest/{id}/reject", method = RequestMethod.PUT)
+    @RequestMapping(value = "/eventRequest/{id}/reject", method = RequestMethod.DELETE)
     public ResponseEntity<?> rejectEventRequest(@PathVariable Long id) {
         EventRequestDTO eventRequestDTO = eventService.rejectEventRequest(id);
         if(eventRequestDTO == null){
