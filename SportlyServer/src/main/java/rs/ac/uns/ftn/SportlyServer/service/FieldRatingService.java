@@ -5,11 +5,15 @@ import rs.ac.uns.ftn.SportlyServer.dto.FieldRatingDTO;
 import java.util.List;
 
 public interface FieldRatingService {
-    public List<FieldRatingDTO> getAllRatings(Long fieldId);
+    FieldRatingDTO getRating(Long id);
 
-    public FieldRatingDTO createRating(FieldRatingDTO ratingDTO);
+    List<FieldRatingDTO> getAllRatings(Long fieldId);
 
-    public FieldRatingDTO editRating(FieldRatingDTO ratingDTO);
+    FieldRatingDTO createRating(FieldRatingDTO ratingDTO);
 
-    public FieldRatingDTO deleteRating(Long id);
+    boolean checkIfFieldRatingExists(FieldRatingDTO ratingDTO);
+
+    FieldRatingDTO editRating(FieldRatingDTO ratingDTO);
+
+    FieldRatingDTO deleteRating(Long id);
 }

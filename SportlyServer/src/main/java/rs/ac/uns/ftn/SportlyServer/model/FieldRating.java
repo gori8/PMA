@@ -22,17 +22,17 @@ public class FieldRating {
     private String comment;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected SportsField sportsField;
+    protected User userCreator;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected User userCreator;
+    protected SportsField field;
 
     public FieldRatingDTO createRatingDTO(){
         FieldRatingDTO ratingDTO = new FieldRatingDTO();
         ratingDTO.setValue(this.getValue());
         ratingDTO.setComment(this.getComment());
         ratingDTO.setId(this.getId());
-        ratingDTO.setFieldId(this.getSportsField().getId());
+        ratingDTO.setFieldId(this.getField().getId());
         ratingDTO.setCreatorEmail(this.getUserCreator().getEmail());
         ratingDTO.setCreatorFirstName(this.getUserCreator().getFirstName());
         ratingDTO.setCreatorLastName(this.getUserCreator().getLastName());

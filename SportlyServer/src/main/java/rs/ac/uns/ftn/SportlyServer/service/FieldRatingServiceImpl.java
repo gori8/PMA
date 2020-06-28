@@ -26,6 +26,15 @@ public class FieldRatingServiceImpl implements FieldRatingService {
     FieldRatingRepository fieldRatingRepository;
 
     @Override
+    public FieldRatingDTO getRating(Long id) {
+        FieldRating fieldRating = fieldRatingRepository.getById(id);
+        if(fieldRating == null)
+            return null;
+
+        return fieldRating.createRatingDTO();
+    }
+
+    @Override
     public List<FieldRatingDTO> getAllRatings(Long fieldId) {
         SportsField sportsField = sportsFieldRepository.getById(fieldId);
         if(sportsField == null)
@@ -42,28 +51,43 @@ public class FieldRatingServiceImpl implements FieldRatingService {
 
     @Override
     public FieldRatingDTO createRating(FieldRatingDTO ratingDTO) {
-        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
-        if(creator == null)
-            return null;
-
-        SportsField sportsField = sportsFieldRepository.getById(ratingDTO.getFieldId());
-        if(sportsField == null)
-            return null;
-
         short val = ratingDTO.getValue();
         if(val < 0 || val > 5)
             return null;
 
+        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
+        SportsField sportsField = sportsFieldRepository.getById(ratingDTO.getFieldId());
+
         FieldRating fieldRating = new FieldRating();
         fieldRating.setValue(val);
         fieldRating.setComment(ratingDTO.getComment());
-        fieldRating.setSportsField(sportsField);
+        fieldRating.setField(sportsField);
         fieldRating.setUserCreator(creator);
 
         FieldRating newFieldRating = fieldRatingRepository.save(fieldRating);
         ratingDTO.setId(newFieldRating.getId());
+        ratingDTO.setCreatorFirstName(newFieldRating.getUserCreator().getFirstName());
+        ratingDTO.setCreatorLastName(newFieldRating.getUserCreator().getLastName());
         UpdateAverageFieldRating(sportsField);
         return ratingDTO;
+    }
+
+    @Override
+    public boolean checkIfFieldRatingExists(FieldRatingDTO ratingDTO) {
+        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
+        if(creator == null)
+            return false;
+
+        SportsField sportsField = sportsFieldRepository.getById(ratingDTO.getFieldId());
+        if(sportsField == null)
+            return false;
+
+        for(FieldRating fieldRating : sportsField.getFieldRatings()){
+            if(fieldRating.getUserCreator().getEmail().equals(creator.getEmail()))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -79,7 +103,7 @@ public class FieldRatingServiceImpl implements FieldRatingService {
         fieldRating.setValue(val);
         fieldRating.setComment(ratingDTO.getComment());
         fieldRatingRepository.save(fieldRating);
-        UpdateAverageFieldRating(fieldRating.getSportsField());
+        UpdateAverageFieldRating(fieldRating.getField());
         return ratingDTO;
     }
 
@@ -90,7 +114,7 @@ public class FieldRatingServiceImpl implements FieldRatingService {
             return null;
 
         fieldRatingRepository.delete(fieldRating);
-        UpdateAverageFieldRating(fieldRating.getSportsField());
+        UpdateAverageFieldRating(fieldRating.getField());
         return fieldRating.createRatingDTO();
     }
 
