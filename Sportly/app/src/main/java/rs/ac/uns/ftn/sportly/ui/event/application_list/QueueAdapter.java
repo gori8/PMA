@@ -39,20 +39,10 @@ public class QueueAdapter extends ArrayAdapter<String> {
         View row = layoutInflater.inflate(R.layout.queue_item, parent, false);
         ImageView imageView = row.findViewById(R.id.image);
         TextView textViewName = row.findViewById(R.id.name);
-        ImageButton imageButton = row.findViewById(R.id.messageButton);
 
         imageView.setImageResource(images.get(position));
         textViewName.setText(names.get(position));
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ApplicationListActivity appListActivity = (ApplicationListActivity) context;
-
-                Intent intent = new Intent(appListActivity, ChatActivity.class);
-                intent.putExtra("person_username", names.get(position));
-                appListActivity.startActivity(intent);
-            }
-        });
 
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v){

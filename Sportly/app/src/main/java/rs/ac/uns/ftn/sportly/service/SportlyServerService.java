@@ -4,6 +4,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
@@ -63,12 +64,12 @@ public interface SportlyServerService {
     @PUT("/event/eventRequest/{id}/accept")
     Call<EventRequestDTO> acceptApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 
-    @PUT("/event/eventRequest/{id}/delete")
+    @DELETE("/event/eventRequest/{id}/delete")
     Call<EventRequestDTO> deleteApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 
-    @PUT("/event/participation/{id}/delete")
+    @DELETE("/event/participation/{id}/delete")
     Call<ParticipationDTO> deleteParticipationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 
-    @PUT("/event/eventRequest/{id}/reject")
+    @DELETE("/event/eventRequest/{id}/reject")
     Call<EventRequestDTO> declineApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 }
