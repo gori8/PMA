@@ -5,12 +5,16 @@ import rs.ac.uns.ftn.SportlyServer.dto.UserRatingDTO;
 import java.util.List;
 
 public interface UserRatingService {
-    public List<UserRatingDTO> getAllRatings(String userEmail);
+    UserRatingDTO getRating(Long id);
 
-    public UserRatingDTO createRating(UserRatingDTO ratingDTO);
+    List<UserRatingDTO> getAllRatings(String userEmail);
 
-    public UserRatingDTO editRating(UserRatingDTO ratingDTO);
+    UserRatingDTO createRating(UserRatingDTO ratingDTO);
 
-    public UserRatingDTO deleteRating(Long id);
+    boolean checkIfUserRatingExists(UserRatingDTO ratingDTO);
+
+    UserRatingDTO editRating(UserRatingDTO ratingDTO);
+
+    UserRatingDTO deleteRating(Long id);
 }
 

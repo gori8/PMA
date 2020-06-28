@@ -22,6 +22,15 @@ public class UserRatingServiceImpl implements UserRatingService {
     UserRatingRepository userRatingRepository;
 
     @Override
+    public UserRatingDTO getRating(Long id) {
+        UserRating userRating = userRatingRepository.getById(id);
+        if(userRating == null)
+            return null;
+
+        return userRating.createRatingDTO();
+    }
+
+    @Override
     public List<UserRatingDTO> getAllRatings(String userEmail) {
         User user = userRepository.findByEmail(userEmail);
         if(user == null)
@@ -38,17 +47,12 @@ public class UserRatingServiceImpl implements UserRatingService {
 
     @Override
     public UserRatingDTO createRating(UserRatingDTO ratingDTO) {
-        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
-        if(creator == null)
-            return null;
-
-        User user = userRepository.findByEmail(ratingDTO.getUserEmail());
-        if(user == null)
-            return null;
-
         short val = ratingDTO.getValue();
         if(val < 0 || val > 5)
             return null;
+
+        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
+        User user = userRepository.findByEmail(ratingDTO.getUserEmail());
 
         UserRating userRating = new UserRating();
         userRating.setValue(val);
@@ -58,8 +62,28 @@ public class UserRatingServiceImpl implements UserRatingService {
 
         UserRating newUserRating = userRatingRepository.save(userRating);
         ratingDTO.setId(newUserRating.getId());
+        ratingDTO.setCreatorFirstName(newUserRating.getUser().getFirstName());
+        ratingDTO.setCreatorLastName(newUserRating.getUser().getLastName());
         UpdateAverageUserRating(user);
         return ratingDTO;
+    }
+
+    @Override
+    public boolean checkIfUserRatingExists(UserRatingDTO ratingDTO) {
+        User creator = userRepository.findByEmail(ratingDTO.getCreatorEmail());
+        if(creator == null)
+            return false;
+
+        User user = userRepository.findByEmail(ratingDTO.getUserEmail());
+        if(user == null)
+            return false;
+
+        for(UserRating userRating : user.getUserRatings()){
+            if(userRating.getUserCreator().getEmail().equals(creator.getEmail()))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
