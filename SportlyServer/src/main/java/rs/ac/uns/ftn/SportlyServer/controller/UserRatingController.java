@@ -38,8 +38,8 @@ public class UserRatingController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody UserRatingDTO urDTO) {
-        //String reqEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        //urDTO.setCreatorEmail(reqEmail);
+        String reqEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        urDTO.setCreatorEmail(reqEmail);
         if(!userRatingService.checkIfUserRatingExists(urDTO))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
