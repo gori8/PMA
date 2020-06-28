@@ -181,4 +181,14 @@ public class EventController {
 
         return new ResponseEntity<>(eventRequestDTO, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/participation/{id}/delete", method = RequestMethod.PUT)
+    public ResponseEntity<?> deleteParticipation(@PathVariable Long id) {
+        ParticipationDTO participationDTO = eventService.deleteParticipation(id);
+        if(participationDTO == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(participationDTO, HttpStatus.OK);
+    }
 }

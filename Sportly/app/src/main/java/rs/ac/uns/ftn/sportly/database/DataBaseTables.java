@@ -56,6 +56,8 @@ public class DataBaseTables {
     public static final String APPLICATION_LIST_EMAIL = "email";
     public static final String APPLICATION_LIST_USERNAME = "username";
     public static final String APPLICATION_LIST_STATUS = "status";
+    public static final String APPLICATION_LIST_REQUEST_ID = "request_id";
+    public static final String APPLICATION_LIST_PARTICIPATION_ID = "participation_id";
 
     //CREATE SQL
     public static final String FRIENDS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_FRIENDS+"("
@@ -105,6 +107,8 @@ public class DataBaseTables {
             + APPLICATION_LIST_USERNAME + " text, "
             + APPLICATION_LIST_EMAIL + " text, "
             + APPLICATION_LIST_STATUS + " text, "
+            + APPLICATION_LIST_REQUEST_ID + " integer, "
+            + APPLICATION_LIST_PARTICIPATION_ID + " integer, "
             + SERVER_ID + " TEXT NOT NULL, UNIQUE("+SERVER_ID+"), "
             + "FOREIGN KEY ("+APPLICATION_LIST_EVENT_SERVER_ID+") REFERENCES "+TABLE_EVENTS+"("+SERVER_ID+"))";
 }

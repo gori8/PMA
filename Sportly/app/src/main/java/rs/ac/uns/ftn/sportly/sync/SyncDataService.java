@@ -186,7 +186,9 @@ public class SyncDataService extends Service {
                                     valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_USERNAME,applier.getUsername());
                                     valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EMAIL,applier.getEmail());
                                     valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_STATUS,applier.getStatus());
-                                    valuesApplicationList.put(DataBaseTables.SERVER_ID,"E"+eventDTO.getId()+"A"+applier.getId()+"");
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_REQUEST_ID,applier.getRequestId());
+                                    valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID, applier.getParticipationId());
+                                    valuesApplicationList.put(DataBaseTables.SERVER_ID,"E"+eventDTO.getId()+"A"+applier.getId());
 
                                     getContentResolver().insert(
                                             Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),

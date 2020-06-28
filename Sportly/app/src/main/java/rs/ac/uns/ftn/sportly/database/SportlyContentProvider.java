@@ -204,9 +204,16 @@ public class SportlyContentProvider extends ContentProvider {
 
         int uriType = sURIMatcher.match(uri);
 
+        getContext().getContentResolver().notifyChange(uri, null);
+
         switch(uriType){
             case FRIENDS:
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS), null);
+                break;
+
+            case EVENTS:
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_MY_EVENTS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
                 break;
         }
 

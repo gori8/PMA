@@ -34,6 +34,7 @@ import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
+import rs.ac.uns.ftn.sportly.dto.ParticipationDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.ApplicationListActivity;
@@ -55,6 +56,10 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private RoundedImageView imageView;
     private String eventName;
     private ProgressDialog mProgressDialog;
+    private String eventStatus;
+    private Button applyButton;
+    private Button cancelButton;
+    Integer numOfParticipants;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +104,10 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         String jwt = JwtTokenUtils.getJwtToken(this);
         String authHeader = "Bearer " + jwt;
 
-        Button cancelButton = findViewById(R.id.cancelButton);
-        Button applyButton = findViewById(R.id.applyButton);
+        cancelButton = findViewById(R.id.cancelButton);
+        applyButton = findViewById(R.id.applyButton);
+
+        //APPLY BUTTON
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,6 +139,22 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                                     DataBaseTables.SERVER_ID + " = "+eventId,
                                     null);
 
+                            ContentValues valuesApplicationList = new ContentValues();
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EVENT_SERVER_ID,eventId);
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_APPLIER_SERVER_ID,JwtTokenUtils.getUserId(EventActivity.this));
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_FIRST_NAME,response.body().getUserFirstName());
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_LAST_NAME,response.body().getUserLastName());
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_USERNAME,response.body().getUserEmail());
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EMAIL,response.body().getUserEmail());
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_STATUS,"QUEUE");
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_REQUEST_ID,response.body().getId());
+                            valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID, 0);
+                            valuesApplicationList.put(DataBaseTables.SERVER_ID,"E"+eventId+"A"+JwtTokenUtils.getUserId(EventActivity.this));
+
+                            getContentResolver().insert(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),
+                                    valuesApplicationList);
+
 
                             applyButton.setVisibility(View.GONE);
                             cancelButton.setVisibility(View.VISIBLE);
@@ -149,6 +172,128 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                     }
                 });
 
+            }
+        });
+
+        //CANCEL BUTTON
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mProgressDialog = new ProgressDialog(EventActivity.this);
+                mProgressDialog.setTitle("Canceling Application...");
+                mProgressDialog.setMessage("Please wait while we are processing your canceling.");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
+
+
+                String serverId ="E"+eventId+"A"+JwtTokenUtils.getUserId(EventActivity.this);
+
+                Cursor cursor = getContentResolver().query(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_APPLICATION_LIST),
+                        new String[]{DataBaseTables.APPLICATION_LIST_REQUEST_ID,DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID},
+                        DataBaseTables.SERVER_ID+" = '"+serverId+"'",
+                        null,
+                        null
+                );
+
+                cursor.moveToFirst();
+
+                //PARTICIPATING USER CANCELING
+                if(eventStatus.equals("PARTICIPANT")){
+                    Long participationId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID));
+                    Call<ParticipationDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteParticipationForEvent(authHeader,participationId);
+
+                    call.enqueue(new Callback<ParticipationDTO>() {
+                        @Override
+                        public void onResponse(Call<ParticipationDTO> call, Response<ParticipationDTO> response) {
+                            if (response.code() == 200){
+
+                                Log.i("DELETE PARTICIPATION", "CALL TO SERVER SUCCESSFUL");
+
+                                getContentResolver().delete(
+                                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_APPLICATION_LIST),
+                                        DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID+" = "+participationId,
+                                        null
+                                );
+
+                                numOfParticipants = numOfParticipants - 1;
+
+                                ContentValues values = new ContentValues();
+                                values.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"NONE");
+                                values.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,numOfParticipants);
+
+                                getContentResolver().update(
+                                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
+                                        values,
+                                        DataBaseTables.SERVER_ID+" = "+eventId,
+                                        null
+                                );
+
+                                cancelButton.setVisibility(View.GONE);
+                                applyButton.setVisibility(View.VISIBLE);
+                            }else{
+                                Log.i("DELETE PARTICIPATION", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            }
+                            mProgressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onFailure(Call<ParticipationDTO> call, Throwable t) {
+                            Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                            Log.i("DELETE PARTICIPATION", "CALL TO SERVER FAILED");
+                            mProgressDialog.dismiss();
+                        }
+                    });
+                }
+
+                //QUEUEING USER CANCELING
+                else if(eventStatus.equals("QUEUE")){
+                    Long requestId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_REQUEST_ID));;
+                    Call<EventRequestDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteApplicationForEvent(authHeader,requestId);
+
+                    call.enqueue(new Callback<EventRequestDTO>() {
+                        @Override
+                        public void onResponse(Call<EventRequestDTO> call, Response<EventRequestDTO> response) {
+                            if (response.code() == 200){
+
+                                Log.i("DELETE APPLICATION", "CALL TO SERVER SUCCESSFUL");
+
+                                getContentResolver().delete(
+                                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_APPLICATION_LIST),
+                                        DataBaseTables.APPLICATION_LIST_REQUEST_ID+" = "+requestId,
+                                        null
+                                );
+
+                                ContentValues values = new ContentValues();
+                                values.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"NONE");
+
+                                getContentResolver().update(
+                                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
+                                        values,
+                                        DataBaseTables.SERVER_ID+" = "+eventId,
+                                        null
+                                );
+
+                                cancelButton.setVisibility(View.GONE);
+                                applyButton.setVisibility(View.VISIBLE);
+                            }else{
+                                Log.i("DELETE APPLICATION", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            }
+                            mProgressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onFailure(Call<EventRequestDTO> call, Throwable t) {
+                            Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                            Log.i("DELETE APPLICATION", "CALL TO SERVER FAILED");
+                            mProgressDialog.dismiss();
+                        }
+                    });
+                }else{
+                    Log.i("DELETE PARTICIPATION OR APPLICATION", "USER IS NOT PARTICIPATING OR QUEUEING FOR THIS EVENT");
+                    mProgressDialog.dismiss();
+                }
             }
         });
 
@@ -216,7 +361,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 DataBaseTables.EVENTS_APPLICATION_STATUS,
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,
                 DataBaseTables.SERVER_ID,
-                DataBaseTables.EVENTS_CREATOR
+                DataBaseTables.EVENTS_CREATOR,
         };
 
 
@@ -255,7 +400,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         String time = timeFrom + " - " + timeTo;
 
         Integer numOfPpl = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PPL));
-        Integer numOfParticipants = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS));
+        numOfParticipants = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS));
         String people = numOfParticipants + "/" + numOfPpl;
 
         String date = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
@@ -266,12 +411,20 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
 
         String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
 
-
+        eventStatus = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_APPLICATION_STATUS));
 
         if(isCreator.equals("CREATOR")){
             LinearLayout creatorButtons = findViewById(R.id.creatorButtons);
             creatorButtons.setVisibility(View.VISIBLE);
         }else{
+            if(eventStatus.equals("PARTICIPANT") || eventStatus.equals("QUEUE")){
+                applyButton.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.VISIBLE);
+            }else{
+                cancelButton.setVisibility(View.GONE);
+                applyButton.setVisibility(View.VISIBLE);
+            }
+
             LinearLayout applierButtons = findViewById(R.id.applierButtons);
             applierButtons.setVisibility(View.VISIBLE);
         }

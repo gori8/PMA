@@ -50,7 +50,7 @@ public class QueueFragment extends Fragment implements LoaderManager.LoaderCallb
         getLoaderManager().initLoader(0, null, this);
         String[] from = new String[] { DataBaseTables.APPLICATION_LIST_FIRST_NAME, DataBaseTables.APPLICATION_LIST_LAST_NAME };
         int[] to = new int[] {R.id.name};
-        adapter = new QueueCursorAdapter(getActivity(), R.layout.queue_item, null, from, to);
+        adapter = new QueueCursorAdapter(getActivity(), R.layout.queue_item, null, from, to, eventId);
         ListView listView = (ListView) getActivity().findViewById(R.id.queue_list);
         listView.setAdapter(adapter);
     }
@@ -74,6 +74,8 @@ public class QueueFragment extends Fragment implements LoaderManager.LoaderCallb
                 DataBaseTables.APPLICATION_LIST_USERNAME,
                 DataBaseTables.APPLICATION_LIST_EMAIL,
                 DataBaseTables.APPLICATION_LIST_STATUS,
+                DataBaseTables.APPLICATION_LIST_REQUEST_ID,
+                DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID,
                 DataBaseTables.SERVER_ID
         };
 

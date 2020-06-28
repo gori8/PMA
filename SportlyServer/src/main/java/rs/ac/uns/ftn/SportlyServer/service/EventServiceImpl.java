@@ -271,7 +271,7 @@ public class EventServiceImpl implements EventService {
         eventRequest.setEventRequestType(eventRequestType);
         eventRequest.setStatus(EventStatusEnum.PENDING);
 
-        erRepository.save(eventRequest);
+        Long erId = erRepository.save(eventRequest).getId();
 
         if(eventRequestType == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
             Map<String,String> data = new HashMap<>();
@@ -282,6 +282,7 @@ public class EventServiceImpl implements EventService {
             data.put("email",user.getEmail());
             data.put("username",user.getUsername());
             data.put("status","QUEUE");
+            data.put("requestId",erId.toString());
             data.put("notificationType","APPLY_FOR_EVENT");
             data.put("title","New application for your event");
             data.put("message",user.getFirstName() + " " + user.getLastName() + " applied for the event "+event.getName()+".");
@@ -293,8 +294,11 @@ public class EventServiceImpl implements EventService {
             pushNotificationService.sendPushNotification(notificationRequest,data);
         }
 
+        eventRequest.setId(erId);
 
-        return eventRequest.createEventRequestDTO();
+        EventRequestDTO ret = eventRequest.createEventRequestDTO();
+
+        return ret;
     }
 
     @Override
@@ -319,9 +323,31 @@ public class EventServiceImpl implements EventService {
         event.getParticipationList().add(participation); //dodamo usera u listu participanta eventa
         eventRequest.setStatus(EventStatusEnum.CONFIRMED);
 
-        participationRepository.save(participation);
+        Long pId = participationRepository.save(participation).getId();
         eventRepository.save(event);
         erRepository.save(eventRequest);
+
+        Map<String,String> data = new HashMap<>();
+        data.put("eventId",event.getId().toString());
+        data.put("applierId",user.getId().toString());
+        data.put("firstName",user.getFirstName());
+        data.put("lastName",user.getLastName());
+        data.put("email",user.getEmail());
+        data.put("username",user.getUsername());
+        data.put("participationId",pId.toString());
+        data.put("status","PARTICIPATING");
+        data.put("eventStatus","PARTICIPANT");
+        data.put("notificationType","ACCEPTED_APPLICATION");
+        data.put("title","Accepted Application for the Event");
+        data.put("message","Your application for the event "+event.getName()+" has been accepted.");
+
+        PushNotificationRequest notificationRequest = new PushNotificationRequest();
+        notificationRequest.setMessage("Your application for the event "+event.getName()+" has been accepted.");
+        notificationRequest.setTitle("Accepted Application for the Event");
+        notificationRequest.setTopic(user.getId().toString());
+        pushNotificationService.sendPushNotification(notificationRequest,data);
+
+        eventRequest.setId(pId);
 
         return eventRequest.createEventRequestDTO();
     }
@@ -346,5 +372,25 @@ public class EventServiceImpl implements EventService {
         eventRequest.setStatus(EventStatusEnum.DELETED);
         erRepository.save(eventRequest);
         return eventRequest.createEventRequestDTO();
+    }
+
+    @Override
+    public ParticipationDTO deleteParticipation(Long id) {
+        Participation participation = participationRepository.getOne(id);
+        if (participation == null || participation.isDeleted())
+            return null;
+
+        participation.setDeleted(true);
+        participationRepository.save(participation);
+
+        ParticipationDTO participationDTO = new ParticipationDTO();
+        participationDTO.setEventId(participation.getEvent().getId());
+        participationDTO.setEventName(participation.getEvent().getName());
+        participationDTO.setId(participation.getId());
+        participationDTO.setUserEmail(participation.getUser().getEmail());
+        participationDTO.setUserFirstName(participation.getUser().getFirstName());
+        participationDTO.setUserLastName(participation.getUser().getLastName());
+
+        return participationDTO;
     }
 }

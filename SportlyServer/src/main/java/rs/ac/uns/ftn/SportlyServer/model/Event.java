@@ -61,7 +61,6 @@ public class Event {
         dto.setTimeFrom(this.getTimeFrom());
         dto.setTimeTo(this.getTimeTo());
         dto.setNumbOfPpl(this.getNumbOfPpl());
-        dto.setNumOfParticipants((short)(this.getParticipationList().size()+1));
         dto.setPrice(this.getPrice());
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
