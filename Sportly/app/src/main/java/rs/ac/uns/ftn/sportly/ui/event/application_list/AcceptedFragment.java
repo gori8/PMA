@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,15 @@ public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        TextView emptyListText = AcceptedFragment.this.getActivity().findViewById(R.id.emptyListText);
+
+        if((data == null) || (data.getCount() == 0)){
+            emptyListText.setVisibility(View.VISIBLE);
+        }else{
+            emptyListText.setVisibility(View.GONE);
+        }
+
         adapter.swapCursor(data);
     }
 
