@@ -18,6 +18,7 @@ public class UserDTO {
     private String email;
     private String password;
     private String token;
+    private float rating;
     private int expiresIn;
 
 

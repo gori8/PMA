@@ -40,5 +40,5 @@ public class SportsField {
     private List<Event> events = new ArrayList<>();
 
     @OneToMany(mappedBy = "sportsField")
-    private List<FieldRating> fieldRatings = new ArrayList<>();
+    private List<FieldRating> fieldRatings = new ArrayList<>(); //lista ocena koje je dobio od korisnika
 }
