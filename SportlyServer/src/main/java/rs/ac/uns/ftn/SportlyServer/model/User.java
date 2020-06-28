@@ -35,6 +35,8 @@ public class User implements UserDetails {
 
     private Boolean enabled;
 
+    private float rating;
+
     @OneToMany(mappedBy = "friendshipRequester")
     private List<Friendship> requestedFriendships = new ArrayList<>();
 
@@ -54,9 +56,6 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "creator")
     private List<Event> creatorEvents = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<FieldRating> fieldRatings = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<EventRequest> eventRequests = new ArrayList<>();
@@ -115,6 +114,15 @@ public class User implements UserDetails {
 //        return friends.stream().filter(o -> o.getEmail().equals(email)).findFirst().isPresent();
 //        return true;
 //    }
+
+    @OneToMany(mappedBy = "userCreator")
+    private List<FieldRating> ratedFields = new ArrayList<>();  //lista ocena koje je dodelio terenima
+
+    @OneToMany(mappedBy = "user")
+    private List<UserRating> userRatings = new ArrayList<>();   //lista ocena koje je dobio od drugih korisnika
+
+    @OneToMany(mappedBy = "userCreator")
+    private List<UserRating> ratedUsers = new ArrayList<>();    //lista ocena koje je dodelio drugim korisnicima
 
     public FriendDTO createFriendDto(){
         FriendDTO friend = new FriendDTO();

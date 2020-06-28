@@ -3,7 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rs.ac.uns.ftn.SportlyServer.dto.FieldRatingDTO;
+import rs.ac.uns.ftn.SportlyServer.dto.UserRatingDTO;
 
 import javax.persistence.*;
 
@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class FieldRating {
+public class UserRating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,17 +22,17 @@ public class FieldRating {
     private String comment;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected SportsField sportsField;
+    protected User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     protected User userCreator;
 
-    public FieldRatingDTO createRatingDTO(){
-        FieldRatingDTO ratingDTO = new FieldRatingDTO();
+    public UserRatingDTO createRatingDTO(){
+        UserRatingDTO ratingDTO = new UserRatingDTO();
+        ratingDTO.setId(this.getId());
         ratingDTO.setValue(this.getValue());
         ratingDTO.setComment(this.getComment());
-        ratingDTO.setId(this.getId());
-        ratingDTO.setFieldId(this.getSportsField().getId());
+        ratingDTO.setUserEmail(this.getUser().getEmail());
         ratingDTO.setCreatorEmail(this.getUserCreator().getEmail());
         ratingDTO.setCreatorFirstName(this.getUserCreator().getFirstName());
         ratingDTO.setCreatorLastName(this.getUserCreator().getLastName());
