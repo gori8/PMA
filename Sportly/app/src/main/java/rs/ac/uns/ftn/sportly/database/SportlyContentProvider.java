@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.sportly.database;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -35,6 +36,7 @@ public class SportlyContentProvider extends ContentProvider {
     private static final int SPORTSFIELDS_EVENTS = 10;
     private static final int APPLICATION_LIST = 11;
     private static final int APPLICATION_LIST_SERVER_ID = 12;
+    private static final int FRIENDS_TO_INVITE_FOR_EVENT = 13;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -55,6 +57,7 @@ public class SportlyContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.SPORTSFIELDS_EVENTS + "/#", SPORTSFIELDS_EVENTS);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST, APPLICATION_LIST);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST + "/*", APPLICATION_LIST_SERVER_ID);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FRIENDS+"/invite", FRIENDS_TO_INVITE_FOR_EVENT);
     }
 
     @Override
@@ -122,6 +125,17 @@ public class SportlyContentProvider extends ContentProvider {
                         + uri.getLastPathSegment());
                 queryBuilder.setTables(DataBaseTables.TABLE_EVENTS);
                 break;
+            case FRIENDS_TO_INVITE_FOR_EVENT:
+
+                String inviteQuery="SELECT DISTINCT f._id, f.first_name, f.last_name, f.server_id, f.email"
+                        + " FROM friends f LEFT OUTER JOIN application_list al ON (f.server_id = al.applier_id)"
+                        + " WHERE f.friends_type='CONFIRMED' AND f.server_id NOT IN (SELECT alist.applier_id FROM application_list alist WHERE alist.event_id="+selection+")";
+
+                SQLiteDatabase db = database.getWritableDatabase();
+                Cursor cursor = db.rawQuery(inviteQuery,null,null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+                return cursor;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -192,6 +206,9 @@ public class SportlyContentProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+values.getAsInteger(DataBaseTables.EVENTS_SPORTS_FILED_ID)), null);
             }break;
+            case FRIENDS:{
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS+"/invite"), null);
+            }break;
         }
 
         return id;
@@ -209,6 +226,7 @@ public class SportlyContentProvider extends ContentProvider {
         switch(uriType){
             case FRIENDS:
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS+"/invite"), null); 
                 break;
 
             case EVENTS:

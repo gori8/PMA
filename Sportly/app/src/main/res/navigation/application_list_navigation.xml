@@ -15,4 +15,9 @@
         android:name="rs.ac.uns.ftn.sportly.ui.event.application_list.AcceptedFragment"
         tools:layout="@layout/fragment_accepted" />
 
+    <fragment
+        android:id="@+id/navigation_invite"
+        android:name="rs.ac.uns.ftn.sportly.ui.event.application_list.InviteFragment"
+        tools:layout="@layout/fragment_invite" />
+
 </navigation>

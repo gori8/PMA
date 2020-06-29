@@ -9,4 +9,9 @@
         android:id="@+id/navigation_accepted"
         android:icon="@drawable/ic_done_black_24dp"
         android:title="@string/accepted" />
+
+    <item
+        android:id="@+id/navigation_invite"
+        android:icon="@drawable/ic_outline_person_add"
+        android:title="@string/invite" />
 </menu>

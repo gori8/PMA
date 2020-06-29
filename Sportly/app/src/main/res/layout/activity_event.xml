@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center|bottom"
                     android:id="@+id/creatorButtons"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:orientation="vertical">
 
                     <Button

@@ -18,6 +18,7 @@
     <string name="fb_login_protocol_scheme">fb189301622103991</string>
     <string name="accepted">Accepted</string>
     <string name="queue">Queue</string>
+    <string name="invite">Invite</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -27,12 +28,6 @@
     <string name="title_dashboard">Dashboard</string>
 
 
-
-
-    <string-array name="roles_array">
-        <item>Creator</item>
-        <item>Participant</item>
-    </string-array>
     <string name="role_selection_label">Select your role:</string>
     <string name="search">Search</string>
     <string name="basketball">Basketball</string>
@@ -54,5 +49,9 @@
     <string name="label_ending_time">Ending time</string>
     <string name="label_number_of_people">Number of people</string>
     <string name="confirm">Confirm</string>
+    <string-array name="roles_array">
+        <item>Creator</item>
+        <item>Participant</item>
+    </string-array>
 
 </resources>
