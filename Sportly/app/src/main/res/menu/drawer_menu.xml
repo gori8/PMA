@@ -12,6 +12,11 @@
             android:title="@string/title_my_events" />
 
         <item
+            android:id="@+id/navigation_invite"
+            android:icon="@drawable/ic_baseline_emoji_people_24"
+            android:title="@string/invites" />
+
+        <item
             android:id="@+id/navigation_settings"
             android:icon="@drawable/ic_settings_primary_24dp"
             android:title="@string/title_settings" />

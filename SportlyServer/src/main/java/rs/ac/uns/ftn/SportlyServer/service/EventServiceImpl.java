@@ -283,16 +283,17 @@ public class EventServiceImpl implements EventService {
 
         Long erId = erRepository.save(eventRequest).getId();
 
+        Map<String,String> data = new HashMap<>();
+        data.put("eventId",event.getId().toString());
+        data.put("applierId",user.getId().toString());
+        data.put("firstName",user.getFirstName());
+        data.put("lastName",user.getLastName());
+        data.put("email",user.getEmail());
+        data.put("username",user.getUsername());
+        data.put("requestId",erId.toString());
+
         if(eventRequestType == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
-            Map<String,String> data = new HashMap<>();
-            data.put("eventId",event.getId().toString());
-            data.put("applierId",user.getId().toString());
-            data.put("firstName",user.getFirstName());
-            data.put("lastName",user.getLastName());
-            data.put("email",user.getEmail());
-            data.put("username",user.getUsername());
             data.put("status","QUEUE");
-            data.put("requestId",erId.toString());
             data.put("notificationType","APPLY_FOR_EVENT");
             data.put("title","New application for your event");
             data.put("message",user.getFirstName() + " " + user.getLastName() + " applied for the event "+event.getName()+".");
@@ -301,6 +302,17 @@ public class EventServiceImpl implements EventService {
             notificationRequest.setMessage(user.getFirstName() + " " + user.getLastName() + " applied for the event "+event.getName()+".");
             notificationRequest.setTitle("New application for your event");
             notificationRequest.setTopic(event.getCreator().getId().toString());
+            pushNotificationService.sendPushNotification(notificationRequest,data);
+        }else{
+            data.put("status","INVITED");
+            data.put("notificationType","INVITE_FRIEND");
+            data.put("title","Invitation for the Event");
+            data.put("message",event.getCreator().getFirstName() + " " + event.getCreator().getLastName() + " has invited you to join event "+event.getName()+".");
+
+            PushNotificationRequest notificationRequest = new PushNotificationRequest();
+            notificationRequest.setMessage(event.getCreator().getFirstName() + " " + event.getCreator().getLastName() + " has invited you to join event "+event.getName()+".");
+            notificationRequest.setTitle("Invitation for the Event");
+            notificationRequest.setTopic(user.getId().toString());
             pushNotificationService.sendPushNotification(notificationRequest,data);
         }
 

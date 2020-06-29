@@ -58,6 +58,9 @@ public interface SportlyServerService {
     @POST("/event/eventRequest/create/participant")
     Call<EventRequestDTO> applyForEvent(@Header("Authorization") String authHeader, @Body EventRequestRequest request);
 
+    @POST("/event/eventRequest/create/creator")
+    Call<EventRequestDTO> inviteFriendOnEvent(@Header("Authorization") String authHeader, @Body EventRequestRequest request);
+
     @POST("/event/create")
     Call<EventDTO> createEvent(@Header("Authorization") String authHeader, @Body EventDTO event);
 

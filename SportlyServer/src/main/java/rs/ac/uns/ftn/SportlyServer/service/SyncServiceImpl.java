@@ -113,13 +113,19 @@ public class SyncServiceImpl implements SyncService {
 
                     }
 
-                    else if(containsUserInEventRequests(event.getEventRequests(),user.getId())){
+                    else if(containsUserInEventRequestsParticipant(event.getEventRequests(),user.getId())){
 
                         eventDTO.setApplicationStatus("QUEUE");
 
 
+                    }else if(containsUserInEventRequestsCreator(event.getEventRequests(),user.getId())){
+
+                        eventDTO.setApplicationStatus("INVITED");
+
                     }else{
+
                         eventDTO.setApplicationStatus("NONE");
+
                     }
 
                     for(Participation participation : event.getParticipationList()){
@@ -166,7 +172,11 @@ public class SyncServiceImpl implements SyncService {
         return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.isDeleted()==false).findFirst().isPresent();
     }
 
-    public boolean containsUserInEventRequests(final List<EventRequest> list, final Long userId){
-        return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING).findFirst().isPresent();
+    public boolean containsUserInEventRequestsParticipant(final List<EventRequest> list, final Long userId){
+        return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING && o.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT).findFirst().isPresent();
+    }
+
+    public boolean containsUserInEventRequestsCreator(final List<EventRequest> list, final Long userId){
+        return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING && o.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_CREATOR).findFirst().isPresent();
     }
 }

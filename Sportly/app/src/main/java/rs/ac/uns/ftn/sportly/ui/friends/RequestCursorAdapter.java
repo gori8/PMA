@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -57,6 +58,7 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
     private DatabaseReference mUserDatabase;
     private DatabaseReference mMyDatabase;
     private DatabaseReference mFriendsDatabase;
+    private ProgressDialog mProgressDialog;
 
 
     public RequestCursorAdapter(Context context,int layout, Cursor c,String[] from,int[] to) {
@@ -119,6 +121,12 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
             @Override
             public void onClick(View v) {
 
+                mProgressDialog = new ProgressDialog(context);
+                mProgressDialog.setTitle("Inviting Friend...");
+                mProgressDialog.setMessage("Please wait while we are processing your invitation.");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
+
                 FriendshipRequestDto request = new FriendshipRequestDto();
                 String email = cursor.getString(emailIndex);
                 request.setRecEmail(email);
@@ -180,7 +188,7 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                         Log.i("CONFIRM FRIEND", "CALL TO SERVER FAILED");
                     }
                 });
-
+                mProgressDialog.dismiss();
             }
         });
 
@@ -197,6 +205,13 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                         .setNegativeButton("NO", null)
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                mProgressDialog = new ProgressDialog(context);
+                                mProgressDialog.setTitle("Inviting Friend...");
+                                mProgressDialog.setMessage("Please wait while we are processing your invitation.");
+                                mProgressDialog.setCanceledOnTouchOutside(false);
+                                mProgressDialog.show();
+
                                 FriendshipRequestDto request = new FriendshipRequestDto();
                                 String email = cursor.getString(emailIndex);
                                 request.setRecEmail(email);
@@ -225,7 +240,9 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                                         Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
                                     }
                                 });
-                            }})
+                                mProgressDialog.dismiss();
+                            }
+                        })
                         .show();
             }
         });

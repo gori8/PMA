@@ -239,17 +239,6 @@ public class SyncDataService extends Service {
         return null;
     }
 
-
-    public boolean userIsFriend(final List<FriendDTO> list, final Long id){
-
-        return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
-    }
-
-    public boolean eventInList(final List<EventDTO> list, final Long id){
-
-        return list.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
-    }
-
     private void deleteIfNotOnServer(Uri uri, List<?> list, String idType){
         Cursor cursor = getContentResolver().query(
                 uri,
@@ -267,27 +256,23 @@ public class SyncDataService extends Service {
             String serverIdString = "";
             if(idType.equals("LONG")){
                 serverId = cursor.getLong(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+                if(!((List<Long>) list).contains(serverId)){
+                    getContentResolver().delete(
+                            uri,
+                            DataBaseTables.SERVER_ID + "=" + serverId,
+                            null);
+                }
             }else if(idType.equals("STRING")){
                 serverIdString = cursor.getString(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+
+                if(!((List<Long>) list).contains(serverIdString)){
+                    getContentResolver().delete(
+                            uri,
+                            DataBaseTables.SERVER_ID + " = '"+serverIdString+"'",
+                            null);
+                }
             }
 
-            if(!list.isEmpty()){
-                if(list.get(0).getClass() == Long.class){
-                    if(!((List<FriendDTO>) list).contains(serverId)){
-                        getContentResolver().delete(
-                                uri,
-                                DataBaseTables.SERVER_ID + "=" + serverId,
-                                null);
-                    }
-                }
-                }else{
-                    if(!((List<String>) list).contains(serverIdString)){
-                        getContentResolver().delete(
-                                uri,
-                                DataBaseTables.SERVER_ID + "='" + serverId+"'",
-                                null);
-                    }
-                }
             cursor.moveToNext();
         }
     }

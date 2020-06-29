@@ -53,4 +53,10 @@
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 
+    <fragment
+        android:id="@+id/navigation_invite"
+        android:name="rs.ac.uns.ftn.sportly.ui.invite.InviteRequestFragment"
+        android:label="@string/invites"
+        tools:layout="@layout/fragment_invite_request" />
+
 </navigation>

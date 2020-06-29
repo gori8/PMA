@@ -209,6 +209,9 @@ public class SportlyContentProvider extends ContentProvider {
             case FRIENDS:{
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS+"/invite"), null);
             }break;
+            case APPLICATION_LIST:{
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS+"/invite"), null);
+            }break;
         }
 
         return id;
