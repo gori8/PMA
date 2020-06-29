@@ -358,20 +358,35 @@ public class EventServiceImpl implements EventService {
         data.put("username",user.getUsername());
         data.put("participationId",pId.toString());
         data.put("status","PARTICIPATING");
-        data.put("eventStatus","PARTICIPANT");
+        data.put("numbOfParticipants",(event.getParticipationList().size()+1) + "");
         data.put("notificationType","ACCEPTED_APPLICATION");
-        data.put("title","Accepted Application for the Event");
-        data.put("message","Your application for the event "+event.getName()+" has been accepted.");
 
-        PushNotificationRequest notificationRequest = new PushNotificationRequest();
-        notificationRequest.setMessage("Your application for the event "+event.getName()+" has been accepted.");
-        notificationRequest.setTitle("Accepted Application for the Event");
-        notificationRequest.setTopic(user.getId().toString());
-        pushNotificationService.sendPushNotification(notificationRequest,data);
+        if(eventRequest.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_PARTICIPANT){
+            data.put("eventStatus","PARTICIPANT");
+            data.put("title","Accepted Application for the Event");
+            data.put("message","Your application for the event "+event.getName()+" has been accepted.");
 
-        eventRequest.setId(pId);
+            PushNotificationRequest notificationRequest = new PushNotificationRequest();
+            notificationRequest.setMessage("Your application for the event "+event.getName()+" has been accepted.");
+            notificationRequest.setTitle("Accepted Application for the Event");
+            notificationRequest.setTopic(user.getId().toString());
+            pushNotificationService.sendPushNotification(notificationRequest,data);
+        }else{
+            data.put("eventStatus","CREATOR");
+            data.put("title","Accepted Invitation for the Event");
+            data.put("message",user.getFirstName() + " " + user.getLastName()+" has accepted invitation for the event "+event.getName()+".");
 
-        return eventRequest.createEventRequestDTO();
+            PushNotificationRequest notificationRequest = new PushNotificationRequest();
+            notificationRequest.setMessage(user.getFirstName() + " " + user.getLastName()+" has accepted invitation for the event "+event.getName()+".");
+            notificationRequest.setTitle("Accepted Invitation for the Event");
+            notificationRequest.setTopic(event.getCreator().getId().toString());
+            pushNotificationService.sendPushNotification(notificationRequest,data);
+        }
+
+        EventRequestDTO ret = eventRequest.createEventRequestDTO();
+        ret.setId(pId);
+
+        return ret;
     }
 
     @Override

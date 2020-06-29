@@ -122,6 +122,23 @@ public class SyncServiceImpl implements SyncService {
 
                         eventDTO.setApplicationStatus("INVITED");
 
+                        for(EventRequest eventRequest : event.getEventRequests()){
+                            if(eventRequest.getUser().getId() == user.getId()){
+                                ApplierDTO applier = new ApplierDTO();
+
+                                applier.setId(user.getId());
+                                applier.setFirstName(user.getFirstName());
+                                applier.setLastName(user.getLastName());
+                                applier.setUsername(user.getUsername());
+                                applier.setEmail(user.getEmail());
+                                applier.setRequestId(eventRequest.getId());
+                                applier.setParticipationId(null);
+                                applier.setStatus("INVITED");
+
+                                eventDTO.getApplicationList().add(applier);
+                            }
+                        }
+
                     }else{
 
                         eventDTO.setApplicationStatus("NONE");
@@ -149,6 +166,10 @@ public class SyncServiceImpl implements SyncService {
                         }
                     }
 
+                    for(EventRequest er : event.getEventRequests()){
+
+                    }
+
                     eventDTO.setNumOfParticipants(numOfParticipants);
 
                     sfDTO.getEvents().add(eventDTO);
@@ -164,10 +185,6 @@ public class SyncServiceImpl implements SyncService {
     }
 
 
-    public boolean containsUserInEventList(final List<User> list, final Long userId){
-        return list.stream().filter(o -> o.getId().equals(userId)).findFirst().isPresent();
-    }
-
     public boolean containsUserInParticipationList(final List<Participation> list, final Long userId){
         return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.isDeleted()==false).findFirst().isPresent();
     }
@@ -179,4 +196,6 @@ public class SyncServiceImpl implements SyncService {
     public boolean containsUserInEventRequestsCreator(final List<EventRequest> list, final Long userId){
         return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING && o.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_CREATOR).findFirst().isPresent();
     }
+
+
 }

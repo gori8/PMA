@@ -122,6 +122,7 @@ public class FCMNotificationService extends FirebaseMessagingService {
 
                 ContentValues valuesEvent = new ContentValues();
                 valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,data.get("eventStatus"));
+                valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,data.get("numbOfParticipants"));
 
                 getContentResolver().update(
                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),

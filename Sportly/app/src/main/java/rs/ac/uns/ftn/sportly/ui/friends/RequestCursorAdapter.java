@@ -116,6 +116,7 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
         String authHeader = "Bearer " + jwt;
 
         Button confirmButton = view.findViewById(R.id.confirm_button);
+        String email = cursor.getString(emailIndex);
 
         confirmButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -128,7 +129,6 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                 mProgressDialog.show();
 
                 FriendshipRequestDto request = new FriendshipRequestDto();
-                String email = cursor.getString(emailIndex);
                 request.setRecEmail(email);
 
                 Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.confirmRequest(authHeader,request);
@@ -180,15 +180,16 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                         }else{
                             Log.i("CONFIRM FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
                         }
+                        mProgressDialog.dismiss();
                     }
 
                     @Override
                     public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                         Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                         Log.i("CONFIRM FRIEND", "CALL TO SERVER FAILED");
+                        mProgressDialog.dismiss();
                     }
                 });
-                mProgressDialog.dismiss();
             }
         });
 
@@ -213,7 +214,6 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                                 mProgressDialog.show();
 
                                 FriendshipRequestDto request = new FriendshipRequestDto();
-                                String email = cursor.getString(emailIndex);
                                 request.setRecEmail(email);
 
                                 Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteFriend(authHeader,request);
@@ -232,15 +232,16 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
                                         }else{
                                             Log.i("REMOVE FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
                                         }
+                                        mProgressDialog.dismiss();
                                     }
 
                                     @Override
                                     public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                                         Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                                         Log.i("REMOVE FRIEND", "CALL TO SERVER FAILED");
+                                        mProgressDialog.dismiss();
                                     }
                                 });
-                                mProgressDialog.dismiss();
                             }
                         })
                         .show();

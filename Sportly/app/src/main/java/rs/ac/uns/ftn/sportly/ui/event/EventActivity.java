@@ -249,7 +249,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 }
 
                 //QUEUEING USER CANCELING
-                else if(eventStatus.equals("QUEUE")){
+                else if(eventStatus.equals("QUEUE") || eventStatus.equals("INVITED")){
                     Long requestId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_REQUEST_ID));;
                     Call<EventRequestDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteApplicationForEvent(authHeader,requestId);
 
@@ -429,7 +429,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
             LinearLayout creatorButtons = findViewById(R.id.creatorButtons);
             creatorButtons.setVisibility(View.VISIBLE);
         }else{
-            if(eventStatus.equals("PARTICIPANT") || eventStatus.equals("QUEUE")){
+            if(eventStatus.equals("PARTICIPANT") || eventStatus.equals("QUEUE") || eventStatus.equals("INVITED")){
                 applyButton.setVisibility(View.GONE);
                 cancelButton.setVisibility(View.VISIBLE);
             }else{

@@ -97,6 +97,9 @@ public class AcceptedCursorAdapter  extends SimpleCursorAdapter implements Filte
         String jwt = JwtTokenUtils.getJwtToken(context);
         String authHeader = "Bearer " + jwt;
 
+        int paricipationIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID);
+        Long participationId = cursor.getLong(paricipationIdIndex);
+
         denyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,9 +109,6 @@ public class AcceptedCursorAdapter  extends SimpleCursorAdapter implements Filte
                 mProgressDialog.setMessage("Please wait while we are processing your canceling.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
-
-                int paricipationIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_PARTICIPATION_ID);
-                Long participationId = cursor.getLong(paricipationIdIndex);
 
                 Call<ParticipationDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteParticipationForEvent(authHeader,participationId);
 

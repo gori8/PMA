@@ -96,6 +96,10 @@ public class QueueCursorAdapter extends SimpleCursorAdapter implements Filterabl
         String jwt = JwtTokenUtils.getJwtToken(context);
         String authHeader = "Bearer " + jwt;
 
+        int requestIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_REQUEST_ID);
+        Long requestId = cursor.getLong(requestIdIndex);
+        String serverId = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID));
+
         ImageButton acceptButton = view.findViewById(R.id.acceptButton);
 
         acceptButton.setOnClickListener(new View.OnClickListener() {
@@ -107,9 +111,6 @@ public class QueueCursorAdapter extends SimpleCursorAdapter implements Filterabl
                 mProgressDialog.setMessage("Please wait while we are processing your accept.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
-
-                int requestIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_REQUEST_ID);
-                Long requestId = cursor.getLong(requestIdIndex);
 
                 Call<EventRequestDTO> call = SportlyServerServiceUtils.sportlyServerService.acceptApplicationForEvent(authHeader,requestId);
 
@@ -127,7 +128,7 @@ public class QueueCursorAdapter extends SimpleCursorAdapter implements Filterabl
                             context.getContentResolver().update(
                                     Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_APPLICATION_LIST),
                                     values,
-                                    DataBaseTables.SERVER_ID + " = '"+cursor.getString(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID))+"'",
+                                    DataBaseTables.SERVER_ID + " = '"+serverId+"'",
                                     null);
 
                             Cursor eventCursor = context.getContentResolver().query(
@@ -177,9 +178,6 @@ public class QueueCursorAdapter extends SimpleCursorAdapter implements Filterabl
                 mProgressDialog.setMessage("Please wait while we are processing your declining.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
-
-                int requestIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_REQUEST_ID);
-                Long requestId = cursor.getLong(requestIdIndex);
 
                 Call<EventRequestDTO> call = SportlyServerServiceUtils.sportlyServerService.declineApplicationForEvent(authHeader,requestId);
 
