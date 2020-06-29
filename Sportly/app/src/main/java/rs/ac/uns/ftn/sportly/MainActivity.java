@@ -18,7 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -37,6 +39,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
@@ -176,7 +179,19 @@ public class MainActivity extends AppCompatActivity {
                                             goToLoginActivity();
                                         }
                                     }
-                                });;
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @SneakyThrows
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i("MAIN_ACTIVITY","FAILED TO UNSUBSCRIBE");
+                                throw e;
+                            }
+                        }).addOnCanceledListener(new OnCanceledListener() {
+                            @Override
+                            public void onCanceled() {
+                                Log.i("MAIN_ACTIVITY","UNSUBSCRIBE CANCELLED");
+                            }
+                        });
 
 
                     }

@@ -61,6 +61,9 @@ public interface SportlyServerService {
     @POST("/event/create")
     Call<EventDTO> createEvent(@Header("Authorization") String authHeader, @Body EventDTO event);
 
+    @PUT("/event/edit")
+    Call<EventDTO> editEvent(@Header("Authorization") String authHeader, @Body EventDTO event);
+
     @PUT("/event/eventRequest/{id}/accept")
     Call<EventRequestDTO> acceptApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 

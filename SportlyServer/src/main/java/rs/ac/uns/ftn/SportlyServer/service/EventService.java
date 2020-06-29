@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.service;
 import rs.ac.uns.ftn.SportlyServer.dto.*;
 import rs.ac.uns.ftn.SportlyServer.model.EventRequest;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -12,8 +13,8 @@ public interface EventService {
     public List<EventDTO> getEventsByDate(Date from, Date to); //no endpoint, if needed it will be added
     public List<EventDTO> getEventsByName(String name); //no endpoint, if needed it will be added
     public EventDTO getEventById(Long id);
-    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO);
-    public EventDTO editEvent(EventDTO eventDTO);
+    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO) throws ParseException;
+    public EventDTO editEvent(EventDTO eventDTO) throws ParseException;
     public EventDTO deleteEvent(Long id);
     public List<UserDTO> getEventParticipants(Long id);
     public UserDTO getEventCreator(Long id);

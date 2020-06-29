@@ -7,11 +7,14 @@ import androidx.fragment.app.DialogFragment;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,13 +26,37 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import lombok.SneakyThrows;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.database.DataBaseTables;
+import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.EventDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
+import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
 import rs.ac.uns.ftn.sportly.ui.time_picker.TimePickerFragment;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class EditEventActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     private int selectedTimePicker;
+
+    private TextView tvLocation;
+    private TextInputEditText etName;
+    private TextInputEditText etStartingTime;
+    private TextInputEditText etEndingTime;
+    private TextInputEditText etDate;
+    private TextInputEditText etPrice;
+    private TextInputEditText etDescription;
+    private TextInputEditText etCurrency;
+    private TextInputEditText etNumOfPpl;
+    private Button confirmBtn;
+
+    private Long eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +68,104 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
         setTitle("Edit event");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+        eventId = getIntent().getLongExtra("eventId",-1);
+
+
+        String locationText = getIntent().getExtras().getString("location");
+
+
+        confirmBtn = findViewById(R.id.confirmButton);
+
+        tvLocation = findViewById(R.id.location);
+        tvLocation.setText(locationText);
+
+        etName = findViewById(R.id.name);
+        etStartingTime = findViewById(R.id.startingTime);
+        etEndingTime = findViewById(R.id.endingTime);
+        etDate = findViewById(R.id.date);
+        etPrice = findViewById(R.id.price);
+        etDescription = findViewById(R.id.description);
+        etCurrency = findViewById(R.id.currency);
+        etNumOfPpl = findViewById(R.id.num_of_people);
+
+
+        confirmBtn.setOnClickListener(new View.OnClickListener() {
+
+            @SneakyThrows
+            @Override
+            public void onClick(View v) {
+
+
+                EventDTO eventDTO = new EventDTO();
+
+                eventDTO.setId(eventId);
+                eventDTO.setName(etName.getText().toString());
+                eventDTO.setDateFrom(etDate.getText().toString());
+                eventDTO.setDateTo(etDate.getText().toString());
+                eventDTO.setTimeFrom(etStartingTime.getText().toString());
+                eventDTO.setTimeTo(etEndingTime.getText().toString());
+                eventDTO.setCurr(etCurrency.getText().toString());
+                eventDTO.setPrice(Double.parseDouble(etPrice.getText().toString()));
+                eventDTO.setDescription(etDescription.getText().toString());
+                eventDTO.setNumbOfPpl(Short.parseShort(etNumOfPpl.getText().toString()));
+                //eventDTO.setSportsFieldId(sportsFieldServerId);
+
+                String jwt = JwtTokenUtils.getJwtToken(EditEventActivity.this);
+                String authHeader = "Bearer " + jwt;
+
+                Call<EventDTO> call = SportlyServerServiceUtils.sportlyServerService.editEvent(authHeader,eventDTO);
+
+                call.enqueue(new Callback<EventDTO>() {
+
+
+                    @Override
+                    public void onResponse(Call<EventDTO> call, Response<EventDTO> response) {
+                        if(response.code()==200){
+
+                            EventDTO respEventDTO = response.body();
+
+                            ContentValues valuesEvent = new ContentValues();
+                            valuesEvent.put(DataBaseTables.EVENTS_NAME,respEventDTO.getName());
+                            valuesEvent.put(DataBaseTables.EVENTS_CURR,respEventDTO.getCurr());
+                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PPL,respEventDTO.getNumbOfPpl());
+                            valuesEvent.put(DataBaseTables.EVENTS_PRICE,respEventDTO.getPrice());
+                            valuesEvent.put(DataBaseTables.EVENTS_DESCRIPTION,respEventDTO.getDescription());
+                            valuesEvent.put(DataBaseTables.EVENTS_DATE_FROM,respEventDTO.getDateFrom().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_DATE_TO,respEventDTO.getDateTo().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_TIME_FROM,respEventDTO.getTimeFrom().toString());
+                            valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,respEventDTO.getTimeTo().toString());
+                            //valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sportsFieldId);
+                            valuesEvent.put(DataBaseTables.SERVER_ID,respEventDTO.getId());
+                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,respEventDTO.getNumOfParticipants());
+                            valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"CREATOR");
+                            valuesEvent.put(DataBaseTables.EVENTS_CREATOR,respEventDTO.getCreator());
+
+
+
+                            getContentResolver().insert(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS),
+                                    valuesEvent);
+
+                            Intent intent = new Intent(EditEventActivity.this, EventActivity.class);
+                            intent.putExtra("eventId", respEventDTO.getId());
+
+                            EditEventActivity.this.startActivity(intent);
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EventDTO> call, Throwable t) {
+
+                    }
+                });
+
+            }
+        });
+
     }
 
     @Override
@@ -51,33 +176,27 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
         String name = myIntent.getStringExtra("name");
         String startingTime = myIntent.getStringExtra("startingTime");
         String endingTime = myIntent.getStringExtra("endingTime");
-        String people = myIntent.getStringExtra("people");
+        String num_of_people = myIntent.getStringExtra("num_of_people");
         String date = myIntent.getStringExtra("date");
+        String currency = myIntent.getStringExtra("currency");
         String price = myIntent.getStringExtra("price");
         String description = myIntent.getStringExtra("description");
         String location = myIntent.getStringExtra("location");
 
-        TextInputEditText tvName = findViewById(R.id.name);
-        TextInputEditText tvStartingTime = findViewById(R.id.startingTime);
-        TextInputEditText tvEndingTime = findViewById(R.id.endingTime);
-        TextInputEditText tvPeople = findViewById(R.id.people);
-        TextInputEditText tvDate = findViewById(R.id.date);
-        TextInputEditText tvPrice = findViewById(R.id.price);
-        TextInputEditText tvDescription = findViewById(R.id.description);
-        TextView tvLocation = findViewById(R.id.location);
 
-        tvName.setText(name);
-        tvStartingTime.setText(startingTime);
-        tvEndingTime.setText(endingTime);
-        tvPeople.setText(people);
-        tvDate.setText(date);
-        tvPrice.setText(price);
-        tvDescription.setText(description);
+        etName.setText(name);
+        etStartingTime.setText(startingTime);
+        etEndingTime.setText(endingTime);
+        etNumOfPpl.setText(num_of_people);
+        etDate.setText(date);
+        etCurrency.setText(currency);
+        etPrice.setText(price);
+        etDescription.setText(description);
         tvLocation.setText(location);
 
         setUpDatePicker();
-        setUpTimePicker(tvStartingTime);
-        setUpTimePicker(tvEndingTime);
+        setUpTimePicker(etStartingTime);
+        setUpTimePicker(etEndingTime);
     }
 
     @Override
@@ -92,7 +211,6 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
 
         TextInputEditText edittext= (TextInputEditText) findViewById(R.id.date);
 
-        updateDateLabel(edittext,myCalendar);
 
         DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 

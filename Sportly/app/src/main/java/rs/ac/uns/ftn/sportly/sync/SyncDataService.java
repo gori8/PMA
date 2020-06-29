@@ -134,6 +134,8 @@ public class SyncDataService extends Service {
                                 System.out.println("NUMBER OF PEOPLE:"+eventDTO.getNumbOfPpl());
                                 System.out.println("PRICE:"+eventDTO.getPrice());
                                 System.out.println("DESCRIPTION:"+eventDTO.getDescription());
+                                System.out.println("DATE FROM:"+eventDTO.getDateFrom());
+                                System.out.println("DATE TO:"+eventDTO.getDateTo());
                                 System.out.println("TIME FROM:"+eventDTO.getTimeFrom());
                                 System.out.println("TIME TO:"+eventDTO.getTimeTo());
                                 System.out.println("SPORTS FIELD ID:"+sfUri.getLastPathSegment());
@@ -148,8 +150,8 @@ public class SyncDataService extends Service {
                                 valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PPL,eventDTO.getNumbOfPpl());
                                 valuesEvent.put(DataBaseTables.EVENTS_PRICE,eventDTO.getPrice());
                                 valuesEvent.put(DataBaseTables.EVENTS_DESCRIPTION,eventDTO.getDescription());
-                                valuesEvent.put(DataBaseTables.EVENTS_DATE_FROM,eventDTO.getDateFrom().toString());
-                                valuesEvent.put(DataBaseTables.EVENTS_DATE_TO,eventDTO.getDateTo().toString());
+                                valuesEvent.put(DataBaseTables.EVENTS_DATE_FROM,eventDTO.getDateFrom());
+                                valuesEvent.put(DataBaseTables.EVENTS_DATE_TO,eventDTO.getDateTo());
                                 valuesEvent.put(DataBaseTables.EVENTS_TIME_FROM,eventDTO.getTimeFrom().toString());
                                 valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,eventDTO.getTimeTo().toString());
                                 valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sfUri.getLastPathSegment());
