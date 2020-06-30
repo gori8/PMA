@@ -85,4 +85,8 @@ public interface SportlyServerService {
 
     @DELETE("/favouriteFields/{fieldId}")
     Call<SportsFieldDTO> removeFromFavorites(@Header("Authorization") String authHeader, @Path("fieldId") Long fieldId);
+
+    @DELETE("/event/{id}/delete")
+    Call<EventDTO> deleteEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
+
 }

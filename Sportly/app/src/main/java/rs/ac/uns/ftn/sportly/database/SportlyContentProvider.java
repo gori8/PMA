@@ -227,14 +227,19 @@ public class SportlyContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
 
         switch(uriType){
-            case FRIENDS:
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS), null);
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_FRIENDS+"/invite"), null); 
+            case FRIENDS: {
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + DataBaseTables.TABLE_FRIENDS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI + DataBaseTables.TABLE_FRIENDS + "/invite"), null);
+            }
                 break;
 
-            case EVENTS:
+            case EVENTS:{
+                String id = selection.split("AND")[1].split("=")[1];
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_MY_EVENTS), null);
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
+                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+id),null);
+            }
                 break;
         }
 

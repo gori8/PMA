@@ -459,6 +459,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
             Intent intent = new Intent(getActivity(), EventActivity.class);
             intent.putExtra("eventId", eventId);
+            intent.putExtra("sportsFieldId", selectedSportsFieldId);
             /*intent.putExtra("location", location);
             intent.putExtra("name", name);
             intent.putExtra("time", timeFrom+" - "+timeTo);

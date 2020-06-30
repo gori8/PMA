@@ -8,8 +8,10 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,8 +21,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -31,9 +35,11 @@ import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
+import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.ParticipationDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
@@ -60,6 +66,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private Button applyButton;
     private Button cancelButton;
     private Integer numOfParticipants;
+    private Long sportsFieldId;
 
 
     @Override
@@ -75,6 +82,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         eventId = getIntent().getLongExtra("eventId",0);
+        sportsFieldId = getIntent().getLongExtra("sportsFieldId",0);
+
 
         getSupportLoaderManager().initLoader(0, null, this);
 
@@ -330,6 +339,58 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 startActivity(intent);
             }
         });
+
+        ProgressBar loadingCircle = findViewById(R.id.loadingCircle);
+
+        Button deleteBtn = findViewById(R.id.deleteEventButton);
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialAlertDialogBuilder(EventActivity.this)
+                        .setTitle("Remove event")
+                        .setMessage("Do you really want to remove this event?")
+                        .setIcon(R.drawable.ic_delete_black_24dp)
+                        .setNegativeButton("NO", null)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                                deleteBtn.setVisibility(View.GONE);
+                                loadingCircle.setVisibility(View.VISIBLE);
+
+
+                                Call<EventDTO> call = SportlyServerServiceUtils.sportlyServerService.deleteEvent(authHeader,eventId);
+
+                                call.enqueue(new Callback<EventDTO>() {
+                                    @Override
+                                    public void onResponse(Call<EventDTO> call, Response<EventDTO> response) {
+                                        if (response.code() == 200){
+
+                                            Log.i("DELETE_EVENT", "CALL TO SERVER SUCCESSFUL");
+
+                                            EventActivity.this.getContentResolver().delete(
+                                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
+                                                    DataBaseTables.SERVER_ID+"="+eventId+" AND "+DataBaseTables.EVENTS_SPORTS_FILED_ID+"="+sportsFieldId,
+                                                    null);
+                                            onBackPressed();
+                                        }else{
+                                            Log.i("DELETE_EVENT", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                            loadingCircle.setVisibility(View.GONE);
+                                            deleteBtn.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<EventDTO> call, Throwable t) {
+                                        Log.i("DELETE_EVENT_EXCEPTION", t.getMessage() != null?t.getMessage():"error");
+                                        Log.i("DELETE_EVENT", "CALL TO SERVER FAILED");
+                                        loadingCircle.setVisibility(View.GONE);
+                                        deleteBtn.setVisibility(View.VISIBLE);
+                                    }
+                                });
+                            }})
+                        .show();
+            }
+        });
     }
 
     @Override
@@ -383,78 +444,80 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
+        if(data!=null && data.getCount()>0) {
 
-        Long locationId = data.getLong(data.getColumnIndex(DataBaseTables.EVENTS_SPORTS_FILED_ID));
+            data.moveToFirst();
 
-        String[] sportFieldsColumns = {
-                DataBaseTables.ID,
-                DataBaseTables.SPORTSFIELDS_NAME,
-        };
+            Long locationId = data.getLong(data.getColumnIndex(DataBaseTables.EVENTS_SPORTS_FILED_ID));
 
-        String sportsfirledsSelection = DataBaseTables.ID + " = " + locationId;
+            String[] sportFieldsColumns = {
+                    DataBaseTables.ID,
+                    DataBaseTables.SPORTSFIELDS_NAME,
+            };
 
-        Cursor sportsfieldData = getContentResolver().query(Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),sportFieldsColumns,sportsfirledsSelection,null,null);
+            String sportsfirledsSelection = DataBaseTables.ID + " = " + locationId;
 
-        sportsfieldData.moveToFirst();
+            Cursor sportsfieldData = getContentResolver().query(Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_SPORTSFIELDS), sportFieldsColumns, sportsfirledsSelection, null, null);
 
-        String location = sportsfieldData.getString(sportsfieldData.getColumnIndex(DataBaseTables.SPORTSFIELDS_NAME));
+            sportsfieldData.moveToFirst();
 
-        String isCreator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_APPLICATION_STATUS));
+            String location = sportsfieldData.getString(sportsfieldData.getColumnIndex(DataBaseTables.SPORTSFIELDS_NAME));
 
-        String name = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_NAME));
-        this.eventName = name;
+            String isCreator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_APPLICATION_STATUS));
 
-        String timeFrom  = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_TIME_FROM));
-        String timeTo  = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_TIME_TO));
-        String time = timeFrom + " - " + timeTo;
+            String name = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_NAME));
+            this.eventName = name;
 
-        Integer numOfPpl = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PPL));
-        numOfParticipants = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS));
-        String people = numOfParticipants + "/" + numOfPpl;
+            String timeFrom = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_TIME_FROM));
+            String timeTo = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_TIME_TO));
+            String time = timeFrom + " - " + timeTo;
 
-        String date = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
+            Integer numOfPpl = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PPL));
+            numOfParticipants = data.getInt(data.getColumnIndex(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS));
+            String people = numOfParticipants + "/" + numOfPpl;
 
-        Double price = data.getDouble(data.getColumnIndex(DataBaseTables.EVENTS_PRICE));
+            String date = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DATE_FROM));
 
-        String currency = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CURR));
+            Double price = data.getDouble(data.getColumnIndex(DataBaseTables.EVENTS_PRICE));
 
-        String creator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
+            String currency = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CURR));
 
-        String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
+            String creator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
 
-        eventStatus = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_APPLICATION_STATUS));
+            String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
 
-        if(isCreator.equals("CREATOR")){
-            LinearLayout creatorButtons = findViewById(R.id.creatorButtons);
-            creatorButtons.setVisibility(View.VISIBLE);
-        }else{
-            if(eventStatus.equals("PARTICIPANT") || eventStatus.equals("QUEUE") || eventStatus.equals("INVITED")){
-                applyButton.setVisibility(View.GONE);
-                cancelButton.setVisibility(View.VISIBLE);
-            }else{
-                cancelButton.setVisibility(View.GONE);
-                applyButton.setVisibility(View.VISIBLE);
+            eventStatus = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_APPLICATION_STATUS));
+
+            if (isCreator.equals("CREATOR")) {
+                LinearLayout creatorButtons = findViewById(R.id.creatorButtons);
+                creatorButtons.setVisibility(View.VISIBLE);
+            } else {
+                if (eventStatus.equals("PARTICIPANT") || eventStatus.equals("QUEUE") || eventStatus.equals("INVITED")) {
+                    applyButton.setVisibility(View.GONE);
+                    cancelButton.setVisibility(View.VISIBLE);
+                } else {
+                    cancelButton.setVisibility(View.GONE);
+                    applyButton.setVisibility(View.VISIBLE);
+                }
+
+                LinearLayout applierButtons = findViewById(R.id.applierButtons);
+                applierButtons.setVisibility(View.VISIBLE);
             }
 
-            LinearLayout applierButtons = findViewById(R.id.applierButtons);
-            applierButtons.setVisibility(View.VISIBLE);
+
+            tvLocation.setText(location);
+            tvName.setText(name);
+            tvTime.setText(time);
+            tvPeople.setText(people);
+            tvDate.setText(date);
+            tvPrice.setText(price.toString() + " " + currency);
+            tvCreator.setText(creator);
+            tvDescription.setText(description);
+
+            //TODO: Use picasso to get Image from firebase
+
+            // imageView.setImageResource(image);
         }
-
-
-
-        tvLocation.setText(location);
-        tvName.setText(name);
-        tvTime.setText(time);
-        tvPeople.setText(people);
-        tvDate.setText(date);
-        tvPrice.setText(price.toString() + " " + currency);
-        tvCreator.setText(creator);
-        tvDescription.setText(description);
-
-        //TODO: Use picasso to get Image from firebase
-
-        // imageView.setImageResource(image);
     }
 
 

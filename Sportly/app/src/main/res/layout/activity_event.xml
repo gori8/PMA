@@ -209,12 +209,20 @@
                             android:text="Edit event"/>
 
                         <Button
+                            android:id="@+id/deleteEventButton"
                             android:textColor="@color/white"
                             android:layout_width="120dp"
                             android:textSize="10dp"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/red"
                             android:text="Delete event"/>
+                        <ProgressBar
+                            android:id="@+id/loadingCircle"
+                            android:visibility="gone"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:indeterminate="true" />
 
                     </LinearLayout>
 
