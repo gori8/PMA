@@ -72,7 +72,11 @@ public class SyncServiceImpl implements SyncService {
             sfDTO.setEvents(new ArrayList<EventDTO>());
 
             for (Event event : sportsField.getEvents()){
-                if(event.getDateFrom().after(new Date())){
+                System.out.println("EVENT FROM: "+event.getDateFrom());
+                Long time = new Date().getTime();
+                Date date = new Date(time - time % (24 * 60 * 60 * 1000)-2*(60 * 60 * 1000));
+                System.out.println("TODAY: "+date);
+                if(!event.getDateFrom().before(date)){
 
                     EventDTO eventDTO = event.createEventDTO();
 

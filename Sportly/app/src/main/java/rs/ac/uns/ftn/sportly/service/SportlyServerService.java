@@ -78,4 +78,7 @@ public interface SportlyServerService {
 
     @DELETE("/event/eventRequest/{id}/reject")
     Call<EventRequestDTO> declineApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
+
+    @DELETE("/event/{id}/delete")
+    Call<EventDTO> deleteEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
 }
