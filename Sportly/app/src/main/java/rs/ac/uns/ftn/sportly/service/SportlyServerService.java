@@ -21,6 +21,7 @@ import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.ParticipationDTO;
 import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
+import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 
@@ -78,4 +79,10 @@ public interface SportlyServerService {
 
     @DELETE("/event/eventRequest/{id}/reject")
     Call<EventRequestDTO> declineApplicationForEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
+
+    @POST("/favouriteFields/{fieldId}")
+    Call<SportsFieldDTO> addToFavorites(@Header("Authorization") String authHeader, @Path("fieldId") Long fieldId);
+
+    @DELETE("/favouriteFields/{fieldId}")
+    Call<SportsFieldDTO> removeFromFavorites(@Header("Authorization") String authHeader, @Path("fieldId") Long fieldId);
 }

@@ -86,6 +86,7 @@ import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
+import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
@@ -739,12 +740,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                             addFavoriteButton.setVisibility(View.GONE);
                             loadingCircle.setVisibility(View.VISIBLE);
 
-                           // Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.addToFavorite(authHeader,markerData.sportsFieldServerId);
+                            Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.addToFavorites(authHeader,markerData.sportsFieldServerId);
 
-                            call.enqueue(new Callback<FriendshipDTO>() {
+                            call.enqueue(new Callback<SportsFieldDTO>() {
                                 @Override
-                                public void onResponse(Call<FriendshipDTO> call, Response<FriendshipDTO> response) {
-                                    if (response.code() == 200){
+                                public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
+                                    if (response.code() == 201){
 
                                         Log.i("ADD TO FAVORITES", "CALL TO SERVER SUCCESSFUL");
 
@@ -769,7 +770,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                                 }
 
                                 @Override
-                                public void onFailure(Call<FriendshipDTO> call, Throwable t) {
+                                public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
                                     Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                                     Log.i("ADD TO FAVORITES", "CALL TO SERVER FAILED");
                                     loadingCircle.setVisibility(View.GONE);
@@ -778,12 +779,57 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                             });
                         }
                     });
+
+                    removeFavoriteButton.setOnClickListener( new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            removeFavoriteButton.setVisibility(View.GONE);
+                            loadingCircle.setVisibility(View.VISIBLE);
+
+                            Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.removeFromFavorites(authHeader,markerData.sportsFieldServerId);
+
+                            call.enqueue(new Callback<SportsFieldDTO>() {
+                                @Override
+                                public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
+                                    if (response.code() == 200){
+
+                                        Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER SUCCESSFUL");
+
+                                        ContentValues values = new ContentValues();
+                                        values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,0);
+
+                                        MapFragment.this.getContext().getContentResolver().update(
+                                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                                                values,
+                                                DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
+                                                null
+                                        );
+
+                                        loadingCircle.setVisibility(View.GONE);
+                                        addFavoriteButton.setVisibility(View.VISIBLE);
+
+                                    }else{
+                                        Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                        loadingCircle.setVisibility(View.GONE);
+                                        removeFavoriteButton.setVisibility(View.VISIBLE);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
+                                    Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                                    Log.i("REMOVE FROM", "CALL TO SERVER FAILED");
+                                    loadingCircle.setVisibility(View.GONE);
+                                    removeFavoriteButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                    });
                 }
                 return true;
             }
         });
-
-
 
         if (location != null) {
             if (myLoc != null) {
