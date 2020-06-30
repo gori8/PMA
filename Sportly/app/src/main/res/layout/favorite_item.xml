@@ -54,22 +54,22 @@
                     />
             </LinearLayout>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Description"
-            android:textColor="@color/description"
-            android:layout_margin="5dp"
-            android:textSize="15dp"
-            android:paddingLeft="15dp"
-            android:id="@+id/favorite_description"/>
     </LinearLayout>
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@color/gray"
-        app:srcCompat="@drawable/ic_delete_black_24dp" />
+        android:background="@null"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/ic_outline_delete" />
+
+    <ProgressBar
+        android:id="@+id/loadingCircle"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:indeterminate="true" />
 </LinearLayout>

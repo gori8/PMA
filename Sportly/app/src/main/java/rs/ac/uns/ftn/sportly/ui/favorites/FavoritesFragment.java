@@ -66,10 +66,9 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(0, null, this);
         String[] from = new String[] {
                 DataBaseTables.SPORTSFIELDS_NAME,
-                DataBaseTables.SPORTSFIELDS_DESCRIPTION,
                 DataBaseTables.SPORTSFIELDS_RATING
         };
-        int[] to = new int[] {R.id.favorite_name, R.id.favorite_description, R.id.favorite_ratingBar};
+        int[] to = new int[] {R.id.favorite_name, R.id.favorite_ratingBar};
         adapter = new FavoriteCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
                 to);
 
@@ -92,8 +91,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                 DataBaseTables.SERVER_ID
         };
 
-        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_FAVORITES),
-                allColumns, null, null, null);
+        return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                allColumns, DataBaseTables.SPORTSFIELDS_FAVORITE+" = "+1, null, null);
     }
 
     @Override

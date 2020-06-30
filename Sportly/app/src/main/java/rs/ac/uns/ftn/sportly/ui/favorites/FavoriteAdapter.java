@@ -37,12 +37,10 @@ public class FavoriteAdapter extends ArrayAdapter<String> {
         View row = layoutInflater.inflate(R.layout.favorite_item, parent, false);
         ImageView imageView = row.findViewById(R.id.favorite_image);
         TextView textViewName = row.findViewById(R.id.favorite_name);
-        TextView textViewDescription = row.findViewById(R.id.favorite_description);
         RatingBar ratingBar = row.findViewById(R.id.favorite_ratingBar);
 
         imageView.setImageResource(images.get(position));
         textViewName.setText(names.get(position));
-        textViewDescription.setText(descriptions.get(position));
         ratingBar.setRating(ratings.get(position));
 
         return row;
