@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.sportly.ui.map;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,8 +28,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -80,14 +83,18 @@ import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
+import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.PlaceDTO;
 import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.GooglePlacesServiceUtils;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.adapters.EventsAdapter;
 import rs.ac.uns.ftn.sportly.ui.adapters.EventsCursorAdapter;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -121,11 +128,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         public Long sportsFieldId;
         public Long sportsFieldServerId;
+        public Integer isFavorite;
 
-        public MarkerData(Long sportsFieldId, Long sportsFieldServerId) {
+        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite) {
             this.sportsFieldId = sportsFieldId;
             this.sportsFieldServerId = sportsFieldServerId;
-
+            this.isFavorite = isFavorite;
         }
     }
 
@@ -636,6 +644,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             Float lat = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LATITUDE));
             Float lng = data.getFloat(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_LONGITUDE));
             Long sportsFieldServerId = data.getLong(data.getColumnIndex(DataBaseTables.SERVER_ID));
+            Integer isFavorite = data.getInt(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_FAVORITE));
             Long id = data.getLong(data.getColumnIndex(DataBaseTables.ID));
 
 
@@ -649,7 +658,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
 
-            MarkerData markerData = new MarkerData(id,sportsFieldServerId);
+            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite);
             marker.setTag(markerData);
 
             markersMap.get(category).add(marker);
@@ -666,6 +675,16 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 if(marker.getTag()!=null) {
 
                     MarkerData markerData = (MarkerData)marker.getTag();
+
+                    ImageButton addFavoriteButton = getView().findViewById(R.id.addFavoriteButton);
+                    ImageButton removeFavoriteButton = getView().findViewById(R.id.removeFavoriteButton);
+                    if(markerData.isFavorite == 1){
+                        addFavoriteButton.setVisibility(View.GONE);
+                        removeFavoriteButton.setVisibility(View.VISIBLE);
+                    }else if(markerData.isFavorite == 0){
+                        removeFavoriteButton.setVisibility(View.GONE);
+                        addFavoriteButton.setVisibility(View.VISIBLE);
+                    }
 
                     Bundle args = new Bundle();
                     args.putLong("sportsFieldsId",markerData.sportsFieldId);
@@ -707,6 +726,58 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     tvPlaceName.setText((String)marker.getTitle());
                     slidingPanel.setAnchorPoint(0.5f);
                     slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+                    String jwt = JwtTokenUtils.getJwtToken(MapFragment.this.getContext());
+                    String authHeader = "Bearer " + jwt;
+
+                    ProgressBar loadingCircle = getView().findViewById(R.id.loadingCircle);
+
+                    addFavoriteButton.setOnClickListener( new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            addFavoriteButton.setVisibility(View.GONE);
+                            loadingCircle.setVisibility(View.VISIBLE);
+
+                           // Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.addToFavorite(authHeader,markerData.sportsFieldServerId);
+
+                            call.enqueue(new Callback<FriendshipDTO>() {
+                                @Override
+                                public void onResponse(Call<FriendshipDTO> call, Response<FriendshipDTO> response) {
+                                    if (response.code() == 200){
+
+                                        Log.i("ADD TO FAVORITES", "CALL TO SERVER SUCCESSFUL");
+
+                                        ContentValues values = new ContentValues();
+                                        values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,1);
+
+                                        MapFragment.this.getContext().getContentResolver().update(
+                                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                                                values,
+                                                DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
+                                                null
+                                        );
+
+                                        loadingCircle.setVisibility(View.GONE);
+                                        removeFavoriteButton.setVisibility(View.VISIBLE);
+
+                                    }else{
+                                        Log.i("ADD TO FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                                        loadingCircle.setVisibility(View.GONE);
+                                        addFavoriteButton.setVisibility(View.VISIBLE);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<FriendshipDTO> call, Throwable t) {
+                                    Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                                    Log.i("ADD TO FAVORITES", "CALL TO SERVER FAILED");
+                                    loadingCircle.setVisibility(View.GONE);
+                                    addFavoriteButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                    });
                 }
                 return true;
             }
