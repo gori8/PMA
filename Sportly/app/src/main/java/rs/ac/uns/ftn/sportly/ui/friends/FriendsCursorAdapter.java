@@ -66,16 +66,9 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
 
-        TextView nameText = (TextView)view.findViewById(R.id.name);
-        ImageView imageView = (ImageView)view.findViewById(R.id.friend_image);
-
-        int firstNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_FIRST_NAME);
-        int lastNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_LAST_NAME);
         int serverIdIndex=cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID);
-
-        nameText.setText(cursor.getString(firstNameIndex)+" "+cursor.getString(lastNameIndex));
-
         String userId = cursor.getString(serverIdIndex);
+        ImageView imageView = (ImageView)view.findViewById(R.id.friend_image);
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(userId);
 
@@ -95,6 +88,12 @@ public class FriendsCursorAdapter extends SimpleCursorAdapter implements Filtera
             }
         });
 
+        TextView nameText = (TextView)view.findViewById(R.id.name);
+
+        int firstNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_FIRST_NAME);
+        int lastNameIndex=cursor.getColumnIndexOrThrow(DataBaseTables.FRIENDS_LAST_NAME);
+
+        nameText.setText(cursor.getString(firstNameIndex)+" "+cursor.getString(lastNameIndex));
 
         String jwt = JwtTokenUtils.getJwtToken(context);
         String authHeader = "Bearer " + jwt;
