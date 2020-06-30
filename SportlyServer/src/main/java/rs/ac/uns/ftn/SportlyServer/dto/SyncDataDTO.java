@@ -13,7 +13,6 @@ import java.util.List;
 public class SyncDataDTO {
 
     private List<FriendDTO> friends = new ArrayList<>();
-    private List<Long> favorite = new ArrayList<>();
     private List<NotificationDTO> notifications = new ArrayList<>();
     private List<SportsFieldDTO> allSportsFields = new ArrayList<>();
 }

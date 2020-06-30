@@ -40,10 +40,6 @@ public class SyncServiceImpl implements SyncService {
         syncDataDTO.setFriends(friendshipService.getUserFriends(username));
         syncDataDTO.getFriends().addAll(friendshipService.getFriendRequests(username));
 
-        for (SportsField sportsField : user.getFavourite()){
-            syncDataDTO.getFavorite().add(sportsField.getId());
-        }
-
         for (Notification notification : user.getNotifications()){
             NotificationDTO notificationDTO = new NotificationDTO();
             notificationDTO.setId(notification.getId());
@@ -70,6 +66,12 @@ public class SyncServiceImpl implements SyncService {
             sfDTO.setRating(sportsField.getRating());
             sfDTO.setCategory(sportsField.getCategory());
             sfDTO.setEvents(new ArrayList<EventDTO>());
+
+            if(sportsFieldIsFavorite(user.getFavourite(),sportsField.getId())){
+                sfDTO.setFavorite(true);
+            }else{
+                sfDTO.setFavorite(false);
+            }
 
             for (Event event : sportsField.getEvents()){
                 if(event.getDateFrom().after(new Date())){
@@ -197,5 +199,8 @@ public class SyncServiceImpl implements SyncService {
         return list.stream().filter(o -> o.getUser().getId().equals(userId) && o.getStatus()==EventStatusEnum.PENDING && o.getEventRequestType() == EventRequestTypeEnum.REQUESTED_BY_CREATOR).findFirst().isPresent();
     }
 
+    public boolean sportsFieldIsFavorite(final List<SportsField> list, final Long sportsFieldId){
+        return list.stream().filter(o -> o.getId().equals(sportsFieldId)).findFirst().isPresent();
+    }
 
 }

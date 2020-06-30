@@ -26,4 +26,6 @@ public class SportsFieldDTO {
     private String category;
 
     private float rating;
+
+    private boolean favorite;
 }

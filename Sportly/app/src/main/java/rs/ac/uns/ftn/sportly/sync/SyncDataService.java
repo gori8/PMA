@@ -116,7 +116,7 @@ public class SyncDataService extends Service {
                             values.put(DataBaseTables.SPORTSFIELDS_CATEGORY,sportsFieldDTO.getCategory());
                             values.put(DataBaseTables.SERVER_ID,sportsFieldDTO.getId());
 
-                            if(syncDataDTO.getFavorite().contains(sportsFieldDTO.getId())){
+                            if(sportsFieldDTO.isFavorite()){
                                 values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,1);
                             }else{
                                 values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,0);
