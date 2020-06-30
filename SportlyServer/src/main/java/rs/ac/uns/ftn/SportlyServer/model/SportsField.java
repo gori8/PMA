@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.SportlyServer.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.SportlyServer.dto.SportsFieldDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,4 +42,16 @@ public class SportsField {
 
     @OneToMany(mappedBy = "field")
     private List<FieldRating> fieldRatings = new ArrayList<>(); //lista ocena koje je dobio od korisnika
+
+    public SportsFieldDTO createSportsFieldDTO(){
+        SportsFieldDTO sportsFieldDTO = new SportsFieldDTO();
+        sportsFieldDTO.setId(this.getId());
+        sportsFieldDTO.setName(this.getName());
+        sportsFieldDTO.setDescription(this.getDescription());
+        sportsFieldDTO.setLatitude(this.getLatitude());
+        sportsFieldDTO.setLongitude(this.getLongitude());
+        sportsFieldDTO.setRating(this.getRating());
+        sportsFieldDTO.setCategory(this.getCategory());
+        return sportsFieldDTO;
+    }
 }
