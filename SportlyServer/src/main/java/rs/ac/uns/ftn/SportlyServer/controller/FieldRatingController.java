@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.uns.ftn.SportlyServer.dto.BundleRatingDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.FieldRatingDTO;
 import rs.ac.uns.ftn.SportlyServer.service.FieldRatingService;
 
@@ -69,6 +70,17 @@ public class FieldRatingController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(fieldRatingDTO, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/bundle", method = RequestMethod.POST)
+    public ResponseEntity<?> createBundleRating(@RequestBody BundleRatingDTO dto) {
+        String reqEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Long id = fieldRatingService.createBundleRating(dto,reqEmail);
+        if(id == null || id == 0L)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 }
 

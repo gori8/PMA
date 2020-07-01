@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rs.ac.uns.ftn.SportlyServer.dto.PlaceDTO;
 import rs.ac.uns.ftn.SportlyServer.model.SportsField;
 import rs.ac.uns.ftn.SportlyServer.repository.SportsFieldRepository;
+import rs.ac.uns.ftn.SportlyServer.schedulingTasks.RatingNotificationTask;
 import rs.ac.uns.ftn.SportlyServer.service.GooglePlacesServiceUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -24,6 +26,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 
 @SpringBootApplication
+@EnableScheduling
 public class SportlyServerApplication {
 
 	private final String API_KEY_PLACES = "AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
@@ -34,6 +37,7 @@ public class SportlyServerApplication {
 	SportsFieldRepository sportsFieldRepository;
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(SportlyServerApplication.class, args);
 	}
 

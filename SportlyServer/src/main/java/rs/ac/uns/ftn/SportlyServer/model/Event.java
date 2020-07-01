@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.uns.ftn.SportlyServer.dto.EventDTO;
+import rs.ac.uns.ftn.SportlyServer.dto.RatingSchedulerEnum;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,9 @@ public class Event {
 
     private boolean isDeleted;
 
+    @Enumerated(EnumType.STRING)
+    private RatingSchedulerEnum ratingSchedulerEnum;
+
     @ManyToOne(fetch = FetchType.EAGER)
     protected User creator;
 
@@ -68,6 +72,7 @@ public class Event {
         dto.setPrice(this.getPrice());
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
+        dto.setRatingSchedulerEnum(this.getRatingSchedulerEnum());
         dto.setSportsFieldId(this.sportsField.getId());
         dto.setCreator(this.creator.getFirstName()+ " " +creator.getLastName());
         return dto;

@@ -430,4 +430,10 @@ public class EventServiceImpl implements EventService {
 
         return participationDTO;
     }
+
+    @Override
+    public List<Event> getAllEventsByRatingScheduler(RatingSchedulerEnum ratingSchedulerEnum) {
+        List<Event> events = eventRepository.findAllByRatingSchedulerEnum(ratingSchedulerEnum);
+        return events;
+    }
 }

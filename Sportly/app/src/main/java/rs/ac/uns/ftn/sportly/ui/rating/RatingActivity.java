@@ -42,12 +42,14 @@ import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.BundleRatingDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.PersonToRateDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsFilterAdapter;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsFragment;
+import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class RatingActivity extends AppCompatActivity {
 
@@ -102,28 +104,65 @@ public class RatingActivity extends AppCompatActivity {
             public void onClick(View v){
 
                 mProgressDialog = new ProgressDialog(RatingActivity.this);
-                mProgressDialog.setTitle("Inviting Friend...");
-                mProgressDialog.setMessage("Please wait while we are processing your invitation.");
+                mProgressDialog.setTitle("Rating...");
+                mProgressDialog.setMessage("Please wait while we are processing your ratings.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 
-                System.out.println("Sport Field ID: "+sportsFieldId);
-                System.out.println("Sport Field NAME: "+sportsFieldName);
-                System.out.println("Sport Field RATING: "+sportsFieldRatingBar.getRating());
-                System.out.println("Sport Field COMMENT: "+sportsFieldComment.getText());
-                int i = 1;
-                for (PersonToRateDTO p : participantList) {
-                    System.out.println("User "+i+" ID: "+p.getId());
-                    System.out.println("User "+i+" NAME: "+p.getName());
-                    System.out.println("User "+i+" RATING: "+p.getRating());
-                    System.out.println("User "+i+" COMMENT: "+p.getComment());
-                    i++;
+                String sfComment="";
+
+                if(sportsFieldComment.getText() != null){
+                    sfComment = sportsFieldComment.getText().toString();
                 }
 
-                mProgressDialog.dismiss();
+                BundleRatingDTO bundle = new BundleRatingDTO();
+                bundle.setSportsFieldId(sportsFieldId);
+                bundle.setSportsFieldComment(sfComment);
+                bundle.setSportsFieldRating(sportsFieldRatingBar.getRating());
+                bundle.setPeople(participantList);
 
-                Intent intent = new Intent(RatingActivity.this, MainActivity.class);
-                startActivity(intent);
+                String jwt = JwtTokenUtils.getJwtToken(RatingActivity.this);
+                String authHeader = "Bearer " + jwt;
+
+                Call<Long> call = SportlyServerServiceUtils.sportlyServerService.rateEverything(authHeader,bundle);
+
+                call.enqueue(new Callback<Long>() {
+                    @Override
+                    public void onResponse(Call<Long> call, Response<Long> response) {
+                        if (response.code() == 201){
+
+                            Log.i("RATE EVERYTHING", "CALL TO SERVER SUCCESSFUL");
+
+                            mProgressDialog.dismiss();
+
+                            Intent intent = new Intent(RatingActivity.this, MainActivity.class);
+                            startActivity(intent);
+
+                        }else{
+                            Log.i("RATE EVERYTHING", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            mProgressDialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Long> call, Throwable t) {
+                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                        Log.i("RATE EVERYTHING", "CALL TO SERVER FAILED");
+                        mProgressDialog.dismiss();
+                    }
+                });
+            }
+        });
+
+        sportsFieldRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                if(v == 0.0){
+                    sportsFieldComment.setText("");
+                    sportsFieldComment.setEnabled(false);
+                }else{
+                    sportsFieldComment.setEnabled(true);
+                }
             }
         });
     }
@@ -179,7 +218,24 @@ public class RatingActivity extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    personDTO.setComment(s.toString());
+                    String comment = "";
+                    if(s != null && s.toString()!=null){
+                        comment = s.toString();
+                    }
+
+                    personDTO.setComment(comment);
+                }
+            });
+
+            ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                    if(v == 0.0){
+                        commentInput.setText("");
+                        commentInput.setEnabled(false);
+                    }else{
+                        commentInput.setEnabled(true);
+                    }
                 }
             });
 
