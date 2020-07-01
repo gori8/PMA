@@ -3,6 +3,8 @@ package rs.ac.uns.ftn.sportly.ui.favorites;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,17 +16,25 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.rating.RatingActivity;
 
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -74,6 +84,24 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
+
+        Button testButton = getView().findViewById(R.id.testButton);
+        testButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(FavoritesFragment.this.getActivity(), RatingActivity.class);
+                intent.putExtra("sportsFieldId",2L);
+                intent.putExtra("sportsFieldName","Karađorđe Stadium");
+                intent.putExtra("numberOfParticipants",2);
+                intent.putExtra("id1",41L);
+                intent.putExtra("name1", "Milica Obradovic");
+                intent.putExtra("id2",43L);
+                intent.putExtra("name2","Branislav Skrbic");
+
+                startActivity(intent);
+            }
+        });
     }
 
     @NonNull
