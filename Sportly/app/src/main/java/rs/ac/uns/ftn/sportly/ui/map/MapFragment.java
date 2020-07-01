@@ -19,19 +19,25 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -95,6 +101,7 @@ import rs.ac.uns.ftn.sportly.ui.adapters.EventsCursorAdapter;
 import rs.ac.uns.ftn.sportly.ui.dialogs.LocationDialog;
 import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.create_event.CreateEventActivity;
+import rs.ac.uns.ftn.sportly.ui.favorites.FavoriteCursorAdapter;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
@@ -116,6 +123,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private EventsCursorAdapter adapter;
     private Long selectedSportsFieldServerId;
     private Long selectedSportsFieldId;
+    private FavoriteCursorAdapter searchAdapter;
+    private ListView searchSportsFieldsListView;
+    private LinearLayout sportsFieldInfo;
+    private SearchView searchView;
+    private MenuItem searchViewMenuItem;
 
 
     public static MapFragment newInstance() {
@@ -154,7 +166,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search_menu, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search_item).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search_item).getActionView();
+        searchViewMenuItem = (MenuItem) menu.findItem(R.id.search_item);
         SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(getActivity(), R.color.message));
         searchAutoComplete.setTextColor(ContextCompat.getColor(getActivity(), R.color.message));
@@ -163,6 +176,49 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         ImageView searchClose = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         searchClose.setImageResource(R.drawable.ic_clear_24dp);
         super.onCreateOptionsMenu(menu,inflater);
+
+        searchView.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
+        searchSportsFieldsListView = (ListView) getView().findViewById(R.id.search_sportsfields_list);
+        sportsFieldInfo = (LinearLayout) getView().findViewById(R.id.sportsfieldInfo);
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String newText) {
+
+                if(newText.equals("")) {
+                    searchSportsFieldsListView.setVisibility(View.GONE);
+                    sportsFieldInfo.setVisibility(View.VISIBLE);
+                }else{
+                    if(sportsFieldInfo.getVisibility() != View.GONE) {
+                        sportsFieldInfo.setVisibility(View.GONE);
+                        searchSportsFieldsListView.setVisibility(View.VISIBLE);
+                    }
+                    searchSportsFields(newText);
+                    slidingPanel.setAnchorPoint(1f);
+                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                }
+
+                return false;
+
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    private void searchSportsFields(String text){
+        Bundle args = new Bundle();
+        args.putString("text",text);
+        if(getLoaderManager().getLoader(1)!=null){
+            getLoaderManager().restartLoader(1, args, MapFragment.this);
+        }else{
+            getLoaderManager().initLoader(1, args, MapFragment.this);
+        }
     }
 
     /**
@@ -222,6 +278,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             @Override
             public void onClick(View view) {
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                searchView.setIconified(true);
             }
         });
 
@@ -308,6 +365,33 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     checkButton(btnAll,"all");
                 }
             }
+        });
+
+        String[] from = new String[] {
+                DataBaseTables.SPORTSFIELDS_NAME,
+                DataBaseTables.SPORTSFIELDS_RATING
+        };
+        int[] to = new int[] {R.id.favorite_name, R.id.favorite_ratingBar};
+        searchAdapter = new FavoriteCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
+                to);
+
+        ListView listView = (ListView) view.findViewById(R.id.search_sportsfields_list);
+        listView.setAdapter(searchAdapter);
+
+        slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+
+
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                if(newState.equals(SlidingUpPanelLayout.PanelState.HIDDEN) || newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
+                    searchViewMenuItem.collapseActionView();
+                }
+            }
+
         });
 
     }
@@ -676,6 +760,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getTag()!=null) {
 
+
+                    if(sportsFieldInfo.getVisibility() == View.GONE) {
+                        sportsFieldInfo.setVisibility(View.VISIBLE);
+                        searchSportsFieldsListView.setVisibility(View.GONE);
+                    }
+
                     MarkerData markerData = (MarkerData)marker.getTag();
 
                     ImageButton addFavoriteButton = getView().findViewById(R.id.addFavoriteButton);
@@ -941,41 +1031,72 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] allColumns = {
-                DataBaseTables.ID,
-                DataBaseTables.EVENTS_NAME,
-                DataBaseTables.EVENTS_CURR,
-                DataBaseTables.EVENTS_DESCRIPTION,
-                DataBaseTables.EVENTS_NUMB_OF_PPL,
-                DataBaseTables.EVENTS_PRICE,
-                DataBaseTables.EVENTS_SPORTS_FILED_ID,
-                DataBaseTables.EVENTS_DATE_FROM,
-                DataBaseTables.EVENTS_DATE_TO,
-                DataBaseTables.EVENTS_TIME_FROM,
-                DataBaseTables.EVENTS_TIME_TO,
-                DataBaseTables.EVENTS_APPLICATION_STATUS,
-                DataBaseTables.SERVER_ID,
-                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
-        };
+
+        if(id == 0) {
+
+            String[] allColumns = {
+                    DataBaseTables.ID,
+                    DataBaseTables.EVENTS_NAME,
+                    DataBaseTables.EVENTS_CURR,
+                    DataBaseTables.EVENTS_DESCRIPTION,
+                    DataBaseTables.EVENTS_NUMB_OF_PPL,
+                    DataBaseTables.EVENTS_PRICE,
+                    DataBaseTables.EVENTS_SPORTS_FILED_ID,
+                    DataBaseTables.EVENTS_DATE_FROM,
+                    DataBaseTables.EVENTS_DATE_TO,
+                    DataBaseTables.EVENTS_TIME_FROM,
+                    DataBaseTables.EVENTS_TIME_TO,
+                    DataBaseTables.EVENTS_APPLICATION_STATUS,
+                    DataBaseTables.SERVER_ID,
+                    DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
+            };
 
 
+            Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.SPORTSFIELDS_EVENTS + "/" + args.getLong("sportsFieldsId"));
 
-        Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+args.getLong("sportsFieldsId"));
+
+            return new CursorLoader(getActivity(), uri, allColumns, null, null, null);
+        }else{
+
+            String[] allColumns = {
+                    DataBaseTables.ID,
+                    DataBaseTables.SPORTSFIELDS_DESCRIPTION,
+                    DataBaseTables.SPORTSFIELDS_LATITUDE,
+                    DataBaseTables.SPORTSFIELDS_LONGITUDE,
+                    DataBaseTables.SPORTSFIELDS_NAME,
+                    DataBaseTables.SPORTSFIELDS_FAVORITE,
+                    DataBaseTables.SPORTSFIELDS_CATEGORY,
+                    DataBaseTables.SPORTSFIELDS_RATING,
+                    DataBaseTables.SERVER_ID
+            };
 
 
-        return new CursorLoader(getActivity(), uri, allColumns, null, null, null);
+            Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_SPORTSFIELDS);
+
+            String selection = DataBaseTables.SPORTSFIELDS_NAME+" like '%"+args.getString("text")+"%'";
+
+            return new CursorLoader(getActivity(), uri, allColumns, selection, null, null);
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
+        if(loader.getId()==0) {
+            adapter.swapCursor(data);
+        }else{
+            searchAdapter.swapCursor(data);
+        }
     }
 
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        if(loader.getId()==0) {
+            adapter.swapCursor(null);
+        }else{
+            searchAdapter.swapCursor(null);
+        }
     }
 
 
