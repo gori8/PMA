@@ -268,6 +268,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         String myFormat = "dd/MM/yy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
         edittext.setText(sdf.format(myCalendar.getTime()));
+
+
     }
 
 
@@ -454,6 +456,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateDateLabel(edittext,myCalendar);
+
+                String myFormat = "dd/MM/yy";
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
+
+                Bundle args = new Bundle();
+                args.putString("dateFilter",sdf.format(myCalendar.getTime()));
+                args.putLong("sportsFieldsId",MapFragment.this.selectedSportsFieldId);
+
+                getLoaderManager().restartLoader(0,args,MapFragment.this);
             }
 
         };
@@ -780,6 +791,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                     Bundle args = new Bundle();
                     args.putLong("sportsFieldsId",markerData.sportsFieldId);
+
+                    String myFormat = "dd/MM/yy";
+                    SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
+
+                    final Calendar today = Calendar.getInstance();
+
+                    args.putString("dateFilter",sdf.format(today.getTime()));
+
                     MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
                     MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
 
@@ -1054,8 +1073,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
             Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.SPORTSFIELDS_EVENTS + "/" + args.getLong("sportsFieldsId"));
 
+            String selection = DataBaseTables.EVENTS_DATE_FROM+"='"+args.getString("dateFilter")+"'";
 
-            return new CursorLoader(getActivity(), uri, allColumns, null, null, null);
+            return new CursorLoader(getActivity(), uri, allColumns, selection, null, null);
         }else{
 
             String[] allColumns = {

@@ -55,12 +55,14 @@ dependencies {
     implementation 'com.facebook.android:facebook-login:5.15.3'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.firebase:firebase-analytics:17.4.3'
-    implementation 'com.google.firebase:firebase-messaging:20.2.0'
-    implementation 'com.google.firebase:firebase-database:19.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.2.1'
+    implementation 'com.google.firebase:firebase-database:19.3.1'
     implementation 'com.firebaseui:firebase-ui-database:1.2.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation "androidx.legacy:legacy-preference-v14:1.0.0"
 
 
 }
