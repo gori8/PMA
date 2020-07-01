@@ -12,6 +12,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import rs.ac.uns.ftn.sportly.dto.BundleRatingDTO;
 import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.EventRequestRequest;
@@ -88,5 +89,8 @@ public interface SportlyServerService {
 
     @DELETE("/event/{id}/delete")
     Call<EventDTO> deleteEvent(@Header("Authorization") String authHeader, @Path("id") Long id);
+
+    @POST("/fieldRatings/bundle")
+    Call<Long> rateEverything(@Header("Authorization") String authHeader, @Body BundleRatingDTO bundle);
 
 }
