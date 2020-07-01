@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.uns.ftn.SportlyServer.model.Event;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +37,9 @@ public class EventDTO implements Comparable<EventDTO> {
     private String curr;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private RatingSchedulerEnum ratingSchedulerEnum;
 
     private Long sportsFieldId;
 
