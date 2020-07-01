@@ -65,6 +65,8 @@ public class FCMNotificationService extends FirebaseMessagingService {
 
         Map<String,String> data = remoteMessage.getData();
         if(!data.isEmpty()){
+            Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);
+
             if(data.get("notificationType").equals("REQUEST")){
                 ContentValues values = new ContentValues();
                 values.put(DataBaseTables.FRIENDS_FIRST_NAME,data.get("firstName"));
@@ -153,12 +155,19 @@ public class FCMNotificationService extends FirebaseMessagingService {
                         valuesEvent,
                         DataBaseTables.SERVER_ID+" = "+data.get("eventId"),
                         null);
+            }else if(data.get("notificationType").equals("RATING_REQUEST")){
+                for(String key : data.keySet()){
+                    if(key.equals("notificationType") || key.equals("message") || key.equals("title")){
+                        continue;
+                    }
+                    ints.putExtra(key,data.get(key));
+                }
             }
 
-            Intent ints = new Intent(MainActivity.NOTIFICATION_INTENT);
+            ints.putExtra("notificationType",data.get("notificationType"));
 
             ints.putExtra("title",data.get("title"));
-            ints.putExtra("body",data.get("message"));
+            ints.putExtra("message",data.get("message"));
 
             sendBroadcast(ints);
         }

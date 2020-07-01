@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.SportlyServer.service;
 
 import rs.ac.uns.ftn.SportlyServer.dto.*;
+import rs.ac.uns.ftn.SportlyServer.model.Event;
 import rs.ac.uns.ftn.SportlyServer.model.EventRequest;
 
 import java.text.ParseException;
@@ -8,23 +9,25 @@ import java.util.Date;
 import java.util.List;
 
 public interface EventService {
-    public List<EventDTO> getCreatorEvents(String email);
-    public List<EventDTO> getParticipantEvents(String email);
-    public List<EventDTO> getEventsByDate(Date from, Date to); //no endpoint, if needed it will be added
-    public List<EventDTO> getEventsByName(String name); //no endpoint, if needed it will be added
-    public EventDTO getEventById(Long id);
-    public EventDTO createEvent(String creatorEmail, EventDTO eventDTO) throws ParseException;
-    public EventDTO editEvent(EventDTO eventDTO) throws ParseException;
-    public EventDTO deleteEvent(Long id);
-    public List<UserDTO> getEventParticipants(Long id);
-    public UserDTO getEventCreator(Long id);
+    List<EventDTO> getCreatorEvents(String email);
+    List<EventDTO> getParticipantEvents(String email);
+    List<EventDTO> getEventsByDate(Date from, Date to); //no endpoint, if needed it will be added
+    List<EventDTO> getEventsByName(String name); //no endpoint, if needed it will be added
+    EventDTO getEventById(Long id);
+    EventDTO createEvent(String creatorEmail, EventDTO eventDTO) throws ParseException;
+    EventDTO editEvent(EventDTO eventDTO) throws ParseException;
+    EventDTO deleteEvent(Long id);
+    List<UserDTO> getEventParticipants(Long id);
+    UserDTO getEventCreator(Long id);
 
-    public EventRequestDTO getEventRequest(Long id);
-    public List<EventRequestDTO> getAllEventRequestsByEvent(Long eventId);
-    public List<EventRequestDTO> getAllEventRequestsByEmail(String userEmail);
-    public EventRequestDTO createEventRequest(EventRequestRequest request, EventRequestTypeEnum eventRequestType);
-    public EventRequestDTO acceptEventRequest(Long id);
-    public EventRequestDTO rejectEventRequest(Long id);
-    public EventRequestDTO deleteEventRequest(Long id);
-    public ParticipationDTO deleteParticipation(Long id);
+    EventRequestDTO getEventRequest(Long id);
+    List<EventRequestDTO> getAllEventRequestsByEvent(Long eventId);
+    List<EventRequestDTO> getAllEventRequestsByEmail(String userEmail);
+    EventRequestDTO createEventRequest(EventRequestRequest request, EventRequestTypeEnum eventRequestType);
+    EventRequestDTO acceptEventRequest(Long id);
+    EventRequestDTO rejectEventRequest(Long id);
+    EventRequestDTO deleteEventRequest(Long id);
+    ParticipationDTO deleteParticipation(Long id);
+
+    List<Event> getAllEventsByRatingScheduler(RatingSchedulerEnum ratingSchedulerEnum);
 }
