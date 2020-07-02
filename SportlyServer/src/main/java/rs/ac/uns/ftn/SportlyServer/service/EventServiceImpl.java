@@ -433,7 +433,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> getAllEventsByRatingScheduler(RatingSchedulerEnum ratingSchedulerEnum) {
-        List<Event> events = eventRepository.findAllByRatingSchedulerEnum(ratingSchedulerEnum);
+        List<Event> events = eventRepository.findAllByRatingSchedulerEnumAndDeleted(ratingSchedulerEnum);
         return events;
     }
 }

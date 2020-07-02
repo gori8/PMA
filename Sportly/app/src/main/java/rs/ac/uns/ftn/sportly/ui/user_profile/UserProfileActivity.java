@@ -33,7 +33,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         Intent myIntent = getIntent();
         Long userId = myIntent.getLongExtra("id",-1L);
-
+/*
         Call<FriendshipDTO> call = SportlyServerServiceUtils.sportlyServerService.addFriend(authHeader,request);
 
         call.enqueue(new Callback<FriendshipDTO>() {
@@ -43,13 +43,10 @@ public class UserProfileActivity extends AppCompatActivity {
 
                     Log.i("ADD FRIEND", "CALL TO SERVER SUCCESSFUL");
 
-                    loadingCircle.setVisibility(View.GONE);
-                    removeButton.setVisibility(View.VISIBLE);
+
 
                 }else{
                     Log.i("ADD FRIEND", "CALL TO SERVER RESPONSE CODE: "+response.code());
-                    loadingCircle.setVisibility(View.GONE);
-                    addButton.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -57,8 +54,6 @@ public class UserProfileActivity extends AppCompatActivity {
             public void onFailure(Call<FriendshipDTO> call, Throwable t) {
                 Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
                 Log.i("ADD FRIEND", "CALL TO SERVER FAILED");
-                loadingCircle.setVisibility(View.GONE);
-                addButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -79,6 +74,6 @@ public class UserProfileActivity extends AppCompatActivity {
         UserProfileAdapter adapter = new UserProfileAdapter(this, ratings, names);
 
         ListView listView = (ListView) findViewById(R.id.user_profile_ratings);
-        listView.setAdapter(adapter);
+        listView.setAdapter(adapter);*/
     }
 }

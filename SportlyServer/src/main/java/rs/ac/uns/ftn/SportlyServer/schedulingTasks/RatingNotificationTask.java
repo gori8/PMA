@@ -3,12 +3,15 @@ package rs.ac.uns.ftn.SportlyServer.schedulingTasks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.uns.ftn.SportlyServer.dto.PushNotificationRequest;
 import rs.ac.uns.ftn.SportlyServer.dto.RatingSchedulerEnum;
 import rs.ac.uns.ftn.SportlyServer.model.Event;
 import rs.ac.uns.ftn.SportlyServer.model.Participation;
 import rs.ac.uns.ftn.SportlyServer.model.SportsField;
 import rs.ac.uns.ftn.SportlyServer.model.User;
+import rs.ac.uns.ftn.SportlyServer.repository.EventRepository;
 import rs.ac.uns.ftn.SportlyServer.service.EventService;
 import rs.ac.uns.ftn.SportlyServer.service.PushNotificationService;
 
@@ -28,6 +31,10 @@ public class RatingNotificationTask {
     @Autowired
     PushNotificationService pushNotificationService;
 
+    @Autowired
+    EventRepository eventRepository;
+
+    @Transactional
     @Scheduled(fixedRate = 60000)   //na 1 min (60000)
     public void checkRatings() {
         getCurrentTimeUsingDate();
@@ -41,16 +48,36 @@ public class RatingNotificationTask {
 
     public void pushData(Event event){
         SportsField sportsField = event.getSportsField();
+
+        int numbOfParticipants = 0;
+
         for(Participation participation1 : event.getParticipationList()){
+            if(!participation1.isDeleted()){
+                numbOfParticipants++;
+            }
+        }
+
+        for(Participation participation1 : event.getParticipationList()){
+
+            if(participation1.isDeleted()){
+                continue;
+            }
+
             User userToSendData = participation1.getUser();
 
             Map<String, String> data = new HashMap<>();
-            data.put("sportFieldId", sportsField.getId().toString());
-            data.put("sportFieldName", sportsField.getName());
-            data.put("numbOfParticipants",(event.getParticipationList().size()) + "");
+            data.put("sportsFieldId", sportsField.getId().toString());
+            data.put("sportsFieldName", sportsField.getName());
+
+            data.put("numbOfParticipants",(numbOfParticipants) + "");
 
             int index = 0;
             for(Participation participation2 : event.getParticipationList()){
+
+                if(participation2.isDeleted()){
+                    continue;
+                }
+
                 User userToRate = participation2.getUser();
                 if(!userToSendData.getEmail().equals(userToRate.getEmail())){
                     index++;
@@ -78,12 +105,18 @@ public class RatingNotificationTask {
 
         User creator = event.getCreator();
         Map<String, String> data = new HashMap<>();
-        data.put("sportFieldId", sportsField.getId().toString());
-        data.put("sportFieldName", sportsField.getName());
-        data.put("numbOfParticipants",(event.getParticipationList().size()) + "");
+        data.put("sportsFieldId", sportsField.getId().toString());
+        data.put("sportsFieldName", sportsField.getName());
+
+        data.put("numbOfParticipants",(numbOfParticipants) + "");
 
         int index = 0;
         for(Participation participation : event.getParticipationList()){
+
+            if(participation.isDeleted()){
+                continue;
+            }
+
             User userToRate = participation.getUser();
             index++;
             data.put("id" + index, userToRate.getId().toString());
@@ -99,6 +132,9 @@ public class RatingNotificationTask {
         request.setTitle("Rating request");
         request.setTopic(creator.getId().toString());   //kome saljem
         pushNotificationService.sendPushNotification(request,data);
+
+        event.setRatingSchedulerEnum(RatingSchedulerEnum.PROCESSED);
+        eventRepository.save(event);
     }
 
     public void getCurrentTimeUsingDate() {

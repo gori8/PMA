@@ -46,10 +46,10 @@ public class Event {
     private RatingSchedulerEnum ratingSchedulerEnum;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected User creator;
+    private User creator;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected SportsField sportsField;
+    private SportsField sportsField;
 
     @OneToMany(mappedBy = "event")
     private List<EventRequest> eventRequests = new ArrayList<>();
@@ -72,7 +72,6 @@ public class Event {
         dto.setPrice(this.getPrice());
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
-        dto.setRatingSchedulerEnum(this.getRatingSchedulerEnum());
         dto.setSportsFieldId(this.sportsField.getId());
         dto.setCreator(this.creator.getFirstName()+ " " +creator.getLastName());
         return dto;

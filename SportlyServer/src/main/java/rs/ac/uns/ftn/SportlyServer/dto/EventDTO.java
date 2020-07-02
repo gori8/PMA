@@ -38,9 +38,6 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    private RatingSchedulerEnum ratingSchedulerEnum;
-
     private Long sportsFieldId;
 
     private List<ApplierDTO> applicationList = new ArrayList<>();
