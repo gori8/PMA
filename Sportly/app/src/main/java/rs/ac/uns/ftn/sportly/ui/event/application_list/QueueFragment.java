@@ -61,7 +61,7 @@ public class QueueFragment extends Fragment implements LoaderManager.LoaderCallb
 
             Intent intent = new Intent(QueueFragment.this.getContext(), UserProfileActivity.class);
 
-            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_APPLIER_SERVER_ID)));
 
             startActivity(intent);
         });

@@ -100,5 +100,5 @@ public interface SportlyServerService {
 
     @PUT("/user")
     Call<UserDTO> editUser(@Header("Authorization") String authHeader, @Body UserDTO request);
-    
+
 }

@@ -68,7 +68,7 @@ public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCa
 
             Intent intent = new Intent(AcceptedFragment.this.getContext(), UserProfileActivity.class);
 
-            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.APPLICATION_LIST_APPLIER_SERVER_ID)));
 
             startActivity(intent);
         });
