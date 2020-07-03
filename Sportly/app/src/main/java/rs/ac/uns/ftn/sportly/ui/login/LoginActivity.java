@@ -69,6 +69,7 @@ import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
+import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
@@ -132,6 +133,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        if(SportlyUtils.getConnectivityStatus(this) == 0){
+            goToMainActivityIfLoginSuccess("");
+        }
         //----------GOOGLE----------
         GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(this);
 
