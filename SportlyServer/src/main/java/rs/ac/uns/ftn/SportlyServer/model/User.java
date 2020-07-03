@@ -37,6 +37,8 @@ public class User implements UserDetails {
 
     private float rating;
 
+    private String imageSrc;
+
     @OneToMany(mappedBy = "friendshipRequester")
     private List<Friendship> requestedFriendships = new ArrayList<>();
 

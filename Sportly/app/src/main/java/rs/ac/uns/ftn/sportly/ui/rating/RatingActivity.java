@@ -74,15 +74,15 @@ public class RatingActivity extends AppCompatActivity {
         super.onResume();
 
         Intent myIntent = getIntent();
-        Long sportsFieldId = myIntent.getLongExtra("sportsFieldId",-1);
+        Long sportsFieldId = Long.parseLong(myIntent.getStringExtra("sportsFieldId"));
         String sportsFieldName = myIntent.getStringExtra("sportsFieldName");
-        int numberOfParticipants = myIntent.getIntExtra("numberOfParticipants",0);
+        int numberOfParticipants = Integer.parseInt(myIntent.getStringExtra("numbOfParticipants"));
 
         participantList = new ArrayList<>();
         List<String> names = new ArrayList<>();
         for (int i = 1; i <= numberOfParticipants; i++){
             PersonToRateDTO p = new PersonToRateDTO();
-            p.setId(myIntent.getLongExtra("id"+i,-1));
+            p.setId(Long.parseLong(myIntent.getStringExtra("id"+i)));
             p.setName(myIntent.getStringExtra("name"+i));
             names.add(myIntent.getStringExtra("name"+i));
 

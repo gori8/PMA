@@ -203,6 +203,7 @@ public class LoginServiceImpl implements  LoginService{
             ret.setEmail(email);
             ret.setIme(firstName);
             ret.setPrezime(lastName);
+            //ret.setPhotoUrl(pictureUrl);
             String jwt = tokenUtils.generateToken(email);
             int expiresIn = tokenUtils.getExpiredIn();
             ret.setExpiresIn(expiresIn);
@@ -242,13 +243,15 @@ public class LoginServiceImpl implements  LoginService{
 
 
         ResponseEntity<FacebookResponse> facebookResponseResponseEntity = restTemplate.getForEntity("https://graph.facebook.com/v7.0/"+facebookRequest.getUserId()+"?fields=id,name,email"+"&access_token="+facebookRequest.getToken(), FacebookResponse.class);
-
         FacebookResponse facebookResponse = facebookResponseResponseEntity.getBody();
+
+        //ResponseEntity<Object> facebookPicture = restTemplate.getForEntity("https://graph.facebook.com/v7.0/"+facebookRequest.getUserId()+"?fields=picture"+"&access_token="+facebookRequest.getToken(), Object.class);
 
         logger.info("---------------------------------- FACEBOOK DATA ----------------------------------");
         logger.info("Email: " + facebookResponse.getEmail());
         logger.info("Name: " + facebookResponse.getName());
         logger.info("Id: " + facebookResponse.getId());
+        //logger.info("Picture: " + facebookResponse.getUrl());
 
         String[] split = facebookResponse.getName().split(" ");
         String firstName = split[0];
@@ -258,6 +261,7 @@ public class LoginServiceImpl implements  LoginService{
         ret.setEmail(facebookResponse.getEmail());
         ret.setIme(firstName);
         ret.setPrezime(lastName);
+        //ret.setPhotoUrl(facebookResponse.getUrl());
         String jwt = tokenUtils.generateToken(facebookResponse.getEmail());
         int expiresIn = tokenUtils.getExpiredIn();
         ret.setExpiresIn(expiresIn);

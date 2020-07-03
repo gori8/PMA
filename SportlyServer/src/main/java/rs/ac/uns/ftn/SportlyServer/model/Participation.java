@@ -16,10 +16,10 @@ public class Participation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected User user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    protected Event event;
+    private Event event;
 
     private boolean isDeleted;
 }

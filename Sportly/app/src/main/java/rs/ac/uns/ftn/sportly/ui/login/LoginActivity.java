@@ -69,6 +69,7 @@ import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
+import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class LoginActivity extends AppCompatActivity {
     public static String signInMethod = "None";
@@ -132,6 +133,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        if(SportlyUtils.getConnectivityStatus(this) == 0){
+            goToMainActivityIfLoginSuccess("");
+        }
         //----------GOOGLE----------
         GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(this);
 
@@ -329,7 +334,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Google sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme() +" "+ userDTO.getPrezime(),userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme() +" "+ userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
                     Log.i("GOOGLE SIGN IN","User ID: "+userDTO.getId());
 
@@ -443,7 +448,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Facebook sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme()+" "+userDTO.getPrezime(),userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme()+" "+userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
 
                     Log.i("FACEBOOK SIGN IN","User ID: "+userDTO.getId());

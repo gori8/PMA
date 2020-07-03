@@ -24,10 +24,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -44,6 +48,7 @@ import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
+import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -141,7 +146,22 @@ public class MainActivity extends AppCompatActivity {
         final Button button = findViewById(R.id.logout);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showLogoutPopup();
+
+                if(SportlyUtils.getConnectivityStatus(MainActivity.this) == 0){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setMessage("You are not signed in.").
+                            setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+
+                    AlertDialog alert1 = alert.create();
+                    alert1.show();
+                }
+                else {
+                    showLogoutPopup();
+                }
             }
         });
     }
@@ -155,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
     private void showLogoutPopup() {
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
         alert.setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Sign out", new DialogInterface.OnClickListener()                 {
+                .setPositiveButton("Sign out", new DialogInterface.OnClickListener(){
 
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -175,9 +195,8 @@ public class MainActivity extends AppCompatActivity {
                                             email = true;
                                         }
 
-                                        if(google || facebook || email) {
-                                            goToLoginActivity();
-                                        }
+                                        goToLoginActivity();
+
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @SneakyThrows
@@ -231,12 +250,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity mainActivity = (MainActivity) this;
         Intent intent = new Intent(mainActivity, UserProfileActivity.class);
 
-        intent.putExtra("name", name);
-        intent.putExtra("surname", surname);
-        intent.putExtra("username", username);
-        intent.putExtra("email", email);
-        intent.putExtra("email", email);
-        intent.putExtra("photoUrl", photoUrl);
+        intent.putExtra("id", JwtTokenUtils.getUserId(this));
 
         mainActivity.startActivity(intent);
     }
@@ -247,49 +261,34 @@ public class MainActivity extends AppCompatActivity {
 
     //TEMP FUNCTION FOR FILLING DATA
     public void fillDataBasedOnEmail(){
-        String current_email = LoginActivity.userEmail;
-        if(current_email.equals("None")){
-            return;
-        }
-
-        String stevanAccount = "stevan@gmail.com";
-        String stevanGoogle = "stevanvulic96@gmail.com";
-        String stevanFacebook = "stevafudbal@gmail.com";
-
-        String milanAccount = "milan@gmail.com";
-        String milanGoogle = "kickapoo889@gmail.com";
-        String milanFacebook = "kickapoo889@gmail.com";
-
-        String igorAccount = "igor@gmail.com";
-        String igorGoogle = "goriantolovic@gmail.com";
-        String igorFacebook = "goriantolovic@gmail.com";
+        //FUNKCIJA DA SE POPUNE INFO U NAV DRAWERU
 
         ImageView drawerIcon = navigationView.getHeaderView(0).findViewById(R.id.main_drawer_icon);
         TextView nameTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_title);
         TextView emailTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_subTitle);
 
-        if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
-            name = "Stevan";
-            surname = "Vulić";
-            username = "Vul4";
-            photoUrl = R.drawable.stevan_vulic;
-        }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
-            name = "Milan";
-            surname = "Skrbić";
-            username = "shekrba";
-            photoUrl = R.drawable.milan_skrbic;
-        }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
-            name = "Igor";
-            surname = "Antolović";
-            username = "gori8";
-            photoUrl = R.drawable.igor_antolovic;
-        }
+        //drawerIcon.setImageResource(photoUrl);
+        nameTV.setText(JwtTokenUtils.getName(this));
+        emailTV.setText(JwtTokenUtils.getEmail(this));
 
-        email = current_email;
+        DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(JwtTokenUtils.getUserId(this).toString());
+        mUserDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-        drawerIcon.setImageResource(photoUrl);
-        nameTV.setText(name + " " + surname);
-        emailTV.setText(email);
+                if(dataSnapshot.child("thumb_image").getValue()!=null){
+                    String image = dataSnapshot.child("thumb_image").getValue().toString();
+
+                    Picasso.get().load(image)
+                            .placeholder(R.drawable.default_avatar).into(drawerIcon);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

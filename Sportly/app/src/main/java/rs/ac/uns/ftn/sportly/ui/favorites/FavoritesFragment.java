@@ -84,24 +84,6 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
-
-        Button testButton = getView().findViewById(R.id.testButton);
-        testButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(FavoritesFragment.this.getActivity(), RatingActivity.class);
-                intent.putExtra("sportsFieldId",2L);
-                intent.putExtra("sportsFieldName","Karađorđe Stadium");
-                intent.putExtra("numberOfParticipants",2);
-                intent.putExtra("id1",41L);
-                intent.putExtra("name1", "Milica Obradovic");
-                intent.putExtra("id2",43L);
-                intent.putExtra("name2","Branislav Skrbic");
-
-                startActivity(intent);
-            }
-        });
     }
 
     @NonNull
