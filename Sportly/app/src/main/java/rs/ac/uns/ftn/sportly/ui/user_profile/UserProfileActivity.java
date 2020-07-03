@@ -16,9 +16,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.R;
-import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
-import rs.ac.uns.ftn.sportly.dto.PersonToRateDTO;
-import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 
 public class UserProfileActivity extends AppCompatActivity {
     @Override

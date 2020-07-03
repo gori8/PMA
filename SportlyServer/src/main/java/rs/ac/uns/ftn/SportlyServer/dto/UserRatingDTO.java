@@ -21,4 +21,8 @@ public class UserRatingDTO {
     private String creatorFirstName;
 
     private String creatorLastName;
+
+    private Long creatorId;
+
+    private String creatorImageSrc;
 }
