@@ -80,6 +80,7 @@ public class UserProfileActivity extends AppCompatActivity {
         if(JwtTokenUtils.getUserId(this) == userId){
             addFriendButton.setVisibility(View.GONE);
             removeFriendButton.setVisibility(View.GONE);
+            messageButton.setVisibility(View.GONE);
         }else{
 
             boolean isFriend = false;

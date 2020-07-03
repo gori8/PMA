@@ -235,12 +235,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity mainActivity = (MainActivity) this;
         Intent intent = new Intent(mainActivity, UserProfileActivity.class);
 
-        intent.putExtra("name", name);
-        intent.putExtra("surname", surname);
-        intent.putExtra("username", username);
-        intent.putExtra("email", email);
-        intent.putExtra("email", email);
-        intent.putExtra("photoUrl", photoUrl);
+        intent.putExtra("id", JwtTokenUtils.getUserId(this));
 
         mainActivity.startActivity(intent);
     }
