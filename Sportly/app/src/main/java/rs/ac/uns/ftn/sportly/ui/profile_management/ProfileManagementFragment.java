@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +33,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,8 +57,13 @@ import java.util.Map;
 import id.zelory.compressor.Compressor;
 import lombok.SneakyThrows;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.BuildConfig;
 import rs.ac.uns.ftn.sportly.R;
+import rs.ac.uns.ftn.sportly.dto.UserDTO;
+import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.RealPathUtil;
@@ -87,22 +98,6 @@ public class ProfileManagementFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile_management, container, false);
-
-        RadioButton genderMale = root.findViewById(R.id.edit_profile_radio_male);
-        genderMale.setOnClickListener((View.OnClickListener) view -> {
-            if (genderMale.isChecked()) {
-                gender = "Male";
-                System.out.println(gender);
-            }
-        });
-
-        RadioButton genderFemale = root.findViewById(R.id.edit_profile_radio_female);
-        genderFemale.setOnClickListener((View.OnClickListener) view -> {
-            if (genderFemale.isChecked()) {
-                gender = "Female";
-                System.out.println(gender);
-            }
-        });
 
         profilePhoto = (ImageView)root.findViewById(R.id.edit_profile_icon);
         profilePhoto.setOnClickListener((View.OnClickListener) view -> {
@@ -139,25 +134,32 @@ public class ProfileManagementFragment extends Fragment {
 
         EditText nameEdit = getView().findViewById(R.id.edit_profile_name);
         EditText surnameEdit = getView().findViewById(R.id.edit_profile_surname);
-        EditText usernameEdit = getView().findViewById(R.id.edit_profile_username);
-        RadioButton genderMale = getView().findViewById(R.id.edit_profile_radio_male);
-        RadioButton genderFemale = getView().findViewById(R.id.edit_profile_radio_female);
 
-        nameEdit.setHint(name);
-        surnameEdit.setHint(surname);
-        usernameEdit.setHint(username);
+        String nameAndSurname = JwtTokenUtils.getName(this.getContext());
+        String[] parts = nameAndSurname.split(" ");
+        nameEdit.setText(parts[0]);
+        String surname = "";
+        for(int i=1; i<parts.length;i++)
+            surname += parts[i] + " ";
 
-        nameEdit.setText("");
-        surnameEdit.setText("");
-        usernameEdit.setText("");
+        surnameEdit.setText(surname);
 
-/*        if(gender.equals("Male")){
-            genderMale.setChecked(true);
-            genderFemale.setChecked(false);
-        }else if(gender.equals("Female")){
-            genderMale.setChecked(false);
-            genderFemale.setChecked(true);
-        }*/
+        DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(JwtTokenUtils.getUserId(this.getContext()).toString());
+        mUserDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String image = dataSnapshot.child("thumb_image").getValue().toString();
+
+                Picasso.get().load(image)
+                        .placeholder(R.drawable.default_avatar).into(img);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void setMessage(String text){
@@ -169,35 +171,58 @@ public class ProfileManagementFragment extends Fragment {
         // Register a callback to respond to the user
         button.setOnClickListener(new View.OnClickListener() {
             private boolean Validate(){
-                boolean retVal = true;
-                //validacija
-                //samo promena podataka, da se prikaze da osvezava
                 EditText nameEdit = getView().findViewById(R.id.edit_profile_name);
                 EditText surnameEdit = getView().findViewById(R.id.edit_profile_surname);
-                EditText usernameEdit = getView().findViewById(R.id.edit_profile_username);
 
                 String nameHelper = nameEdit.getText().toString();
                 String surnameHelper = surnameEdit.getText().toString();
-                String usernameHelper = usernameEdit.getText().toString();
 
-                if(!nameHelper.equals("")){
-                    name = nameHelper;
-                }
-                if(!surnameHelper.equals("")){
-                    surname = surnameHelper;
-                }
-                if(!usernameHelper.equals("")){
-                    username = usernameHelper;
-                }
+                if(nameHelper.equals("") || surnameHelper.equals(""))
+                    return false;
 
-                return retVal;
+                return true;
             }
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.edit_profile_save_button:
                         if(Validate()){
-                            showCreatePopup();
+                            EditText nameEdit = getView().findViewById(R.id.edit_profile_name);
+                            EditText surnameEdit = getView().findViewById(R.id.edit_profile_surname);
+                            String name = nameEdit.getText().toString();
+                            String surname = surnameEdit.getText().toString();
+
+                            UserDTO dto = new UserDTO();
+                            dto.setIme(name);
+                            dto.setPrezime(surname);
+
+                            String jwt = JwtTokenUtils.getJwtToken(ProfileManagementFragment.this.getContext());
+                            String authHeader = "Bearer " + jwt;
+
+                            Call<UserDTO> call = SportlyServerServiceUtils.sportlyServerService.editUser(authHeader, dto);
+                            call.enqueue(new Callback<UserDTO>() {
+                                @Override
+                                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                                    if (response.code() == 200){
+                                        UserDTO userDTO = response.body();
+                                        JwtTokenUtils.setName(userDTO.getIme() + " " + userDTO.getPrezime(), ProfileManagementFragment.this.getContext());
+
+                                        EditText nameEdit = getView().findViewById(R.id.edit_profile_name);
+                                        EditText surnameEdit = getView().findViewById(R.id.edit_profile_surname);
+                                        nameEdit.setText(userDTO.getIme());
+                                        surnameEdit.setText(userDTO.getPrezime());
+
+                                        showCreatePopup();
+                                    }else{
+                                        Log.d("REZ","Meesage recieved: "+response.code());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<UserDTO> call, Throwable t) {
+                                    Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
+                                }
+                            });
                         }
                         else{
                             String msg = "Validation failed. Please try again.";
@@ -405,42 +430,7 @@ public class ProfileManagementFragment extends Fragment {
 
     //TEMP FUNCTION FOR FILLING DATA
     public void fillDataBasedOnEmail(){
-        String current_email = LoginActivity.userEmail;
-        if(current_email.equals("None")){
-            return;
-        }
 
-        String stevanAccount = "stevan@gmail.com";
-        String stevanGoogle = "stevanvulic96@gmail.com";
-        String stevanFacebook = "stevafudbal@gmail.com";
-
-        String milanAccount = "milan@gmail.com";
-        String milanGoogle = "kickapoo889@gmail.com";
-        String milanFacebook = "kickapoo889@gmail.com";
-
-        String igorAccount = "igor@gmail.com";
-        String igorGoogle = "goriantolovic@gmail.com";
-        String igorFacebook = "goriantolovic@gmail.com";
-
-        if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
-            name = "Stevan";
-            surname = "Vulic";
-            username = "Vul4";
-            photoUrl = R.drawable.stevan_vulic;
-            gender = "Male";
-        }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
-            name = "Milan";
-            surname = "Skrbic";
-            username = "shekrba";
-            photoUrl = R.drawable.milan_skrbic;
-            gender = "Male";
-        }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
-            name = "Igor";
-            surname = "Antolovic";
-            username = "gori8";
-            photoUrl = R.drawable.igor_antolovic;
-            gender = "Male";
-        }
     }
 
     @Override

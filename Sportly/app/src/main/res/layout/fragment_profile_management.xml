@@ -62,74 +62,8 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <LinearLayout
-        android:paddingTop="15dp"
-        android:paddingBottom="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:layout_marginTop="5dp">
 
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:textSize="14dp"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginTop="3dp"
-            android:text="Gender:"/>
-
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textSize="14dp"
-            android:inputType="textPassword"
-            android:textColor="@color/colorPrimary"
-            android:textCursorDrawable="@null"
-            android:layout_centerHorizontal="true">
-            <RadioButton android:id="@+id/edit_profile_radio_male"
-                android:layout_width="140dp"
-                android:layout_height="30dp"
-                android:text="Male"
-                android:checked="true"
-                android:buttonTint="@color/colorPrimary"
-                android:textColor="@color/colorPrimary" />
-            <RadioButton android:id="@+id/edit_profile_radio_female"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:text="Female"
-                android:buttonTint="@color/colorPrimary"
-                android:textColor="@color/colorPrimary"/>
-        </RadioGroup>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:layout_marginTop="5dp">
-
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:textSize="14dp"
-            android:textColor="@color/colorPrimary"
-            android:text="Username:"/>
-
-        <EditText
-            android:id="@+id/edit_profile_username"
-            android:textSize="16dp"
-            android:textColor="@color/colorPrimary"
-            android:backgroundTint="@color/colorPrimary"
-            android:textCursorDrawable="@null"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
+    <!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -206,7 +140,7 @@
             android:textCursorDrawable="@null"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-    </LinearLayout>
+    </LinearLayout>-->
 
     <RelativeLayout
         android:layout_width="match_parent"

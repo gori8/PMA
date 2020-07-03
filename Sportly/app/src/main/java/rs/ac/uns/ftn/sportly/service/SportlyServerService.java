@@ -94,6 +94,11 @@ public interface SportlyServerService {
     @POST("/fieldRatings/bundle")
     Call<Long> rateEverything(@Header("Authorization") String authHeader, @Body BundleRatingDTO bundle);
 
+
     @GET("/user/{id}")
     Call<UserWithRatingsDTO> getUserWithRatings(@Header("Authorization") String authHeader, @Path("id") Long id);
+
+    @PUT("/user")
+    Call<UserDTO> editUser(@Header("Authorization") String authHeader, @Body UserDTO request);
+    
 }
