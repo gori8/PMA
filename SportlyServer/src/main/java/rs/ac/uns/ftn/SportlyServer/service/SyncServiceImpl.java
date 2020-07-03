@@ -43,7 +43,9 @@ public class SyncServiceImpl implements SyncService {
         for (Notification notification : user.getNotifications()){
             NotificationDTO notificationDTO = new NotificationDTO();
             notificationDTO.setId(notification.getId());
-            notificationDTO.setContent(notification.getContent());
+            notificationDTO.setMessage(notification.getMessage());
+            notificationDTO.setTitle(notification.getTitle());
+            notificationDTO.setType(notification.getType());
             notificationDTO.setDate(notification.getDate());
 
             syncDataDTO.getNotifications().add(notificationDTO);
