@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.SportlyServer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import retrofit.http.DELETE;
 import rs.ac.uns.ftn.SportlyServer.dto.*;
 import rs.ac.uns.ftn.SportlyServer.model.*;

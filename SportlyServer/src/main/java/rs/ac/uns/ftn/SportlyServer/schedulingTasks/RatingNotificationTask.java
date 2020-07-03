@@ -9,6 +9,7 @@ import rs.ac.uns.ftn.SportlyServer.model.Event;
 import rs.ac.uns.ftn.SportlyServer.model.Participation;
 import rs.ac.uns.ftn.SportlyServer.model.SportsField;
 import rs.ac.uns.ftn.SportlyServer.model.User;
+import rs.ac.uns.ftn.SportlyServer.repository.EventRepository;
 import rs.ac.uns.ftn.SportlyServer.service.EventService;
 import rs.ac.uns.ftn.SportlyServer.service.PushNotificationService;
 
@@ -26,9 +27,12 @@ public class RatingNotificationTask {
     EventService eventService;
 
     @Autowired
+    EventRepository eventRepository;
+
+    @Autowired
     PushNotificationService pushNotificationService;
 
-    @Scheduled(fixedRate = 60000)   //na 1 min (60000)
+    @Scheduled(fixedRate = 6000)   //na 1 min (60000)
     public void checkRatings() {
         getCurrentTimeUsingDate();
         List<Event> events = eventService.getAllEventsByRatingScheduler(RatingSchedulerEnum.ENDED);
