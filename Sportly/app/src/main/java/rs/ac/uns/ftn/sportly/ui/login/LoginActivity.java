@@ -329,7 +329,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Google sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme() +" "+ userDTO.getPrezime(),userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme() +" "+ userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
                     Log.i("GOOGLE SIGN IN","User ID: "+userDTO.getId());
 
@@ -443,7 +443,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Facebook sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme()+" "+userDTO.getPrezime(),userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme()+" "+userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
 
                     Log.i("FACEBOOK SIGN IN","User ID: "+userDTO.getId());

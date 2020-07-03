@@ -247,49 +247,15 @@ public class MainActivity extends AppCompatActivity {
 
     //TEMP FUNCTION FOR FILLING DATA
     public void fillDataBasedOnEmail(){
-        String current_email = LoginActivity.userEmail;
-        if(current_email.equals("None")){
-            return;
-        }
-
-        String stevanAccount = "stevan@gmail.com";
-        String stevanGoogle = "stevanvulic96@gmail.com";
-        String stevanFacebook = "stevafudbal@gmail.com";
-
-        String milanAccount = "milan@gmail.com";
-        String milanGoogle = "kickapoo889@gmail.com";
-        String milanFacebook = "kickapoo889@gmail.com";
-
-        String igorAccount = "igor@gmail.com";
-        String igorGoogle = "goriantolovic@gmail.com";
-        String igorFacebook = "goriantolovic@gmail.com";
+        //FUNKCIJA DA SE POPUNE INFO U NAV DRAWERU
 
         ImageView drawerIcon = navigationView.getHeaderView(0).findViewById(R.id.main_drawer_icon);
         TextView nameTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_title);
         TextView emailTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_subTitle);
 
-        if(current_email.equals(stevanAccount) || current_email.equals(stevanGoogle) || current_email.equals(stevanFacebook)){
-            name = "Stevan";
-            surname = "Vulić";
-            username = "Vul4";
-            photoUrl = R.drawable.stevan_vulic;
-        }else if(current_email.equals(milanAccount) || current_email.equals(milanGoogle) || current_email.equals(milanFacebook)){
-            name = "Milan";
-            surname = "Skrbić";
-            username = "shekrba";
-            photoUrl = R.drawable.milan_skrbic;
-        }else if(current_email.equals(igorAccount) || current_email.equals(igorGoogle) || current_email.equals(igorFacebook)){
-            name = "Igor";
-            surname = "Antolović";
-            username = "gori8";
-            photoUrl = R.drawable.igor_antolovic;
-        }
-
-        email = current_email;
-
-        drawerIcon.setImageResource(photoUrl);
-        nameTV.setText(name + " " + surname);
-        emailTV.setText(email);
+        //drawerIcon.setImageResource(photoUrl);
+        nameTV.setText(JwtTokenUtils.getName(this));
+        emailTV.setText(JwtTokenUtils.getEmail(this));
     }
 
 
