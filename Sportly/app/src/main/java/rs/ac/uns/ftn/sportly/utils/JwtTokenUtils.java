@@ -59,4 +59,11 @@ public class JwtTokenUtils {
         SharedPreferences sharedpreferences = context.getSharedPreferences(MyPrefrences, Mode);
         return sharedpreferences.getString("email","Email");
     }
+
+    public static void setName(String name, Context context){
+        SharedPreferences sharedpreferences = context.getSharedPreferences(MyPrefrences, Mode);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("name", name);
+        editor.commit();
+    }
 }

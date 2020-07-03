@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.SportlyServer.dto.PeopleDTO;
+import rs.ac.uns.ftn.SportlyServer.dto.UserDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.UserRatingDTO;
 import rs.ac.uns.ftn.SportlyServer.dto.UserWithRatingsDTO;
 import rs.ac.uns.ftn.SportlyServer.model.User;
@@ -105,5 +106,27 @@ public class UserServiceImpl implements UserService {
         }
 
         return ret;
+    }
+
+    @Override
+    public UserDTO editUser(UserDTO userDTO, String reqEmail) {
+        if(userDTO == null)
+            return null;
+
+        User user = userRepository.findByEmail(reqEmail);
+        if(user == null)
+            return null;
+
+        if(userDTO.getIme() == null || userDTO.getIme().equals(""))
+            return null;
+
+        if(userDTO.getPrezime() == null || userDTO.getPrezime().equals(""))
+            return null;
+
+        user.setFirstName(userDTO.getIme());
+        user.setLastName(userDTO.getPrezime());
+
+        userRepository.save(user);
+        return userDTO;
     }
 }
