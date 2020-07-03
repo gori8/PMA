@@ -21,6 +21,7 @@ import android.widget.TextView;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
 
 public class InviteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -53,6 +54,16 @@ public class InviteFragment extends Fragment implements LoaderManager.LoaderCall
         adapter = new InviteCursorAdapter(getActivity(), R.layout.invite_item, null, from, to, eventId);
         ListView listView = (ListView) getActivity().findViewById(R.id.invite_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor cursor = (Cursor)adapter.getItem(position);
+
+            Intent intent = new Intent(InviteFragment.this.getContext(), UserProfileActivity.class);
+
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+
+            startActivity(intent);
+        });
     }
 
     @NonNull

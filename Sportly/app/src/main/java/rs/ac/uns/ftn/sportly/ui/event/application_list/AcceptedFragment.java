@@ -20,10 +20,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.ui.friends.FriendsCursorAdapter;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
 public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -60,6 +62,16 @@ public class AcceptedFragment extends Fragment implements LoaderManager.LoaderCa
         adapter = new AcceptedCursorAdapter(getActivity(), R.layout.accepted_item, null, from, to,eventId);
         ListView listView = (ListView) getActivity().findViewById(R.id.accepted_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor cursor = (Cursor)adapter.getItem(position);
+
+            Intent intent = new Intent(AcceptedFragment.this.getContext(), UserProfileActivity.class);
+
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+
+            startActivity(intent);
+        });
     }
 
     @NonNull

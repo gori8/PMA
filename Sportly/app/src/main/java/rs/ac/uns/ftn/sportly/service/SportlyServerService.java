@@ -25,6 +25,7 @@ import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
+import rs.ac.uns.ftn.sportly.dto.UserWithRatingsDTO;
 
 /**
  * Created by gori8 on 06-June-20.
@@ -93,4 +94,6 @@ public interface SportlyServerService {
     @POST("/fieldRatings/bundle")
     Call<Long> rateEverything(@Header("Authorization") String authHeader, @Body BundleRatingDTO bundle);
 
+    @GET("/user/{id}")
+    Call<UserWithRatingsDTO> getUserWithRatings(@Header("Authorization") String authHeader, @Path("id") Long id);
 }

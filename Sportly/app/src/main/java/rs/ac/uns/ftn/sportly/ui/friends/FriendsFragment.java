@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.sportly.ui.friends;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class FriendsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -114,14 +116,13 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
 
         friendsListView.setOnItemClickListener((parent, view, position, id) -> {
             Cursor cursor = (Cursor)adapter.getItem(position);
-            String name = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_FIRST_NAME));
-            String surname = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_LAST_NAME));
-            String username = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_FIRST_NAME));
-            String email = cursor.getString(cursor.getColumnIndex(DataBaseTables.FRIENDS_EMAIL));
-            int photoUrl = 0;
 
             MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.goToUserProfileActivity(name, surname, username, email, photoUrl);
+            Intent intent = new Intent(mainActivity, UserProfileActivity.class);
+
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+
+            startActivity(intent);
         });
 
         //REQUEST ADAPTER
@@ -137,6 +138,17 @@ public class FriendsFragment extends Fragment implements LoaderManager.LoaderCal
 
         ListView peopleListView = (ListView) getView().findViewById(R.id.people_list);
         peopleListView.setAdapter(filterAdapter);
+
+        peopleListView.setOnItemClickListener((parent, view, position, id) -> {
+            Long userId = filterAdapter.getPeopleList().get(position).getId();
+
+            MainActivity mainActivity = (MainActivity) getActivity();
+            Intent intent = new Intent(mainActivity, UserProfileActivity.class);
+
+            intent.putExtra("id",userId);
+
+            startActivity(intent);
+        });
 
     }
 

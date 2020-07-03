@@ -23,6 +23,7 @@ import java.util.List;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
 public class QueueFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -54,6 +55,16 @@ public class QueueFragment extends Fragment implements LoaderManager.LoaderCallb
         adapter = new QueueCursorAdapter(getActivity(), R.layout.queue_item, null, from, to, eventId);
         ListView listView = (ListView) getActivity().findViewById(R.id.queue_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor cursor = (Cursor)adapter.getItem(position);
+
+            Intent intent = new Intent(QueueFragment.this.getContext(), UserProfileActivity.class);
+
+            intent.putExtra("id",cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.SERVER_ID)));
+
+            startActivity(intent);
+        });
     }
 
     @NonNull

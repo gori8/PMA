@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:id="@+id/item"
+    android:descendantFocusability="blocksDescendants"
     >
 
     <de.hdodenhof.circleimageview.CircleImageView

@@ -11,14 +11,14 @@
         android:layout_height="125dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:src="@drawable/stevan_vulic"
+        android:src="@drawable/ic_person_black_24dp"
         android:layout_marginBottom="10dp"
         app:civ_border_width="2dp"
         android:clickable="true"
         app:civ_border_color="@color/white"/>
 
     <TextView
-        android:id="@+id/user_profile_name_surname_username"
+        android:id="@+id/user_profile_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="25dp"
@@ -27,7 +27,7 @@
         android:layout_below="@+id/user_profile_icon"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
-        android:text="Stevan Vulic (vul4)" />
+        android:text="Name" />
 
     <TextView
         android:id="@+id/user_profile_email"
@@ -36,10 +36,10 @@
         android:layout_marginLeft="25dp"
         android:textSize="16sp"
         android:textColor="@color/white"
-        android:layout_below="@+id/user_profile_name_surname_username"
+        android:layout_below="@+id/user_profile_name"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
-        android:text="voste69@gmail.com" />
+        android:text="email@example.com" />
 
     <LinearLayout
         android:layout_below="@+id/user_profile_email"
@@ -54,24 +54,45 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/addFriendButton"
             android:textColor="@color/white"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:visibility="visible"
             android:textSize="10sp"
-            android:background="@color/colorPrimaryDark"
             android:text="Add Friend"/>
 
         <Button
+            android:id="@+id/removeFriendButton"
             android:textColor="@color/white"
             android:layout_width="0dp"
             android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="10sp"
-            android:backgroundTint="@color/message"
-            android:background="@color/colorPrimaryDark"
+            android:backgroundTint="@color/red"
             android:text="Remove friend"/>
+
+        <ProgressBar
+            android:id="@+id/loadingCircle"
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+        <Button
+            android:id="@+id/messageButton"
+            android:textColor="@color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:textSize="10sp"
+            android:backgroundTint="@color/message"
+            android:text="Send message"/>
 
     </LinearLayout>
 

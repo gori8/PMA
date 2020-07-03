@@ -25,6 +25,7 @@
         android:orientation="vertical">
 
         <ListView
+            android:clickable="true"
             android:id="@+id/invite_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

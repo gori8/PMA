@@ -221,6 +221,7 @@
                     android:layout_width="0dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
+                    android:indeterminateTint="@color/white"
                     android:layout_weight="1"
                     android:indeterminate="true"
                     android:visibility="gone" />
