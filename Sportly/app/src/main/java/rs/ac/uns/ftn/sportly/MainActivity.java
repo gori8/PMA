@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity  {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         tryGoogleSignOut();
                                         tryFacebookSignOut();
+                                        tryStandardSignOut();
 
                                         goToLoginActivity();
 
@@ -233,6 +234,18 @@ public class MainActivity extends AppCompatActivity  {
             return true;
         }catch (Exception e){
             System.out.println("Google sign out error");
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean tryStandardSignOut(){
+        try{
+            JwtTokenUtils.removeJwtToken(MainActivity.this);
+            System.out.println("Standard sign out success");
+            return true;
+        }catch (Exception e){
+            System.out.println("Standard sign out error");
             System.out.println(e.getMessage());
             return false;
         }

@@ -74,7 +74,7 @@ public class LoginServiceImpl implements  LoginService{
     }
 
 
-
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public UserDTO register(UserDTO userDTO) throws RollbackException {
         User user = new User();
 
@@ -87,15 +87,19 @@ public class LoginServiceImpl implements  LoginService{
         user.setEnabled(true);
         user.setFirstName(userDTO.getIme());
         user.setEmail(userDTO.getEmail());
-        Authority authority = authorityRepository.findOneByName("ROLE_USER");
-        List<Authority> authorities = new ArrayList<>();
-        authorities.add(authority);
-        user.setAuthorities(authorities);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setFirstLogin(true);
+
+//        Authority authority = authorityRepository.findOneByName("ROLE_USER");
+//        List<Authority> authorities = new ArrayList<>();
+//        authorities.add(authority);
+//        user.setAuthorities(authorities);
 
         user = userRepository.save(user);
-        userDTO.setId(user.getId());
+        UserDTO newUserDTO = new UserDTO();
+        newUserDTO.setId(user.getId());
 
-        return userDTO;
+        return newUserDTO;
     }
 
     @Override
@@ -108,6 +112,12 @@ public class LoginServiceImpl implements  LoginService{
                 UserDTO userDTO= ObjectMapperUtils.map(user,UserDTO.class);
                 userDTO.setExpiresIn(expiresIn);
                 userDTO.setToken(jwt);
+                userDTO.setIme(user.getFirstName());
+                userDTO.setPrezime(user.getLastName());
+                userDTO.setEmail(user.getEmail());
+                userDTO.setFirstLogin(user.isFirstLogin());
+                //userDTO.setRating(user.getRating());
+                userDTO.setId(user.getId());
                 // Vrati user-a sa tokenom kao odgovor na uspesnu autentifikaciju
                 return userDTO;
             }

@@ -20,6 +20,7 @@ import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.JwtAuthenticationRequest;
 import rs.ac.uns.ftn.sportly.dto.ParticipationDTO;
 import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
@@ -45,6 +46,12 @@ public interface SportlyServerService {
 
     @POST("/auth/facebook/login")
     Call<UserDTO> postFacebookToken(@Body FacebookRequestDTO facebookRequestDTO);
+
+    @POST("/auth/register")
+    Call<UserDTO> standardRegister(@Body UserDTO userDTO);
+
+    @POST("/auth/standard/login")
+    Call<UserDTO> standardLogin(@Body JwtAuthenticationRequest jwtAuthenticationRequest);
 
     @GET("/friendship/people/{filterText}")
     Call<List<PeopleDTO>> searchPeople(@Header("Authorization") String authHeader, @Path("filterText") String filterText);
@@ -93,7 +100,6 @@ public interface SportlyServerService {
 
     @POST("/fieldRatings/bundle")
     Call<Long> rateEverything(@Header("Authorization") String authHeader, @Body BundleRatingDTO bundle);
-
 
     @GET("/user/{id}")
     Call<UserWithRatingsDTO> getUserWithRatings(@Header("Authorization") String authHeader, @Path("id") Long id);
