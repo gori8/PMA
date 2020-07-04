@@ -55,7 +55,31 @@ public class FCMNotificationReceiver extends BroadcastReceiver {
 				bundleData.putString(entry.getKey(), entry.getValue());
 			}
 			intent.putExtras(bundleData);
-			pendingIntent = PendingIntent.getActivity(context, 0, intent,
+			pendingIntent = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent,
+					PendingIntent.FLAG_ONE_SHOT);
+		}else if(notificationType.equals("REQUEST")){
+			Intent intent = new Intent(context,MainActivity.class);
+			intent.putExtra("goto_fragment","FriendsFragment");
+			pendingIntent = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent,
+					PendingIntent.FLAG_ONE_SHOT);
+		}else if (notificationType.equals("CONFIRMATION")){
+
+			Intent intent = new Intent(context,MainActivity.class);
+			intent.putExtra("goto_fragment","FriendsFragment");
+			pendingIntent = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent,
+					PendingIntent.FLAG_ONE_SHOT);
+		}else if (notificationType.equals("APPLY_FOR_EVENT")){
+
+			Intent intent = new Intent(context,MainActivity.class);
+			intent.putExtra("goto_fragment","MyEventsFragment");
+			pendingIntent = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent,
+					PendingIntent.FLAG_ONE_SHOT);
+
+		}else if (notificationType.equals("ACCEPTED_APPLICATION")){
+
+			Intent intent = new Intent(context,MainActivity.class);
+			intent.putExtra("goto_fragment","MyEventsFragment");
+			pendingIntent = PendingIntent.getActivity(context, (int)System.currentTimeMillis(), intent,
 					PendingIntent.FLAG_ONE_SHOT);
 		}
 

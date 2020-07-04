@@ -106,6 +106,8 @@ public class FCMNotificationService extends FirebaseMessagingService {
                 getContentResolver().insert(
                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_APPLICATION_LIST),
                         valuesApplicationList);
+
+                ints.putExtra("eventId",data.get("eventId"));
             }else if(data.get("notificationType").equals("ACCEPTED_APPLICATION")){
                 ContentValues valuesApplicationList = new ContentValues();
                 valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EVENT_SERVER_ID,data.get("eventId"));
@@ -131,6 +133,8 @@ public class FCMNotificationService extends FirebaseMessagingService {
                         valuesEvent,
                         DataBaseTables.SERVER_ID+" = "+data.get("eventId"),
                         null);
+
+                ints.putExtra("eventId",data.get("eventId"));
             }else if(data.get("notificationType").equals("INVITE_FRIEND")){
                 ContentValues valuesApplicationList = new ContentValues();
                 valuesApplicationList.put(DataBaseTables.APPLICATION_LIST_EVENT_SERVER_ID,data.get("eventId"));
