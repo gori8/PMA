@@ -193,17 +193,8 @@ public class MainActivity extends AppCompatActivity {
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        boolean google = false;
-                                        boolean facebook = false;
-                                        boolean email = false;
-
-                                        if (LoginActivity.signInMethod == LoginActivity.GOOGLE){
-                                            google = tryGoogleSignOut();
-                                        }else if(LoginActivity.signInMethod == LoginActivity.FACEBOOK){
-                                            facebook = tryFacebookSignOut();
-                                        }else if(LoginActivity.signInMethod == LoginActivity.EMAIL_ACCOUNT){
-                                            email = true;
-                                        }
+                                        tryGoogleSignOut();
+                                        tryFacebookSignOut();
 
                                         goToLoginActivity();
 
