@@ -214,7 +214,10 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                 DataBaseTables.EVENTS_APPLICATION_STATUS,
                 DataBaseTables.EVENTS_CATEGORY,
                 DataBaseTables.SERVER_ID,
-                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
+                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,
+                DataBaseTables.EVENTS_IMAGE_REF,
+                DataBaseTables.EVENTS_CREATOR_ID,
+                DataBaseTables.EVENTS_CREATOR
         };
 
         Uri uri = SportlyContentProvider.CONTENT_URI;

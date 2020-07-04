@@ -102,7 +102,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                 DataBaseTables.SPORTSFIELDS_LONGITUDE,
                 DataBaseTables.SPORTSFIELDS_RATING,
                 DataBaseTables.SPORTSFIELDS_CATEGORY,
-                DataBaseTables.SERVER_ID
+                DataBaseTables.SERVER_ID,
+                DataBaseTables.EVENTS_IMAGE_REF
         };
 
         return new CursorLoader(getActivity(), Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),

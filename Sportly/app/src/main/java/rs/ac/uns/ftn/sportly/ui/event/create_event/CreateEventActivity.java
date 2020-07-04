@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -51,6 +52,7 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
     private TextInputEditText etCurrency;
     private TextInputEditText etNumOfPpl;
     private Button confirmBtn;
+    private ProgressDialog mProgressDialog;
 
     private Long sportsFieldServerId;
     private Long sportsFieldId;
@@ -93,6 +95,12 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
             @SneakyThrows
             @Override
             public void onClick(View v) {
+
+                mProgressDialog = new ProgressDialog(CreateEventActivity.this);
+                mProgressDialog.setTitle("Creating Event...");
+                mProgressDialog.setMessage("Please wait while we are processing your create action.");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
 
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
 
@@ -140,7 +148,7 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
                             valuesEvent.put(DataBaseTables.EVENTS_CREATOR,respEventDTO.getCreator());
                             valuesEvent.put(DataBaseTables.EVENTS_CATEGORY,category);
                             valuesEvent.put(DataBaseTables.EVENTS_CREATOR_ID,JwtTokenUtils.getUserId(CreateEventActivity.this));
-
+                            valuesEvent.put(DataBaseTables.EVENTS_IMAGE_REF,respEventDTO.getImageRef());
 
 
                             getContentResolver().insert(
@@ -149,19 +157,30 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
 
                             Intent intent = new Intent(CreateEventActivity.this, EventActivity.class);
                             intent.putExtra("eventId", respEventDTO.getId());
+                            intent.putExtra("sportsFieldId", sportsFieldId);
 
                             CreateEventActivity.this.startActivity(intent);
 
 
                         }
+                        mProgressDialog.dismiss();
                     }
 
                     @Override
                     public void onFailure(Call<EventDTO> call, Throwable t) {
-
+                        mProgressDialog.dismiss();
                     }
                 });
+            }
+        });
 
+        Button cancelButton = findViewById(R.id.cancelCEButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @SneakyThrows
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
         });
     }

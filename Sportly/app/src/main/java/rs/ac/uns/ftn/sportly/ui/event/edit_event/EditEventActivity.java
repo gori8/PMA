@@ -6,6 +6,7 @@ import androidx.fragment.app.DialogFragment;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -55,6 +56,7 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
     private TextInputEditText etCurrency;
     private TextInputEditText etNumOfPpl;
     private Button confirmBtn;
+    private ProgressDialog mProgressDialog;
 
     private Long eventId;
 
@@ -97,6 +99,11 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
             @Override
             public void onClick(View v) {
 
+                mProgressDialog = new ProgressDialog(EditEventActivity.this);
+                mProgressDialog.setTitle("Creating Event...");
+                mProgressDialog.setMessage("Please wait while we are processing your create action.");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
 
                 EventDTO eventDTO = new EventDTO();
 
@@ -155,14 +162,24 @@ public class EditEventActivity extends AppCompatActivity implements TimePickerDi
 
 
                         }
+                        mProgressDialog.dismiss();
                     }
 
                     @Override
                     public void onFailure(Call<EventDTO> call, Throwable t) {
-
+                        mProgressDialog.dismiss();
                     }
                 });
+            }
+        });
 
+        Button cancelButton = findViewById(R.id.cancelCEButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @SneakyThrows
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
         });
 

@@ -33,23 +33,25 @@
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/eventSportsfieldImage"
                     android:src="@drawable/ic_location_on_black_24dp"
-                    android:scaleType="fitCenter"
+                    android:scaleType="fitXY"
                     app:riv_corner_radius="5dip"
+                    android:background="@color/message"
                     app:riv_border_width="1dip"
                     app:riv_border_color="@color/colorPrimary"
                     app:riv_mutate_background="true"
                     app:riv_oval="false"
-                    android:layout_height="100dp"
-                    android:layout_width="140dp"/>
+                    android:layout_height="120dp"
+                    android:layout_width="150dp"/>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginLeft="10dp"
@@ -194,7 +196,7 @@
                         android:text="Application list"/>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="250dp"
                         android:layout_height="wrap_content"
                         android:gravity="center|bottom"
                         android:orientation="horizontal">
@@ -203,6 +205,7 @@
                             android:textColor="@color/white"
                             android:layout_width="120dp"
                             android:id="@+id/editEventButton"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:textSize="10dp"
                             android:backgroundTint="@color/colorPrimary"
@@ -214,13 +217,16 @@
                             android:textColor="@color/white"
                             android:layout_width="120dp"
                             android:textSize="10dp"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/red"
                             android:text="Delete event"/>
+
                         <ProgressBar
                             android:id="@+id/loadingCircle"
                             android:visibility="gone"
-                            android:layout_width="20dp"
+                            android:layout_width="120dp"
+                            android:layout_weight="1"
                             android:layout_height="20dp"
                             android:layout_gravity="center"
                             android:indeterminate="true" />

@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
@@ -69,6 +70,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private Integer numOfParticipants;
     private Long sportsFieldId;
     private Long creatorId;
+    private String imageRef="";
 
 
     @Override
@@ -117,7 +119,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(v.getContext(), ApplicationListActivity.class);
+                Intent intent = new Intent(EventActivity.this, ApplicationListActivity.class);
                 intent.putExtra("eventId",eventId);
                 intent.putExtra("eventName", eventName);
                 startActivity(intent);
@@ -446,7 +448,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_CREATOR,
-                DataBaseTables.EVENTS_CREATOR_ID
+                DataBaseTables.EVENTS_CREATOR_ID,
+                DataBaseTables.EVENTS_IMAGE_REF
         };
 
 
@@ -499,6 +502,14 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
             String creator = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_CREATOR));
 
             String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
+
+            imageRef = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_IMAGE_REF));
+
+            //set Image of selected SportsField
+            String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
+            Log.i("IMAGE_REF","IMAGE REF: "+imageRef);
+            Picasso.get().load(imageUri)
+                    .placeholder(R.drawable.default_avatar).into(imageView);
 
             eventStatus = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_APPLICATION_STATUS));
 

@@ -9,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,6 +52,14 @@ public class FavoriteCursorAdapter extends SimpleCursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
+
+        //set Image of selected SportsField
+        ImageView imageView = view.findViewById(R.id.favorite_image);
+        String imageRef = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseTables.SPORTSFIELDS_IMAGE_REF));
+        String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
+        Log.i("IMAGE_REF","IMAGE REF: "+imageRef);
+        Picasso.get().load(imageUri)
+                .placeholder(R.drawable.default_avatar).into(imageView);
 
         RatingBar ratingBar = view.findViewById(R.id.favorite_ratingBar);
 

@@ -50,6 +50,8 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private Long creatorId;
 
+    private String imageRef;
+
     @Override
     public int compareTo(EventDTO e) {
         return getDateFrom().compareTo(e.getDateFrom());

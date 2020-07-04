@@ -14,6 +14,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import rs.ac.uns.ftn.sportly.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
@@ -23,5 +25,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.settings_preference, rootKey);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.VISIBLE);
     }
 }

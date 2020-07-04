@@ -76,6 +76,7 @@ public class Event {
         dto.setCategory(this.sportsField.getCategory());
         dto.setCreatorId(this.creator.getId());
         dto.setCreator(this.creator.getFirstName()+ " " +creator.getLastName());
+        dto.setImageRef(this.sportsField.getPhotoReference());
         return dto;
     }
 }

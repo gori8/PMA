@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SportlySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "sportly.db";
-    private static final int DATABASE_VERSION = 28;
+    private static final int DATABASE_VERSION = 29;
 
     public SportlySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

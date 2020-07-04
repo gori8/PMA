@@ -176,6 +176,7 @@ public class SyncDataService extends Service {
                                 System.out.println("SERVER ID:"+eventDTO.getId());
                                 System.out.println("EVENT CREATOR:"+eventDTO.getCreator());
                                 System.out.println("CATEGORY:"+eventDTO.getCategory());
+                                System.out.println("IMAGE REF:"+eventDTO.getImageRef());
 
 
                                 ContentValues valuesEvent = new ContentValues();
@@ -195,6 +196,7 @@ public class SyncDataService extends Service {
                                 valuesEvent.put(DataBaseTables.EVENTS_CREATOR,eventDTO.getCreator());
                                 valuesEvent.put(DataBaseTables.EVENTS_CATEGORY,eventDTO.getCategory());
                                 valuesEvent.put(DataBaseTables.EVENTS_CREATOR_ID,eventDTO.getCreatorId());
+                                valuesEvent.put(DataBaseTables.EVENTS_IMAGE_REF,eventDTO.getImageRef());
 
 
                                 getContentResolver().insert(

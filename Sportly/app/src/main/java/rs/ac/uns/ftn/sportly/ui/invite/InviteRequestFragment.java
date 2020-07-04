@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
@@ -54,6 +56,20 @@ public class InviteRequestFragment extends Fragment implements LoaderManager.Loa
         adapter = new InviteRequestCursorAdapter(getActivity(), R.layout.invite_request_item, null, from, to);
         ListView listView = (ListView) getActivity().findViewById(R.id.invite_list);
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BottomNavigationView toolbar = getActivity().findViewById(R.id.nav_view);
+        toolbar.setVisibility(View.VISIBLE);
     }
 
     @NonNull
