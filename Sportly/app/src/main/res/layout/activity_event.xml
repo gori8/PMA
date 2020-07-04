@@ -150,10 +150,11 @@
 
                     <Button
                         android:layout_width="250dp"
+                        android:id="@+id/checkCreatorButton"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:backgroundTint="@color/message"
-                        android:text="Message creator"/>
+                        android:text="Check creator"/>
 
                     <Button
                         android:textColor="@color/white"

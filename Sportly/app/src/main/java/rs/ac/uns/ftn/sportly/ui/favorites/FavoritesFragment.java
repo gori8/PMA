@@ -26,15 +26,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.rating.RatingActivity;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -65,6 +69,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_favorites, container, false);
+
         return root;
     }
 
@@ -84,6 +89,10 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            //TODO: OTIDJI NA MAPU I OTVORI TAJ SPORTSFIELD
+        });
     }
 
     @NonNull

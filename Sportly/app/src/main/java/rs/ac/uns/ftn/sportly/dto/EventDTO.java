@@ -43,6 +43,10 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String creator;
 
+    private String category;
+
+    private Long creatorId;
+
     @Override
     public int compareTo(EventDTO e) {
         return getTimeFrom().compareTo(e.getTimeFrom());

@@ -44,7 +44,11 @@ public class EventDTO implements Comparable<EventDTO> {
 
     private String applicationStatus;
 
+    private String category;
+
     private String creator;
+
+    private Long creatorId;
 
     @Override
     public int compareTo(EventDTO e) {

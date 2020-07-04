@@ -19,9 +19,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.UserRatingDTO;
 
+@Setter
+@Getter
 public class UserProfileAdapter extends ArrayAdapter<String> {
 
     private Context context;

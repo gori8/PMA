@@ -37,6 +37,8 @@ public class DataBaseTables {
     public static final String EVENTS_APPLICATION_STATUS = "application_status";
     public static final String EVENTS_NUMB_OF_PARTICIPANTS = "num_of_participants";
     public static final String EVENTS_CREATOR = "creator";
+    public static final String EVENTS_CATEGORY = "category";
+    public static final String EVENTS_CREATOR_ID = "creator_id";
 
 
     public static final String TABLE_FAVORITES = "favorites";
@@ -99,6 +101,8 @@ public class DataBaseTables {
             + EVENTS_SPORTS_FILED_ID + " integer, "
             + EVENTS_APPLICATION_STATUS + " text, "
             + EVENTS_CREATOR + " text, "
+            + EVENTS_CREATOR_ID + " integer, "
+            + EVENTS_CATEGORY + " text, "
             + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"), "
             + "FOREIGN KEY ("+EVENTS_SPORTS_FILED_ID+") REFERENCES "+TABLE_SPORTSFIELDS+"("+ID+"))";
 

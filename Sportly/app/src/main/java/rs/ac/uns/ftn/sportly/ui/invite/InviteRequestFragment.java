@@ -73,6 +73,7 @@ public class InviteRequestFragment extends Fragment implements LoaderManager.Loa
                 DataBaseTables.EVENTS_TIME_FROM,
                 DataBaseTables.EVENTS_TIME_TO,
                 DataBaseTables.EVENTS_APPLICATION_STATUS,
+                DataBaseTables.EVENTS_CATEGORY,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,
         };

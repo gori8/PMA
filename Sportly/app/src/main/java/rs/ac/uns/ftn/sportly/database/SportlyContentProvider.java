@@ -246,11 +246,9 @@ public class SportlyContentProvider extends ContentProvider {
                 break;
 
             case EVENTS:{
-                String id = selection.split("AND")[1].split("=")[1];
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_MY_EVENTS), null);
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
                 getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.TABLE_PARTICIPATING_EVENTS), null);
-                getContext().getContentResolver().notifyChange(Uri.parse(CONTENT_URI+DataBaseTables.SPORTSFIELDS_EVENTS+"/"+id),null);
             }
                 break;
 

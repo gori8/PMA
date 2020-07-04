@@ -28,6 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -65,6 +67,7 @@ import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
+import rs.ac.uns.ftn.sportly.ui.map.MapFragment;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.RealPathUtil;
 
@@ -212,7 +215,11 @@ public class ProfileManagementFragment extends Fragment {
                                         nameEdit.setText(userDTO.getIme());
                                         surnameEdit.setText(userDTO.getPrezime());
 
+                                        JwtTokenUtils.setName(userDTO.getIme() + " " + userDTO.getPrezime(),ProfileManagementFragment.this.getContext());
+
                                         showCreatePopup();
+
+                                        //TODO: PREBACI SE NA MAP FRAGMENT
                                     }else{
                                         Log.d("REZ","Meesage recieved: "+response.code());
                                     }

@@ -48,7 +48,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 DataBaseTables.NOTIFICATIONS_DATE
         };
         int[] to = new int[] {R.id.notification_name, R.id.notification_info, R.id.notification_time};
-        adapter = new NotificationCursorAdapter(getActivity(), R.layout.favorite_item, null, from,
+        adapter = new NotificationCursorAdapter(getActivity(), R.layout.notification_item, null, from,
                 to);
 
         ListView listView = (ListView) getActivity().findViewById(R.id.notification_list);

@@ -222,6 +222,7 @@
                             android:layout_height="wrap_content"
                             android:imeOptions="actionDone"
                             android:singleLine="true"
+                            android:layout_marginLeft="5dp"
                             android:hint="@string/label_price"
                             android:layout_width="match_parent"
                             android:inputType="numberDecimal"/>

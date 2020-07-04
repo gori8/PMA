@@ -68,6 +68,7 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
 
         sportsFieldServerId = getIntent().getExtras().getLong("sportsFieldServerId");
         sportsFieldId = getIntent().getExtras().getLong("sportsFieldId");
+        String category = getIntent().getStringExtra("category");
 
         String locationText = getIntent().getExtras().getString("location");
 
@@ -134,9 +135,11 @@ public class CreateEventActivity extends AppCompatActivity implements TimePicker
                             valuesEvent.put(DataBaseTables.EVENTS_TIME_TO,respEventDTO.getTimeTo().toString());
                             valuesEvent.put(DataBaseTables.EVENTS_SPORTS_FILED_ID,sportsFieldId);
                             valuesEvent.put(DataBaseTables.SERVER_ID,respEventDTO.getId());
-                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,respEventDTO.getNumOfParticipants());
+                            valuesEvent.put(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,1);
                             valuesEvent.put(DataBaseTables.EVENTS_APPLICATION_STATUS,"CREATOR");
                             valuesEvent.put(DataBaseTables.EVENTS_CREATOR,respEventDTO.getCreator());
+                            valuesEvent.put(DataBaseTables.EVENTS_CATEGORY,category);
+                            valuesEvent.put(DataBaseTables.EVENTS_CREATOR_ID,JwtTokenUtils.getUserId(CreateEventActivity.this));
 
 
 

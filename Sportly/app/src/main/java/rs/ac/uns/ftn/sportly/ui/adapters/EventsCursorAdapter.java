@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -55,5 +56,27 @@ public class EventsCursorAdapter extends SimpleCursorAdapter {
         descriptionText.setText(cursor.getString(descriptionIndex));
         timeFromText.setText(cursor.getString(timeFromIndex));
         timeToText.setText(cursor.getString(timeToIndex));
+
+        String category = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_CATEGORY));
+        ImageView imageView = view.findViewById(R.id.list_event_image);
+
+        switch (category) {
+            case "football":{
+                imageView.setImageResource(R.drawable.ic_football_event);
+            }break;
+
+            case "basketball":{
+                imageView.setImageResource(R.drawable.ic_basketball_event);
+            }break;
+
+            case "tennis":{
+                imageView.setImageResource(R.drawable.ic_tennis_event);
+            }break;
+
+            default:{
+                System.out.println("EVENT CATEGORY DOES NOT EXIST");
+            }
+        }
+
     }
 }

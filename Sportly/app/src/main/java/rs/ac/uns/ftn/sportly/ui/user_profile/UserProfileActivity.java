@@ -31,6 +31,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
@@ -163,6 +164,16 @@ public class UserProfileActivity extends AppCompatActivity {
                     UserProfileAdapter adapter = new UserProfileAdapter(UserProfileActivity.this, response.body().getRatings(),names);
 
                     listView.setAdapter(adapter);
+
+                    listView.setOnItemClickListener((parent, view, position, id) -> {
+                        Long userId = adapter.getRatings().get(position).getCreatorId();
+
+                        Intent intent = new Intent(UserProfileActivity.this, UserProfileActivity.class);
+
+                        intent.putExtra("id",userId);
+
+                        startActivity(intent);
+                    });
                 }else{
                     Log.i("GET USER", "CALL TO SERVER RESPONSE CODE: "+response.code());
                 }

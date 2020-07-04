@@ -128,6 +128,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private LinearLayout sportsFieldInfo;
     private SearchView searchView;
     private MenuItem searchViewMenuItem;
+    private String category;
 
 
     public static MapFragment newInstance() {
@@ -142,11 +143,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         public Long sportsFieldId;
         public Long sportsFieldServerId;
         public Integer isFavorite;
+        public String category;
+        public String placeName;
 
-        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite) {
+        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite,String category, String placeName) {
             this.sportsFieldId = sportsFieldId;
             this.sportsFieldServerId = sportsFieldServerId;
             this.isFavorite = isFavorite;
+            this.category = category;
+            this.placeName = placeName;
         }
     }
 
@@ -297,6 +302,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 intent.putExtra("location", placeName);
                 intent.putExtra("sportsFieldServerId", MapFragment.this.selectedSportsFieldServerId);
                 intent.putExtra("sportsFieldId", MapFragment.this.selectedSportsFieldId);
+                intent.putExtra("category",category);
 
 
                 mainActivity.startActivity(intent);
@@ -755,7 +761,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
 
-            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite);
+            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite,category,name);
             marker.setTag(markerData);
 
             markersMap.get(category).add(marker);
@@ -801,6 +807,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                     MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
                     MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
+                    MapFragment.this.category = markerData.category;
+                    MapFragment.this.placeName = markerData.placeName;
 
 
                     if(getLoaderManager().getLoader(0)!=null){
@@ -1066,14 +1074,16 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     DataBaseTables.EVENTS_TIME_FROM,
                     DataBaseTables.EVENTS_TIME_TO,
                     DataBaseTables.EVENTS_APPLICATION_STATUS,
+                    DataBaseTables.EVENTS_CATEGORY,
                     DataBaseTables.SERVER_ID,
                     DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
             };
 
 
-            Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.SPORTSFIELDS_EVENTS + "/" + args.getLong("sportsFieldsId"));
+            Uri uri = Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_EVENTS);
 
-            String selection = DataBaseTables.EVENTS_DATE_FROM+"='"+args.getString("dateFilter")+"'";
+            String selection = DataBaseTables.EVENTS_SPORTS_FILED_ID + " = "+args.getLong("sportsFieldsId")
+                    + " AND " + DataBaseTables.EVENTS_DATE_FROM+"='"+args.getString("dateFilter")+"'";
 
             return new CursorLoader(getActivity(), uri, allColumns, selection, null, null);
         }else{

@@ -14,11 +14,13 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.rating.RatingActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:noHistory="true"/>
 
         <activity
             android:name=".ui.event.create_event.CreateEventActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:noHistory="true"/>
 
         <activity
             android:name=".ui.event.edit_event.EditEventActivity"

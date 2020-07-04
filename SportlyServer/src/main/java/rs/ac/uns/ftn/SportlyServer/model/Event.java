@@ -73,6 +73,8 @@ public class Event {
         dto.setCurr(this.getCurr());
         dto.setDescription(this.getDescription());
         dto.setSportsFieldId(this.sportsField.getId());
+        dto.setCategory(this.sportsField.getCategory());
+        dto.setCreatorId(this.creator.getId());
         dto.setCreator(this.creator.getFirstName()+ " " +creator.getLastName());
         return dto;
     }

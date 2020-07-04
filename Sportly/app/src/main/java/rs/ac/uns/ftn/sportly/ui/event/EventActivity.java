@@ -45,6 +45,7 @@ import rs.ac.uns.ftn.sportly.model.Event;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.ApplicationListActivity;
 import rs.ac.uns.ftn.sportly.ui.event.edit_event.EditEventActivity;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 public class EventActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -67,6 +68,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private Button cancelButton;
     private Integer numOfParticipants;
     private Long sportsFieldId;
+    private Long creatorId;
 
 
     @Override
@@ -98,6 +100,17 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         tvCreator = findViewById(R.id.creator);
         tvDescription = findViewById(R.id.description);
         imageView = findViewById(R.id.eventSportsfieldImage);
+
+        Button checkCreatorButton = findViewById(R.id.checkCreatorButton);
+        checkCreatorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(v.getContext(), UserProfileActivity.class);
+                intent.putExtra("id",creatorId);
+                startActivity(intent);
+            }
+        });
 
         Button applicationListButton = findViewById(R.id.applicationListButton);
         applicationListButton.setOnClickListener(new View.OnClickListener() {
@@ -433,6 +446,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_CREATOR,
+                DataBaseTables.EVENTS_CREATOR_ID
         };
 
 
@@ -487,6 +501,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
             String description = data.getString(data.getColumnIndex(DataBaseTables.EVENTS_DESCRIPTION));
 
             eventStatus = data.getString(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_APPLICATION_STATUS));
+
+            creatorId = data.getLong(data.getColumnIndexOrThrow(DataBaseTables.EVENTS_CREATOR_ID));
 
             if (isCreator.equals("CREATOR")) {
                 LinearLayout creatorButtons = findViewById(R.id.creatorButtons);

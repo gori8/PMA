@@ -91,6 +91,11 @@ public class SyncServiceImpl implements SyncService {
             }
 
             for (Event event : sportsField.getEvents()){
+
+                if(event.isDeleted()){
+                    continue;
+                }
+
                 System.out.println("EVENT FROM: "+event.getDateFrom());
                 Long time = new Date().getTime();
                 Date date = new Date(time - time % (24 * 60 * 60 * 1000)-2*(60 * 60 * 1000));

@@ -78,17 +78,8 @@ public class InviteRequestCursorAdapter extends SimpleCursorAdapter {
         int participantsIndex=cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS);
 
         Long eventId = cursor.getLong(eventIdIndex);
-        Long sportsFieldId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_SPORTS_FILED_ID));
 
-        Cursor spCursor = context.getContentResolver().query(
-                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
-                new String[]{DataBaseTables.SPORTSFIELDS_CATEGORY},
-                DataBaseTables.SERVER_ID + " = " + sportsFieldId,
-                null,
-                null
-        );
-        spCursor.moveToFirst();
-        String category = spCursor.getString(spCursor.getColumnIndexOrThrow(DataBaseTables.SPORTSFIELDS_CATEGORY));
+        String category = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_CATEGORY));
 
         if(category.equals("basketball")){
             imageView.setImageResource(R.drawable.ic_basketball_event);

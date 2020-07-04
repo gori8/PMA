@@ -223,6 +223,7 @@
                             android:imeOptions="actionDone"
                             android:singleLine="true"
                             android:hint="@string/label_price"
+                            android:layout_marginLeft="5dp"
                             android:layout_width="match_parent"
                             android:inputType="numberDecimal"/>
 

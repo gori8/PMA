@@ -158,6 +158,17 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                 listView.setAdapter(adapter);
 
 
+                listView.setOnItemClickListener((parent, vieww, positionLv, idLv) -> {
+                    Cursor cursor = (Cursor)adapter.getItem(positionLv);
+                    Long eventId = cursor.getLong(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+                    Long sportsFieldId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_SPORTS_FILED_ID));
+
+                    Intent intent = new Intent(getActivity(), EventActivity.class);
+                    intent.putExtra("eventId", eventId);
+                    intent.putExtra("sportsFieldId", sportsFieldId);
+                    getActivity().startActivity(intent);
+
+                });
 
 
             }
@@ -201,6 +212,7 @@ public class MyEventsFragment extends Fragment implements LoaderManager.LoaderCa
                 DataBaseTables.EVENTS_TIME_FROM,
                 DataBaseTables.EVENTS_TIME_TO,
                 DataBaseTables.EVENTS_APPLICATION_STATUS,
+                DataBaseTables.EVENTS_CATEGORY,
                 DataBaseTables.SERVER_ID,
                 DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
         };
