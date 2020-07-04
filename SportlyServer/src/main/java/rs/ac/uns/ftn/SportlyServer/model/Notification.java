@@ -5,7 +5,9 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.SportlyServer.dto.NotificationDTO;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -13,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Notification {
+public class Notification implements Comparable<Notification>  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,8 +27,13 @@ public class Notification {
 
     private String title;
 
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     protected User user;
+
+    @Override
+    public int compareTo(Notification n) {
+        return getDate().compareTo(n.getDate());
+    }
 }

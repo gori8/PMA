@@ -114,11 +114,12 @@ public class UserProfileActivity extends AppCompatActivity {
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("thumb_image").getValue() != null){
+                    String image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                String image = dataSnapshot.child("thumb_image").getValue().toString();
-
-                Picasso.get().load(image)
-                        .placeholder(R.drawable.default_avatar).into(imageView);
+                    Picasso.get().load(image)
+                            .placeholder(R.drawable.default_avatar).into(imageView);
+                }
             }
 
             @Override

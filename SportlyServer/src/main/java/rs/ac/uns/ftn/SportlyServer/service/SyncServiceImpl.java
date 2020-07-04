@@ -7,6 +7,9 @@ import rs.ac.uns.ftn.SportlyServer.model.*;
 import rs.ac.uns.ftn.SportlyServer.repository.SportsFieldRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -40,18 +43,30 @@ public class SyncServiceImpl implements SyncService {
         syncDataDTO.setFriends(friendshipService.getUserFriends(username));
         syncDataDTO.getFriends().addAll(friendshipService.getFriendRequests(username));
 
+        Collections.sort(user.getNotifications(), Collections.reverseOrder());
+
         for (Notification notification : user.getNotifications()){
             NotificationDTO notificationDTO = new NotificationDTO();
             notificationDTO.setId(notification.getId());
             notificationDTO.setMessage(notification.getMessage());
             notificationDTO.setTitle(notification.getTitle());
             notificationDTO.setType(notification.getType());
-            notificationDTO.setDate(notification.getDate());
+
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+            String dateString = notification.getDate().format(dateFormatter);
+            String todayString = LocalDateTime.now().format(dateFormatter);
+
+            if(dateString.equals(todayString)){
+                String timeString = notification.getDate().format(timeFormatter);
+                notificationDTO.setDate(timeString);
+            }
+            else{
+                notificationDTO.setDate(dateString);
+            }
 
             syncDataDTO.getNotifications().add(notificationDTO);
         }
-
-        Collections.sort(syncDataDTO.getNotifications(), Collections.reverseOrder());
 
 
         //SPORTS FIELDS DATA

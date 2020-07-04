@@ -37,6 +37,8 @@ public class SportlyContentProvider extends ContentProvider {
     private static final int APPLICATION_LIST = 11;
     private static final int APPLICATION_LIST_SERVER_ID = 12;
     private static final int FRIENDS_TO_INVITE_FOR_EVENT = 13;
+    private static final int NOTIFICATIONS = 14;
+    private static final int NOTIFICATIONS_SERVER_ID = 15;
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -58,6 +60,8 @@ public class SportlyContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST, APPLICATION_LIST);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_APPLICATION_LIST + "/*", APPLICATION_LIST_SERVER_ID);
         sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_FRIENDS+"/invite", FRIENDS_TO_INVITE_FOR_EVENT);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_NOTIFICATIONS, NOTIFICATIONS);
+        sURIMatcher.addURI(AUTHORITY, DataBaseTables.TABLE_NOTIFICATIONS + "/#", NOTIFICATIONS_SERVER_ID);
     }
 
     @Override
@@ -136,6 +140,14 @@ public class SportlyContentProvider extends ContentProvider {
                 cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
                 return cursor;
+            case NOTIFICATIONS_SERVER_ID:
+                queryBuilder.appendWhere(DataBaseTables.SERVER_ID + "="
+                        + uri.getLastPathSegment());
+                queryBuilder.setTables(DataBaseTables.TABLE_NOTIFICATIONS);
+                break;
+            case NOTIFICATIONS:
+                queryBuilder.setTables(DataBaseTables.TABLE_NOTIFICATIONS);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }

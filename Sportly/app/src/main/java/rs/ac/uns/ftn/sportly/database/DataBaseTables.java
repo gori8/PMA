@@ -12,9 +12,6 @@ public class DataBaseTables {
     public static final String FRIENDS_USERNAME = "username";
     public static final String FRINEDS_TYPE = "friends_type";
 
-
-    public static final String TABLE_NOTIFICATIONS = "notifications";
-
     //SPORTSFIELDS
     public static final String TABLE_SPORTSFIELDS = "sportsfields";
     public static final String SPORTSFIELDS_DESCRIPTION = "description";
@@ -58,6 +55,13 @@ public class DataBaseTables {
     public static final String APPLICATION_LIST_STATUS = "status";
     public static final String APPLICATION_LIST_REQUEST_ID = "request_id";
     public static final String APPLICATION_LIST_PARTICIPATION_ID = "participation_id";
+
+    //NOTIFICATIONS
+    public static final String TABLE_NOTIFICATIONS = "notifications";
+    public static final String NOTIFICATIONS_MESSAGE = "message";
+    public static final String NOTIFICATIONS_TYPE = "type";
+    public static final String NOTIFICATIONS_TITTLE = "title";
+    public static final String NOTIFICATIONS_DATE = "date";
 
     //CREATE SQL
     public static final String FRIENDS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_FRIENDS+"("
@@ -111,4 +115,12 @@ public class DataBaseTables {
             + APPLICATION_LIST_PARTICIPATION_ID + " integer, "
             + SERVER_ID + " TEXT NOT NULL, UNIQUE("+SERVER_ID+"), "
             + "FOREIGN KEY ("+APPLICATION_LIST_EVENT_SERVER_ID+") REFERENCES "+TABLE_EVENTS+"("+SERVER_ID+"))";
+
+    public static final String NOTIFICATIONS_CREATE = "CREATE TABLE "+DataBaseTables.TABLE_NOTIFICATIONS+"("
+            + ID + " integer primary key autoincrement ,"
+            + NOTIFICATIONS_MESSAGE + " text, "
+            + NOTIFICATIONS_TITTLE + " text, "
+            + NOTIFICATIONS_TYPE + " text, "
+            + NOTIFICATIONS_DATE + " text, "
+            + SERVER_ID + " INTEGER NOT NULL, UNIQUE("+SERVER_ID+"))";
 }

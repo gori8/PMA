@@ -9,7 +9,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NotificationDTO implements Comparable<NotificationDTO> {
+public class NotificationDTO {
 
     private Long id;
 
@@ -19,10 +19,5 @@ public class NotificationDTO implements Comparable<NotificationDTO> {
 
     private String title;
 
-    private Date date;
-
-    @Override
-    public int compareTo(NotificationDTO n) {
-        return getDate().compareTo(n.getDate());
-    }
+    private String date;
 }

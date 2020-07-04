@@ -8,6 +8,7 @@ import rs.ac.uns.ftn.SportlyServer.model.User;
 import rs.ac.uns.ftn.SportlyServer.repository.NotificationRepository;
 import rs.ac.uns.ftn.SportlyServer.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
         String type = data.get("notificationType");
         String title = request.getTitle();
         String message = request.getMessage();
-        Date date = new Date();
+        LocalDateTime date = LocalDateTime.now();
         String userId = request.getTopic();
 
         Long id = Long.parseLong(userId);

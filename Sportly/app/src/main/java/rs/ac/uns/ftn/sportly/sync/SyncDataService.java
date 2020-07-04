@@ -24,6 +24,7 @@ import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.ApplierDTO;
 import rs.ac.uns.ftn.sportly.dto.EventDTO;
 import rs.ac.uns.ftn.sportly.dto.FriendDTO;
+import rs.ac.uns.ftn.sportly.dto.NotificationDTO;
 import rs.ac.uns.ftn.sportly.dto.PeopleDTO;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
@@ -64,6 +65,7 @@ public class SyncDataService extends Service {
                         List<Long> allFriends = new ArrayList<>();
                         List<Long> allEvents = new ArrayList<>();
                         List<String> allApplicationLists = new ArrayList<>();
+                        List<Long> allNotifications = new ArrayList<>();
 
                         //FRIENDS
                         for(FriendDTO friendDTO : syncDataDTO.getFriends()){
@@ -94,6 +96,35 @@ public class SyncDataService extends Service {
                         deleteIfNotOnServer(
                                 Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_FRIENDS),
                                 allFriends,
+                                "LONG"
+                        );
+
+                        //NOTIFICATIONS
+                        for(NotificationDTO notificationDTO : syncDataDTO.getNotifications()){
+                            System.out.println("---NOTIFICATION---");
+                            System.out.println("TITTLE:"+notificationDTO.getTitle());
+                            System.out.println("TYPE:"+notificationDTO.getType());
+                            System.out.println("MESSAGE:"+notificationDTO.getMessage());
+                            System.out.println("DATE:"+notificationDTO.getDate());
+                            System.out.println("SERVER ID:"+notificationDTO.getId());
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.NOTIFICATIONS_TITTLE,notificationDTO.getTitle());
+                            values.put(DataBaseTables.NOTIFICATIONS_TYPE,notificationDTO.getType());
+                            values.put(DataBaseTables.NOTIFICATIONS_MESSAGE,notificationDTO.getMessage());
+                            values.put(DataBaseTables.NOTIFICATIONS_DATE,notificationDTO.getDate());
+                            values.put(DataBaseTables.SERVER_ID,notificationDTO.getId());
+
+                            getContentResolver().insert(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
+                                    values);
+
+                            allNotifications.add(notificationDTO.getId());
+                        }
+
+                        deleteIfNotOnServer(
+                                Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
+                                allNotifications,
                                 "LONG"
                         );
 

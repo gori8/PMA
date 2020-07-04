@@ -99,10 +99,12 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                String image = dataSnapshot.child("thumb_image").getValue().toString();
+                if(dataSnapshot.child("thumb_image").getValue() != null){
+                    String image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                Picasso.get().load(image)
-                        .placeholder(R.drawable.default_avatar).into(imageView);
+                    Picasso.get().load(image)
+                            .placeholder(R.drawable.default_avatar).into(imageView);
+                }
             }
 
             @Override

@@ -13,9 +13,13 @@ public class NotificationDTO implements Comparable<NotificationDTO> {
 
     private Long id;
 
-    private String content;
+    private String message;
 
-    private Date date;
+    private String type;
+
+    private String title;
+
+    private String date;
 
     @Override
     public int compareTo(NotificationDTO n) {
