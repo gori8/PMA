@@ -81,11 +81,11 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 }break;
 
                 case "APPLY_FOR_EVENT":{
-                    mainActivity.bottomNavigationView.setSelectedItemId(R.id.navigation_my_events);
+                    mainActivity.navController.navigate(R.id.navigation_my_events);
                 }break;
 
                 case "ACCEPTED_APPLICATION":{
-                    mainActivity.bottomNavigationView.setSelectedItemId(R.id.navigation_my_events);
+                    mainActivity.navController.navigate(R.id.navigation_my_events);
                 }break;
 
                 default:{

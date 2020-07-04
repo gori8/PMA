@@ -19,11 +19,14 @@ import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
+import rs.ac.uns.ftn.sportly.ui.event.EventActivity;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.InviteCursorAdapter;
 import rs.ac.uns.ftn.sportly.ui.event.application_list.InviteFragment;
+import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
 
@@ -56,6 +59,18 @@ public class InviteRequestFragment extends Fragment implements LoaderManager.Loa
         adapter = new InviteRequestCursorAdapter(getActivity(), R.layout.invite_request_item, null, from, to);
         ListView listView = (ListView) getActivity().findViewById(R.id.invite_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, vieww, positionLv, idLv) -> {
+            Cursor cursor = (Cursor)adapter.getItem(positionLv);
+            Long eventId = cursor.getLong(cursor.getColumnIndex(DataBaseTables.SERVER_ID));
+            Long sportsFieldId = cursor.getLong(cursor.getColumnIndexOrThrow(DataBaseTables.EVENTS_SPORTS_FILED_ID));
+
+            Intent intent = new Intent(getActivity(), EventActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("sportsFieldId", sportsFieldId);
+            getActivity().startActivity(intent);
+
+        });
     }
 
     @Override

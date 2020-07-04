@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.SportlyServer.dto.PushNotificationRequest;
 import rs.ac.uns.ftn.SportlyServer.firebase.FCMService;
+import rs.ac.uns.ftn.SportlyServer.model.Notification;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -26,8 +30,15 @@ public class PushNotificationService {
 
     public void sendPushNotification(PushNotificationRequest request, Map<String,String> data) {
         try {
+            Notification notification = notificationService.addNotification(request, data);
+            data.put("id",notification.getId().toString());
+
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+            String timeString = notification.getDate().format(timeFormatter);
+            data.put("date",timeString);
+
             fcmService.sendMessage(data, request);
-            notificationService.addNotification(request, data);     //sacuvaj u bazi
         } catch (InterruptedException | ExecutionException e) {
             logger.error(e.getMessage());
         }

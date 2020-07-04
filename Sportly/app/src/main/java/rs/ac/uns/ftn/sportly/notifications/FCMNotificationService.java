@@ -159,7 +159,17 @@ public class FCMNotificationService extends FirebaseMessagingService {
                         valuesEvent,
                         DataBaseTables.SERVER_ID+" = "+data.get("eventId"),
                         null);
-            }else if(data.get("notificationType").equals("RATING_REQUEST")){
+            }
+            else if(data.get("notificationTyp").equals("EVENT_DELETED")){
+
+                getContentResolver().delete(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
+                        DataBaseTables.SERVER_ID + " = " + data.get("eventId"),
+                        null
+                );
+
+            }
+            else if(data.get("notificationType").equals("RATING_REQUEST")){
                 for(String key : data.keySet()){
                     if(key.equals("notificationType") || key.equals("message") || key.equals("title")){
                         continue;
@@ -167,6 +177,17 @@ public class FCMNotificationService extends FirebaseMessagingService {
                     ints.putExtra(key,data.get(key));
                 }
             }
+
+            ContentValues values = new ContentValues();
+            values.put(DataBaseTables.NOTIFICATIONS_TITTLE,data.get("title"));
+            values.put(DataBaseTables.NOTIFICATIONS_TYPE,data.get("notificationType"));
+            values.put(DataBaseTables.NOTIFICATIONS_MESSAGE,data.get("message"));
+            values.put(DataBaseTables.NOTIFICATIONS_DATE,data.get("date"));
+            values.put(DataBaseTables.SERVER_ID,data.get("id"));
+
+            getContentResolver().insert(
+                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
+                    values);
 
             ints.putExtra("notificationType",data.get("notificationType"));
 

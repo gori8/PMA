@@ -85,6 +85,10 @@ public class NotificationCursorAdapter extends SimpleCursorAdapter {
                 imageView.setImageResource(R.drawable.ic_notification_rating_request);
             }break;
 
+            case "EVENT_DELETED":{
+                imageView.setImageResource(R.drawable.ic_notification_event_delete);
+            }break;
+
             default:{
                 System.out.println("NOTIFICATION TYPE IS NOT IMPLEMENTED");
             }

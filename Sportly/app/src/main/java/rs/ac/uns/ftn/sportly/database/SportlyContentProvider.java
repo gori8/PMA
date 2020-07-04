@@ -147,6 +147,7 @@ public class SportlyContentProvider extends ContentProvider {
                 break;
             case NOTIFICATIONS:
                 queryBuilder.setTables(DataBaseTables.TABLE_NOTIFICATIONS);
+                sortOrder = DataBaseTables.SERVER_ID + " DESC";
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);

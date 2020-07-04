@@ -182,8 +182,24 @@ public class EventServiceImpl implements EventService {
         if(event == null || event.isDeleted())
             return null;
 
+        for (Participation participation : event.getParticipationList()){
+
+            Map<String,String> data = new HashMap<>();
+            data.put("eventId",event.getId().toString());
+            data.put("notificationType","EVENT_DELETED");
+            data.put("title","Event has been deleted.");
+            data.put("message",event.getCreator().getFirstName() + " " + event.getCreator().getLastName()+ " has deleted "+event.getName()+" event.");
+
+            PushNotificationRequest notificationRequest = new PushNotificationRequest();
+            notificationRequest.setMessage(event.getCreator().getFirstName() + " " + event.getCreator().getLastName()+ " has deleted "+event.getName()+" event.");
+            notificationRequest.setTitle("Event has been deleted.");
+            notificationRequest.setTopic(participation.getUser().getId().toString());
+            pushNotificationService.sendPushNotification(notificationRequest,data);
+        }
+
         event.setDeleted(true);
         eventRepository.save(event);
+
         return event.createEventDTO();
     }
 

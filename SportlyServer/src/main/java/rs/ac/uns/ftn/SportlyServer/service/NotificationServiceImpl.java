@@ -22,7 +22,7 @@ public class NotificationServiceImpl implements NotificationService {
     UserRepository userRepository;
 
     @Override
-    public void addNotification(PushNotificationRequest request, Map<String, String> data) {
+    public Notification addNotification(PushNotificationRequest request, Map<String, String> data) {
         String type = data.get("notificationType");
         String title = request.getTitle();
         String message = request.getMessage();
@@ -32,7 +32,7 @@ public class NotificationServiceImpl implements NotificationService {
         Long id = Long.parseLong(userId);
         User user = userRepository.getOne(id);
         if(user == null)
-            return;
+            return null;
 
         Notification notification = new Notification();
         notification.setTitle(title);
@@ -44,5 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         user.getNotifications().add(newNotification);
         userRepository.save(user);
+
+        return notification;
     }
 }
