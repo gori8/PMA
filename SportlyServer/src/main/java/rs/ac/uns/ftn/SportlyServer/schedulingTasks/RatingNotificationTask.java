@@ -29,10 +29,11 @@ public class RatingNotificationTask {
     EventService eventService;
 
     @Autowired
-    PushNotificationService pushNotificationService;
+    EventRepository eventRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    PushNotificationService pushNotificationService;
+
 
     @Transactional
     @Scheduled(fixedRate = 60000)   //na 1 min (60000)

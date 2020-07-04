@@ -48,6 +48,7 @@ import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
+import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     AppBarConfiguration appBarConfiguration;
     NavController navController;
 
-    public static String SYNC_DATA = "SYNC_DATA";
     public static String NOTIFICATION_INTENT = "NOTIFICATION";
 
 
@@ -145,7 +145,22 @@ public class MainActivity extends AppCompatActivity {
         final Button button = findViewById(R.id.logout);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showLogoutPopup();
+
+                if(SportlyUtils.getConnectivityStatus(MainActivity.this) == 0){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setMessage("You are not signed in.").
+                            setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+
+                    AlertDialog alert1 = alert.create();
+                    alert1.show();
+                }
+                else {
+                    showLogoutPopup();
+                }
             }
         });
     }
@@ -159,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     private void showLogoutPopup() {
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
         alert.setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Sign out", new DialogInterface.OnClickListener()                 {
+                .setPositiveButton("Sign out", new DialogInterface.OnClickListener(){
 
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -179,9 +194,8 @@ public class MainActivity extends AppCompatActivity {
                                             email = true;
                                         }
 
-                                        if(google || facebook || email) {
-                                            goToLoginActivity();
-                                        }
+                                        goToLoginActivity();
+
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @SneakyThrows

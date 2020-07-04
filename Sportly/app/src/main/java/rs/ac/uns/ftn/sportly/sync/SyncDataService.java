@@ -30,6 +30,7 @@ import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.dto.SyncDataDTO;
 import rs.ac.uns.ftn.sportly.model.firebase.Friends;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
@@ -40,9 +41,7 @@ public class SyncDataService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Intent ints = new Intent(MainActivity.SYNC_DATA);
         int status = SportlyUtils.getConnectivityStatus(getApplicationContext());
-        ints.putExtra(RESULT_CODE, status);
 
 
         Log.d("SERVICE", "--------------SERVICE--------------");
@@ -258,7 +257,16 @@ public class SyncDataService extends Service {
 
         }
 
-        //sendBroadcast(ints);
+        if(intent.getStringExtra("flagStarted")!=null) {
+            if (intent.getStringExtra("flagStarted").equals("LoginActivity")) {
+
+                Intent ints = new Intent(LoginActivity.SYNC_DATA_FINISHED);
+
+                ints.putExtra("authType", intent.getStringExtra("authType"));
+
+                sendBroadcast(ints);
+            }
+        }
 
         stopSelf();
 
