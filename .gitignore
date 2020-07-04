@@ -4,7 +4,7 @@ SportlyServer/src/main/resources/
 
 
 # Built application files
-*.apk
+.apk
 *.aar
 *.ap_
 *.aab
