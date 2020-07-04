@@ -310,6 +310,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 30*1000, pendingIntent);
+
+        String goToFragment = getIntent().getStringExtra("goto_fragment");
+
+        if(goToFragment!=null){
+            if(goToFragment.equals("FriendsFragment")){
+                this.bottomNavigationView.setSelectedItemId(R.id.navigation_friends);
+            }else if(goToFragment.equals("MyEventsFragment")){
+                this.navController.navigate(R.id.navigation_my_events);
+            }
+        }
     }
 
 
@@ -344,6 +354,8 @@ public class MainActivity extends AppCompatActivity {
 
         mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
+
+
 
 
 }
