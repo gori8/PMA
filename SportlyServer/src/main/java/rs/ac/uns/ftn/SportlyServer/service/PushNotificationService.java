@@ -31,7 +31,7 @@ public class PushNotificationService {
     public void sendPushNotification(PushNotificationRequest request, Map<String,String> data) {
         try {
             Notification notification = notificationService.addNotification(request, data);
-            data.put("id",notification.getId().toString());
+            data.put("notificationId",notification.getId().toString());
 
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 

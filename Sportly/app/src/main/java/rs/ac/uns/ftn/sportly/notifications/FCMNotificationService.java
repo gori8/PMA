@@ -185,7 +185,7 @@ public class FCMNotificationService extends FirebaseMessagingService {
                 values.put(DataBaseTables.NOTIFICATIONS_TYPE, data.get("notificationType"));
                 values.put(DataBaseTables.NOTIFICATIONS_MESSAGE, data.get("message"));
                 values.put(DataBaseTables.NOTIFICATIONS_DATE, data.get("date"));
-                values.put(DataBaseTables.SERVER_ID, data.get("id"));
+                values.put(DataBaseTables.SERVER_ID, data.get("notificationId"));
 
                 getContentResolver().insert(
                         Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
