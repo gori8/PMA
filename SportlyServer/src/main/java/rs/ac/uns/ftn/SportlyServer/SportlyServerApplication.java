@@ -139,6 +139,7 @@ public class SportlyServerApplication {
 				sportsField.setLongitude(dto.getGeometry().getLocation().getLng());
 				sportsField.setPlace_id(dto.getPlace_id());
 				sportsField.setCategory(category);
+				sportsField.setPhotoReference(dto.getPhotos().get(0).getPhoto_reference());
 
 				sportsFieldRepository.save(sportsField);
 			}catch (Exception e){

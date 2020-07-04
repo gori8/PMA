@@ -29,4 +29,7 @@ public class SportsFieldDTO {
     private String category;
 
     private boolean favorite;
+
+    private String imageRef;
+
 }

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -37,7 +38,7 @@ public class EventsCursorAdapter extends SimpleCursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
-
+        
         TextView eventNameText = (TextView)view.findViewById(R.id.list_event_name);
         TextView timeFromText = (TextView)view.findViewById(R.id.list_event_time_from);
         TextView timeToText = (TextView)view.findViewById(R.id.list_event_time_to);

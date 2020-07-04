@@ -70,6 +70,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -128,6 +129,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private LinearLayout sportsFieldInfo;
     private SearchView searchView;
     private MenuItem searchViewMenuItem;
+    private CircleImageView sfImage;
 
 
     public static MapFragment newInstance() {
@@ -142,11 +144,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         public Long sportsFieldId;
         public Long sportsFieldServerId;
         public Integer isFavorite;
+        public String imageRef;
 
-        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite) {
+        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite, String imageRef) {
             this.sportsFieldId = sportsFieldId;
             this.sportsFieldServerId = sportsFieldServerId;
             this.isFavorite = isFavorite;
+            this.imageRef = imageRef;
         }
     }
 
@@ -276,6 +280,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        sfImage = view.findViewById(R.id.place_info_image);
+
+
         slidingPanel.setFadeOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -711,14 +719,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
 
-        LatLng latLngForSearch = new LatLng(45.253513,19.829127);
 
-        String mockLocationProvider = LocationManager.GPS_PROVIDER;
 
-        location = new Location(mockLocationProvider);
-
-        location.setLatitude(latLngForSearch.latitude);
-        location.setLongitude(latLngForSearch.longitude);
 
         String[] allColumns = {
                 DataBaseTables.ID,
@@ -728,6 +730,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 DataBaseTables.SPORTSFIELDS_NAME,
                 DataBaseTables.SPORTSFIELDS_FAVORITE,
                 DataBaseTables.SPORTSFIELDS_CATEGORY,
+                DataBaseTables.SPORTSFIELDS_IMAGE_REF,
                 DataBaseTables.SERVER_ID
         };
 
@@ -743,6 +746,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             Long sportsFieldServerId = data.getLong(data.getColumnIndex(DataBaseTables.SERVER_ID));
             Integer isFavorite = data.getInt(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_FAVORITE));
             Long id = data.getLong(data.getColumnIndex(DataBaseTables.ID));
+            String imageRef = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_IMAGE_REF));
+            //Log.i("IMAGE_REF_DATABSE","IMAGE REF DATABASE "+imageRef);
 
 
             Marker marker = null;
@@ -755,7 +760,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
 
-            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite);
+            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite,imageRef);
             marker.setTag(markerData);
 
             markersMap.get(category).add(marker);
@@ -776,6 +781,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         sportsFieldInfo.setVisibility(View.VISIBLE);
                         searchSportsFieldsListView.setVisibility(View.GONE);
                     }
+
+
 
                     MarkerData markerData = (MarkerData)marker.getTag();
 
@@ -801,6 +808,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                     MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
                     MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
+
+                    //set Image of selected SportsField
+                    String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+markerData.imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
+                    Log.i("IMAGE_REF","IMAGE REF: "+markerData.imageRef);
+                    Picasso.get().load(imageUri)
+                            .placeholder(R.drawable.default_avatar).into(sfImage);
 
 
                     if(getLoaderManager().getLoader(0)!=null){
@@ -1087,6 +1100,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     DataBaseTables.SPORTSFIELDS_FAVORITE,
                     DataBaseTables.SPORTSFIELDS_CATEGORY,
                     DataBaseTables.SPORTSFIELDS_RATING,
+                    DataBaseTables.SPORTSFIELDS_IMAGE_REF,
                     DataBaseTables.SERVER_ID
             };
 

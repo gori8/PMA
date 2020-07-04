@@ -31,6 +31,8 @@ public class SportsField {
 
     private String category;
 
+    private String photoReference;
+
     @Column(unique=true)
     private String place_id;
 
@@ -52,6 +54,7 @@ public class SportsField {
         sportsFieldDTO.setLongitude(this.getLongitude());
         sportsFieldDTO.setRating(this.getRating());
         sportsFieldDTO.setCategory(this.getCategory());
+        sportsFieldDTO.setImageRef(this.getPhotoReference());
         return sportsFieldDTO;
     }
 }
