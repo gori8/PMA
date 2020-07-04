@@ -602,6 +602,11 @@ public class LoginActivity extends AppCompatActivity {
             userMap.put("thumb_image", "default");
             userMap.put("device_token", device_token);
 
+            if(authType.equals(GOOGLE)){
+                userMap.put("image", user.getPhotoUrl());
+                userMap.put("thumb_image", user.getPhotoUrl());
+            }
+
             mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
 
                 @Override

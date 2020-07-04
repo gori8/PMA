@@ -203,7 +203,7 @@ public class LoginServiceImpl implements  LoginService{
             ret.setEmail(email);
             ret.setIme(firstName);
             ret.setPrezime(lastName);
-            //ret.setPhotoUrl(pictureUrl);
+            ret.setPhotoUrl(pictureUrl);
             String jwt = tokenUtils.generateToken(email);
             int expiresIn = tokenUtils.getExpiredIn();
             ret.setExpiresIn(expiresIn);

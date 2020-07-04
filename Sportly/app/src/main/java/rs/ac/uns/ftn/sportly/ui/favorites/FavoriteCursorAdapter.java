@@ -59,7 +59,7 @@ public class FavoriteCursorAdapter extends SimpleCursorAdapter {
         String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
         Log.i("IMAGE_REF","IMAGE REF: "+imageRef);
         Picasso.get().load(imageUri)
-                .placeholder(R.drawable.default_avatar).into(imageView);
+                .placeholder(R.drawable.ic_location_on_black_24dp).into(imageView);
 
         RatingBar ratingBar = view.findViewById(R.id.favorite_ratingBar);
 

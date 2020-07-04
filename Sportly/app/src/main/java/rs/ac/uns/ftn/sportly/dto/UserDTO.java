@@ -21,4 +21,6 @@ public class UserDTO {
     private float rating;
     private int expiresIn;
     private boolean firstLogin;
+    private String photoUrl;
+
 }

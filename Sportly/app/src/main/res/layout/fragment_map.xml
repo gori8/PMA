@@ -138,7 +138,8 @@
                     android:layout_height="100dp"
                     android:layout_gravity="center"
                     android:layout_margin="16dp"
-                    android:src="@drawable/djacko" />
+                    android:src="@drawable/ic_location_on_black_24dp"
+                    />
 
                 <TextView
                     android:id="@+id/place_info_name"

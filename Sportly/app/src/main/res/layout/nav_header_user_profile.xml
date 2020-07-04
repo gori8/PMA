@@ -11,7 +11,7 @@
         android:layout_height="125dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:src="@drawable/ic_person_black_24dp"
+        android:src="@drawable/default_avatar"
         android:layout_marginBottom="10dp"
         app:civ_border_width="2dp"
         android:clickable="true"
@@ -48,10 +48,12 @@
         android:layout_height="wrap_content"
         android:gravity="center|bottom"
         android:id="@+id/creatorButtons"
-        android:weightSum="3"
+        android:weightSum="2"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="5dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp">
 
         <Button
             android:id="@+id/addFriendButton"

@@ -172,6 +172,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         markersMap.put("football",new ArrayList<>());
         markersMap.put("tennis",new ArrayList<>());
 
+
     }
 
     @Override
@@ -607,6 +608,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onLocationChanged(Location location) {
        if (map != null) {
            LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
+           myLoc.remove();
            myLoc = addMarker(loc,"My position", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         }
     }
@@ -874,7 +876,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+markerData.imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
         Log.i("IMAGE_REF","IMAGE REF: "+markerData.imageRef);
         Picasso.get().load(imageUri)
-                .placeholder(R.drawable.default_avatar).into(sfImage);
+                .placeholder(R.drawable.ic_location_on_black_24dp).into(sfImage);
 
 
         if(getLoaderManager().getLoader(0)!=null){

@@ -160,7 +160,7 @@ public class FCMNotificationService extends FirebaseMessagingService {
                         DataBaseTables.SERVER_ID+" = "+data.get("eventId"),
                         null);
             }
-            else if(data.get("notificationTyp").equals("EVENT_DELETED")){
+            else if(data.get("notificationType").equals("EVENT_DELETED")){
 
                 getContentResolver().delete(
                         Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_EVENTS),
@@ -178,17 +178,20 @@ public class FCMNotificationService extends FirebaseMessagingService {
                 }
             }
 
-            ContentValues values = new ContentValues();
-            values.put(DataBaseTables.NOTIFICATIONS_TITTLE,data.get("title"));
-            values.put(DataBaseTables.NOTIFICATIONS_TYPE,data.get("notificationType"));
-            values.put(DataBaseTables.NOTIFICATIONS_MESSAGE,data.get("message"));
-            values.put(DataBaseTables.NOTIFICATIONS_DATE,data.get("date"));
-            values.put(DataBaseTables.SERVER_ID,data.get("id"));
+            if(!data.get("notificationType").equals("CHAT")) {
 
-            getContentResolver().insert(
-                    Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
-                    values);
+                ContentValues values = new ContentValues();
+                values.put(DataBaseTables.NOTIFICATIONS_TITTLE, data.get("title"));
+                values.put(DataBaseTables.NOTIFICATIONS_TYPE, data.get("notificationType"));
+                values.put(DataBaseTables.NOTIFICATIONS_MESSAGE, data.get("message"));
+                values.put(DataBaseTables.NOTIFICATIONS_DATE, data.get("date"));
+                values.put(DataBaseTables.SERVER_ID, data.get("id"));
 
+                getContentResolver().insert(
+                        Uri.parse(SportlyContentProvider.CONTENT_URI + DataBaseTables.TABLE_NOTIFICATIONS),
+                        values);
+
+            }
             ints.putExtra("notificationType",data.get("notificationType"));
 
             ints.putExtra("title",data.get("title"));

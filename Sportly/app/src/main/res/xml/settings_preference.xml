@@ -11,22 +11,24 @@
 
         <SwitchPreferenceCompat
             android:key="notifications_enable_settings"
-            app:title="Enable notifications" />
+            app:title="Enable notifications"
+            android:defaultValue="true"/>
 
         <SwitchPreferenceCompat
             android:key="notifications_sounds_enable_settings"
-            app:title="Enable notifications sound" />
+            app:title="Enable notifications sound"
+            android:defaultValue="true"/>
 
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory
         android:key="sync_category"
-        app:title="Notifications">
+        app:title="Sync">
 
         <EditTextPreference
             android:key="sync_time_settings"
-            app:title="Sync time" >
-
+            app:title="Enter sync time(min)"
+            android:defaultValue="1">
         </EditTextPreference>
 
 

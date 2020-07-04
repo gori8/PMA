@@ -25,6 +25,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -71,6 +74,7 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
     private Long sportsFieldId;
     private Long creatorId;
     private String imageRef="";
+    private DatabaseReference mUserRef;
 
 
     @Override
@@ -78,6 +82,8 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(JwtTokenUtils.getUserId(this).toString());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -560,5 +566,21 @@ public class EventActivity extends AppCompatActivity implements LoaderManager.Lo
         tvCreator.setText(null);
         tvDescription.setText(null);
 
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mUserRef.child("online").setValue("true");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }

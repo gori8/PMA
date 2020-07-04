@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +47,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.SeekBarPreference;
 
 import java.util.List;
 
@@ -56,7 +59,7 @@ import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
 
     DrawerLayout drawer;
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
     }
 
     private void init() {
@@ -293,13 +297,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     protected void onResume() {
         super.onResume();
 
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences( this );
 
-        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 30*1000, pendingIntent);
+        String syncTimeStr = prefs.getString("sync_time_settings", "1");
+
+        Log.i("SYNC_TIME", "SYNC TIME " + syncTimeStr);
+
+        Long syncTime = Long.parseLong(syncTimeStr);
+
+        if (manager != null) {
+            manager.cancel(pendingIntent);
+        }
+
+
+
+        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 60*1000*syncTime, pendingIntent);
 
         String goToFragment = getIntent().getStringExtra("goto_fragment");
 
@@ -308,6 +326,12 @@ public class MainActivity extends AppCompatActivity {
                 this.bottomNavigationView.setSelectedItemId(R.id.navigation_friends);
             }else if(goToFragment.equals("MyEventsFragment")){
                 this.navController.navigate(R.id.navigation_my_events);
+            }else if (goToFragment.equals("InviteFragment")){
+                this.navController.navigate(R.id.navigation_invite);
+            }else if (goToFragment.equals("NotificationsFragment")){
+                this.bottomNavigationView.setSelectedItemId(R.id.navigation_notifications);
+            }else if (goToFragment.equals("ChatFragment")){
+                this.bottomNavigationView.setSelectedItemId(R.id.navigation_messages);
             }
         }
     }
@@ -322,7 +346,6 @@ public class MainActivity extends AppCompatActivity {
             manager.cancel(pendingIntent);
         }
         Log.i("MAIN ACTIVITY","ACTIVITY MAIN PAUSED");
-
 
 
 
@@ -344,8 +367,6 @@ public class MainActivity extends AppCompatActivity {
 
         mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
-
-
 
 
 }

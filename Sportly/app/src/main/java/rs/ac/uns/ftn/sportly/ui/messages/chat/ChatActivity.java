@@ -87,6 +87,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private String mLastKey = "";
     private String mPrevKey = "";
+    private DatabaseReference mUserRef;
+
 
 
     @Override
@@ -104,6 +106,9 @@ public class ChatActivity extends AppCompatActivity {
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mCurrentUserId = JwtTokenUtils.getUserId(this).toString();
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUserId);
+
 
         mChatUser = getIntent().getStringExtra("user_id");
         String userName = getIntent().getStringExtra("user_name");
@@ -505,5 +510,20 @@ public class ChatActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mUserRef.child("online").setValue("true");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }
