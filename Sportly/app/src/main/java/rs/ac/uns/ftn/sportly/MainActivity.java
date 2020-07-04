@@ -2,9 +2,11 @@ package rs.ac.uns.ftn.sportly;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -38,35 +40,45 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import java.util.List;
+
 import lombok.SneakyThrows;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.login.LoginActivity;
+import rs.ac.uns.ftn.sportly.ui.map.MapFragment;
 import rs.ac.uns.ftn.sportly.ui.user_profile.UserProfileActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TODO fragment se ponovo kreira kada se na toolbaru izabere vec selektovani!!!
 
     DrawerLayout drawer;
     NavigationView navigationView;
-    BottomNavigationView bottomNavigationView;
+    public BottomNavigationView bottomNavigationView;
     AppBarConfiguration appBarConfiguration;
-    NavController navController;
+    public NavController navController;
 
     public static String NOTIFICATION_INTENT = "NOTIFICATION";
+
+    public static String FAVOURITE_ONCLICK = "fav_onclick";
 
 
     private PendingIntent pendingIntent;
 
 
     private AlarmManager manager;
+
+    public Long selectedSf = null;
+
+
+
 
 
 
@@ -295,8 +307,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+
+
         manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 30*1000, pendingIntent);
     }
+
 
 
 
@@ -307,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
             manager.cancel(pendingIntent);
         }
         Log.i("MAIN ACTIVITY","ACTIVITY MAIN PAUSED");
+
 
 
 

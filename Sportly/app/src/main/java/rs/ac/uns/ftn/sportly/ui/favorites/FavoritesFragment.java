@@ -12,6 +12,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
@@ -26,14 +27,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.Marker;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.database.DataBaseTables;
 import rs.ac.uns.ftn.sportly.database.SportlyContentProvider;
 import rs.ac.uns.ftn.sportly.dto.SportsFieldDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.map.MapFragment;
 import rs.ac.uns.ftn.sportly.ui.rating.RatingActivity;
 
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -65,6 +70,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_favorites, container, false);
+
         return root;
     }
 
@@ -84,6 +90,18 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
 
         ListView listView = (ListView) getActivity().findViewById(R.id.favorite_list);
         listView.setAdapter(adapter);
+
+
+        listView.setOnItemClickListener((parent, vieww, positionLv, idLv) -> {
+            adapter.getCursor().moveToPosition(positionLv);
+            Long foundSFId = adapter.getCursor().getLong(adapter.getCursor().getColumnIndex(DataBaseTables.ID));
+
+            MainActivity mainActivity = (MainActivity)getActivity();
+            mainActivity.selectedSf = foundSFId;
+            mainActivity.bottomNavigationView.setSelectedItemId(R.id.navigation_map);
+
+
+        });
     }
 
     @NonNull

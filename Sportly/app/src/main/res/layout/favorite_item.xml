@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:id="@+id/favorite_item"
+    android:descendantFocusability="blocksDescendants"
     >
     <LinearLayout
         android:layout_width="wrap_content"
