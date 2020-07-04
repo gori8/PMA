@@ -136,6 +136,8 @@ public class SyncDataService extends Service {
                             System.out.println("LATITUDE:"+sportsFieldDTO.getLatitude());
                             System.out.println("LONGITUDE:"+sportsFieldDTO.getLongitude());
                             System.out.println("SERVER ID:"+sportsFieldDTO.getId());
+                            System.out.println("IMAGE REF:"+sportsFieldDTO.getImageRef());
+
 
                             ContentValues values = new ContentValues();
                             values.put(DataBaseTables.SPORTSFIELDS_NAME,sportsFieldDTO.getName());
@@ -144,6 +146,7 @@ public class SyncDataService extends Service {
                             values.put(DataBaseTables.SPORTSFIELDS_LONGITUDE,sportsFieldDTO.getLongitude());
                             values.put(DataBaseTables.SPORTSFIELDS_RATING,sportsFieldDTO.getRating());
                             values.put(DataBaseTables.SPORTSFIELDS_CATEGORY,sportsFieldDTO.getCategory());
+                            values.put(DataBaseTables.SPORTSFIELDS_IMAGE_REF,sportsFieldDTO.getImageRef());
                             values.put(DataBaseTables.SERVER_ID,sportsFieldDTO.getId());
 
                             if(sportsFieldDTO.isFavorite()){

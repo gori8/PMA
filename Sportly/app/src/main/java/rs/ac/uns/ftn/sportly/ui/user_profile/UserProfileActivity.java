@@ -40,6 +40,7 @@ import rs.ac.uns.ftn.sportly.dto.FriendshipRequestDto;
 import rs.ac.uns.ftn.sportly.dto.UserRatingDTO;
 import rs.ac.uns.ftn.sportly.dto.UserWithRatingsDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.ui.messages.chat.ChatActivity;
 import rs.ac.uns.ftn.sportly.ui.rating.RatingActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 
@@ -285,7 +286,11 @@ public class UserProfileActivity extends AppCompatActivity {
         messageButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: MESSAGE USER (FIREBASE)
+                Intent chatIntent = new Intent(UserProfileActivity.this, ChatActivity.class);
+                chatIntent.putExtra("user_id", userId);
+                chatIntent.putExtra("user_name", tvName.getText());
+                startActivity(chatIntent);
+
             }
         });
     }

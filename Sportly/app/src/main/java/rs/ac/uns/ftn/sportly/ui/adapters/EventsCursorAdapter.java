@@ -38,7 +38,7 @@ public class EventsCursorAdapter extends SimpleCursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
-
+        
         TextView eventNameText = (TextView)view.findViewById(R.id.list_event_name);
         TextView timeFromText = (TextView)view.findViewById(R.id.list_event_time_from);
         TextView timeToText = (TextView)view.findViewById(R.id.list_event_time_to);

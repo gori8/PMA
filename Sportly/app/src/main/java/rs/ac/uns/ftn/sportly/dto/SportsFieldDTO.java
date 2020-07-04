@@ -28,4 +28,6 @@ public class SportsFieldDTO {
     private float rating;
 
     private boolean favorite;
+
+    private String imageRef;
 }

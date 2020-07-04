@@ -70,6 +70,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -119,6 +120,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private String placeName;
     private HashMap<String,Boolean> filterChecks = new HashMap<>();
     private HashMap<String,ArrayList<Marker>> markersMap = new HashMap<>();
+    public HashMap<Long,Marker> allMarkers = new HashMap<>();
     private Cursor data;
     private EventsCursorAdapter adapter;
     private Long selectedSportsFieldServerId;
@@ -129,6 +131,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private SearchView searchView;
     private MenuItem searchViewMenuItem;
     private String category;
+    private CircleImageView sfImage;
 
 
     public static MapFragment newInstance() {
@@ -145,13 +148,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         public Integer isFavorite;
         public String category;
         public String placeName;
+        public String imageRef;
 
-        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite,String category, String placeName) {
+        public MarkerData(Long sportsFieldId, Long sportsFieldServerId, Integer isFavorite,String category, String placeName, String imageRef) {
             this.sportsFieldId = sportsFieldId;
             this.sportsFieldServerId = sportsFieldServerId;
             this.isFavorite = isFavorite;
             this.category = category;
             this.placeName = placeName;
+            this.imageRef = imageRef;
         }
     }
 
@@ -166,6 +171,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         markersMap.put("basketball",new ArrayList<>());
         markersMap.put("football",new ArrayList<>());
         markersMap.put("tennis",new ArrayList<>());
+
     }
 
     @Override
@@ -281,6 +287,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        sfImage = view.findViewById(R.id.place_info_image);
+
+
         slidingPanel.setFadeOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -385,6 +395,15 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         ListView listView = (ListView) view.findViewById(R.id.search_sportsfields_list);
         listView.setAdapter(searchAdapter);
+
+        listView.setOnItemClickListener((parent, vieww, positionLv, idLv) -> {
+            searchAdapter.getCursor().moveToPosition(positionLv);
+
+            Long foundSFId = searchAdapter.getCursor().getLong(searchAdapter.getCursor().getColumnIndex(DataBaseTables.ID));
+            Marker marker = allMarkers.get(foundSFId);
+            onClickMarker(marker);
+
+        });
 
         slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 
@@ -586,9 +605,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
      * */
     @Override
     public void onLocationChanged(Location location) {
-        //todo Kad odes u Novi Sad majmune
        if (map != null) {
-            //addMarker(location);
+           LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
+           myLoc = addMarker(loc,"My position", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         }
     }
 
@@ -705,6 +724,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         Location location = null;
 
+
         if (checkLocationPermission()) {
             if (ContextCompat.checkSelfPermission(getContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -717,14 +737,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             }
         }
 
-        LatLng latLngForSearch = new LatLng(45.253513,19.829127);
 
-        String mockLocationProvider = LocationManager.GPS_PROVIDER;
 
-        location = new Location(mockLocationProvider);
-
-        location.setLatitude(latLngForSearch.latitude);
-        location.setLongitude(latLngForSearch.longitude);
 
         String[] allColumns = {
                 DataBaseTables.ID,
@@ -734,6 +748,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 DataBaseTables.SPORTSFIELDS_NAME,
                 DataBaseTables.SPORTSFIELDS_FAVORITE,
                 DataBaseTables.SPORTSFIELDS_CATEGORY,
+                DataBaseTables.SPORTSFIELDS_IMAGE_REF,
                 DataBaseTables.SERVER_ID
         };
 
@@ -749,6 +764,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             Long sportsFieldServerId = data.getLong(data.getColumnIndex(DataBaseTables.SERVER_ID));
             Integer isFavorite = data.getInt(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_FAVORITE));
             Long id = data.getLong(data.getColumnIndex(DataBaseTables.ID));
+            String imageRef = data.getString(data.getColumnIndex(DataBaseTables.SPORTSFIELDS_IMAGE_REF));
+            //Log.i("IMAGE_REF_DATABSE","IMAGE REF DATABASE "+imageRef);
 
 
             Marker marker = null;
@@ -761,9 +778,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 marker = addMarker(new LatLng(lat, lng), name, bitmapDescriptorFromVector(getActivity(), R.drawable.marker_tennis));
             }
 
-            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite,category,name);
+
+            MarkerData markerData = new MarkerData(id,sportsFieldServerId,isFavorite,category,name,imageRef);
             marker.setTag(markerData);
 
+
+            allMarkers.put(id,marker);
             markersMap.get(category).add(marker);
             data.moveToNext();
         }
@@ -777,173 +797,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getTag()!=null) {
 
+                    onClickMarker(marker);
 
-                    if(sportsFieldInfo.getVisibility() == View.GONE) {
-                        sportsFieldInfo.setVisibility(View.VISIBLE);
-                        searchSportsFieldsListView.setVisibility(View.GONE);
-                    }
-
-                    MarkerData markerData = (MarkerData)marker.getTag();
-
-                    ImageButton addFavoriteButton = getView().findViewById(R.id.addFavoriteButton);
-                    ImageButton removeFavoriteButton = getView().findViewById(R.id.removeFavoriteButton);
-                    if(markerData.isFavorite == 1){
-                        addFavoriteButton.setVisibility(View.GONE);
-                        removeFavoriteButton.setVisibility(View.VISIBLE);
-                    }else if(markerData.isFavorite == 0){
-                        removeFavoriteButton.setVisibility(View.GONE);
-                        addFavoriteButton.setVisibility(View.VISIBLE);
-                    }
-
-                    Bundle args = new Bundle();
-                    args.putLong("sportsFieldsId",markerData.sportsFieldId);
-
-                    String myFormat = "dd/MM/yy";
-                    SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
-
-                    final Calendar today = Calendar.getInstance();
-
-                    args.putString("dateFilter",sdf.format(today.getTime()));
-
-                    MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
-                    MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
-                    MapFragment.this.category = markerData.category;
-                    MapFragment.this.placeName = markerData.placeName;
-
-
-                    if(getLoaderManager().getLoader(0)!=null){
-                        getLoaderManager().restartLoader(0, args, MapFragment.this);
-                    }else{
-                        getLoaderManager().initLoader(0, args, MapFragment.this);
-                    }
-
-
-                    String[] from = new String[] {
-                            DataBaseTables.EVENTS_NAME,
-                            DataBaseTables.EVENTS_DESCRIPTION,
-                            DataBaseTables.EVENTS_NUMB_OF_PPL,
-                            DataBaseTables.EVENTS_TIME_FROM,
-                            DataBaseTables.EVENTS_TIME_TO,
-                            DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
-                    };
-                    int[] to = new int[] {
-                            R.id.list_event_name,
-                            R.id.list_event_description,
-                            R.id.list_event_ppl,
-                            R.id.list_event_time_from,
-                            R.id.list_event_time_to,
-                            R.id.list_event_participants
-                    };
-                    adapter = new EventsCursorAdapter(getActivity(), R.layout.event_item, null, from,
-                            to);
-
-                    ListView listView = (ListView) getView().findViewById(R.id.events_list);
-                    listView.setAdapter(adapter);
-
-
-                    TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
-                    tvPlaceName.setText((String)marker.getTitle());
-                    slidingPanel.setAnchorPoint(0.5f);
-                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-
-                    String jwt = JwtTokenUtils.getJwtToken(MapFragment.this.getContext());
-                    String authHeader = "Bearer " + jwt;
-
-                    ProgressBar loadingCircle = getView().findViewById(R.id.loadingCircle);
-
-                    addFavoriteButton.setOnClickListener( new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            addFavoriteButton.setVisibility(View.GONE);
-                            loadingCircle.setVisibility(View.VISIBLE);
-
-                            Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.addToFavorites(authHeader,markerData.sportsFieldServerId);
-
-                            call.enqueue(new Callback<SportsFieldDTO>() {
-                                @Override
-                                public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
-                                    if (response.code() == 201){
-
-                                        Log.i("ADD TO FAVORITES", "CALL TO SERVER SUCCESSFUL");
-
-                                        ContentValues values = new ContentValues();
-                                        values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,1);
-
-                                        MapFragment.this.getContext().getContentResolver().update(
-                                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
-                                                values,
-                                                DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
-                                                null
-                                        );
-
-                                        loadingCircle.setVisibility(View.GONE);
-                                        removeFavoriteButton.setVisibility(View.VISIBLE);
-
-                                    }else{
-                                        Log.i("ADD TO FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
-                                        loadingCircle.setVisibility(View.GONE);
-                                        addFavoriteButton.setVisibility(View.VISIBLE);
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
-                                    Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
-                                    Log.i("ADD TO FAVORITES", "CALL TO SERVER FAILED");
-                                    loadingCircle.setVisibility(View.GONE);
-                                    addFavoriteButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-                        }
-                    });
-
-                    removeFavoriteButton.setOnClickListener( new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            removeFavoriteButton.setVisibility(View.GONE);
-                            loadingCircle.setVisibility(View.VISIBLE);
-
-                            Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.removeFromFavorites(authHeader,markerData.sportsFieldServerId);
-
-                            call.enqueue(new Callback<SportsFieldDTO>() {
-                                @Override
-                                public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
-                                    if (response.code() == 200){
-
-                                        Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER SUCCESSFUL");
-
-                                        ContentValues values = new ContentValues();
-                                        values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,0);
-
-                                        MapFragment.this.getContext().getContentResolver().update(
-                                                Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
-                                                values,
-                                                DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
-                                                null
-                                        );
-
-                                        loadingCircle.setVisibility(View.GONE);
-                                        addFavoriteButton.setVisibility(View.VISIBLE);
-
-                                    }else{
-                                        Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
-                                        loadingCircle.setVisibility(View.GONE);
-                                        removeFavoriteButton.setVisibility(View.VISIBLE);
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
-                                    Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
-                                    Log.i("REMOVE FROM", "CALL TO SERVER FAILED");
-                                    loadingCircle.setVisibility(View.GONE);
-                                    removeFavoriteButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-                        }
-                    });
                 }
                 return true;
             }
@@ -960,6 +815,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
             map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+
+        Long idSfFromFavs = ((MainActivity)getActivity()).selectedSf;
+        if(idSfFromFavs!=null){
+            onClickMarker(allMarkers.get(idSfFromFavs));
+            idSfFromFavs=null;
+        }
     }
 
     private Marker addMarker(LatLng loc, String title, BitmapDescriptor bitmapDescriptor) {
@@ -971,6 +832,191 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         ret.setFlat(true);
 
         return ret;
+    }
+
+    public void onClickMarker(Marker marker){
+
+
+        if(sportsFieldInfo.getVisibility() == View.GONE) {
+            sportsFieldInfo.setVisibility(View.VISIBLE);
+            searchSportsFieldsListView.setVisibility(View.GONE);
+        }
+
+
+
+        MarkerData markerData = (MarkerData)marker.getTag();
+
+        ImageButton addFavoriteButton = getView().findViewById(R.id.addFavoriteButton);
+        ImageButton removeFavoriteButton = getView().findViewById(R.id.removeFavoriteButton);
+        if(markerData.isFavorite == 1){
+            addFavoriteButton.setVisibility(View.GONE);
+            removeFavoriteButton.setVisibility(View.VISIBLE);
+        }else if(markerData.isFavorite == 0){
+            removeFavoriteButton.setVisibility(View.GONE);
+            addFavoriteButton.setVisibility(View.VISIBLE);
+        }
+
+        Bundle args = new Bundle();
+        args.putLong("sportsFieldsId",markerData.sportsFieldId);
+
+        String myFormat = "dd/MM/yy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("sr","RS"));
+
+        final Calendar today = Calendar.getInstance();
+
+        args.putString("dateFilter",sdf.format(today.getTime()));
+
+        MapFragment.this.selectedSportsFieldServerId = markerData.sportsFieldServerId;
+        MapFragment.this.selectedSportsFieldId = markerData.sportsFieldId;
+        MapFragment.this.category = markerData.category;
+        MapFragment.this.placeName = markerData.placeName;
+
+        //set Image of selected SportsField
+        String imageUri = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="+markerData.imageRef+"&key=AIzaSyD1xhjBoYoxC_Jz1t7cqlbWV-Q1m0p979Q";
+        Log.i("IMAGE_REF","IMAGE REF: "+markerData.imageRef);
+        Picasso.get().load(imageUri)
+                .placeholder(R.drawable.default_avatar).into(sfImage);
+
+
+        if(getLoaderManager().getLoader(0)!=null){
+            getLoaderManager().restartLoader(0, args, MapFragment.this);
+        }else{
+            getLoaderManager().initLoader(0, args, MapFragment.this);
+        }
+
+
+        String[] from = new String[] {
+                DataBaseTables.EVENTS_NAME,
+                DataBaseTables.EVENTS_DESCRIPTION,
+                DataBaseTables.EVENTS_NUMB_OF_PPL,
+                DataBaseTables.EVENTS_TIME_FROM,
+                DataBaseTables.EVENTS_TIME_TO,
+                DataBaseTables.EVENTS_NUMB_OF_PARTICIPANTS
+        };
+        int[] to = new int[] {
+                R.id.list_event_name,
+                R.id.list_event_description,
+                R.id.list_event_ppl,
+                R.id.list_event_time_from,
+                R.id.list_event_time_to,
+                R.id.list_event_participants
+        };
+        adapter = new EventsCursorAdapter(getActivity(), R.layout.event_item, null, from,
+                to);
+
+        ListView listView = (ListView) getView().findViewById(R.id.events_list);
+        listView.setAdapter(adapter);
+
+
+        TextView tvPlaceName = getView().findViewById(R.id.place_info_name);
+        tvPlaceName.setText((String)marker.getTitle());
+        slidingPanel.setAnchorPoint(0.5f);
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+        String jwt = JwtTokenUtils.getJwtToken(MapFragment.this.getContext());
+        String authHeader = "Bearer " + jwt;
+
+        ProgressBar loadingCircle = getView().findViewById(R.id.loadingCircle);
+
+        addFavoriteButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                addFavoriteButton.setVisibility(View.GONE);
+                loadingCircle.setVisibility(View.VISIBLE);
+
+                Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.addToFavorites(authHeader,markerData.sportsFieldServerId);
+
+                call.enqueue(new Callback<SportsFieldDTO>() {
+                    @Override
+                    public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
+                        if (response.code() == 201){
+
+                            Log.i("ADD TO FAVORITES", "CALL TO SERVER SUCCESSFUL");
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,1);
+
+                            MapFragment.this.getContext().getContentResolver().update(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                                    values,
+                                    DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
+                                    null
+                            );
+
+                            loadingCircle.setVisibility(View.GONE);
+                            removeFavoriteButton.setVisibility(View.VISIBLE);
+
+                        }else{
+                            Log.i("ADD TO FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            loadingCircle.setVisibility(View.GONE);
+                            addFavoriteButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
+                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                        Log.i("ADD TO FAVORITES", "CALL TO SERVER FAILED");
+                        loadingCircle.setVisibility(View.GONE);
+                        addFavoriteButton.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        });
+
+        removeFavoriteButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                removeFavoriteButton.setVisibility(View.GONE);
+                loadingCircle.setVisibility(View.VISIBLE);
+
+                Call<SportsFieldDTO> call = SportlyServerServiceUtils.sportlyServerService.removeFromFavorites(authHeader,markerData.sportsFieldServerId);
+
+                call.enqueue(new Callback<SportsFieldDTO>() {
+                    @Override
+                    public void onResponse(Call<SportsFieldDTO> call, Response<SportsFieldDTO> response) {
+                        if (response.code() == 200){
+
+                            Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER SUCCESSFUL");
+
+                            ContentValues values = new ContentValues();
+                            values.put(DataBaseTables.SPORTSFIELDS_FAVORITE,0);
+
+                            MapFragment.this.getContext().getContentResolver().update(
+                                    Uri.parse(SportlyContentProvider.CONTENT_URI+DataBaseTables.TABLE_SPORTSFIELDS),
+                                    values,
+                                    DataBaseTables.SERVER_ID + " = " + markerData.sportsFieldServerId,
+                                    null
+                            );
+
+                            loadingCircle.setVisibility(View.GONE);
+                            addFavoriteButton.setVisibility(View.VISIBLE);
+
+                        }else{
+                            Log.i("REMOVE FROM FAVORITES", "CALL TO SERVER RESPONSE CODE: "+response.code());
+                            loadingCircle.setVisibility(View.GONE);
+                            removeFavoriteButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SportsFieldDTO> call, Throwable t) {
+                        Log.i("REZ", t.getMessage() != null?t.getMessage():"error");
+                        Log.i("REMOVE FROM", "CALL TO SERVER FAILED");
+                        loadingCircle.setVisibility(View.GONE);
+                        removeFavoriteButton.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        });
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(marker.getPosition()).zoom(14).build();
+
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -1097,6 +1143,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     DataBaseTables.SPORTSFIELDS_FAVORITE,
                     DataBaseTables.SPORTSFIELDS_CATEGORY,
                     DataBaseTables.SPORTSFIELDS_RATING,
+                    DataBaseTables.SPORTSFIELDS_IMAGE_REF,
                     DataBaseTables.SERVER_ID
             };
 

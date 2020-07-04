@@ -82,6 +82,7 @@ public class SyncServiceImpl implements SyncService {
             sfDTO.setLatitude(sportsField.getLatitude());
             sfDTO.setRating(sportsField.getRating());
             sfDTO.setCategory(sportsField.getCategory());
+            sfDTO.setImageRef(sportsField.getPhotoReference());
             sfDTO.setEvents(new ArrayList<EventDTO>());
 
             if(sportsFieldIsFavorite(user.getFavourite(),sportsField.getId())){
