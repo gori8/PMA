@@ -819,8 +819,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         Long idSfFromFavs = ((MainActivity)getActivity()).selectedSf;
         if(idSfFromFavs!=null){
             onClickMarker(allMarkers.get(idSfFromFavs));
-            idSfFromFavs=null;
-        }
+            ((MainActivity)getActivity()).selectedSf=null;        }
     }
 
     private Marker addMarker(LatLng loc, String title, BitmapDescriptor bitmapDescriptor) {

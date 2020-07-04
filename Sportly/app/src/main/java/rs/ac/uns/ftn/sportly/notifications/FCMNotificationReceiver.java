@@ -33,15 +33,24 @@ public class FCMNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		if(intent.getAction().equals(MainActivity.NOTIFICATION_INTENT)){
-			HashMap<String,String> data = new HashMap<>();
-			for(String key : intent.getExtras().keySet()){
-				if(key.equals("notificationType") || key.equals("message") || key.equals("title")){
+		if(intent.getAction().equals(MainActivity.NOTIFICATION_INTENT)) {
+			HashMap<String, String> data = new HashMap<>();
+			for (String key : intent.getExtras().keySet()) {
+				if (key.equals("notificationType") || key.equals("message") || key.equals("title")) {
 					continue;
 				}
-				data.put(key,intent.getStringExtra(key));
+				data.put(key, intent.getStringExtra(key));
 			}
-			sendNotification(context,intent.getStringExtra("title"),intent.getStringExtra("message"), intent.getStringExtra("notificationType"),data);
+
+			SharedPreferences sharedPreferences =
+					PreferenceManager.getDefaultSharedPreferences(context);
+			boolean notifEnabled = sharedPreferences.getBoolean("notifications_enable_settings", true);
+
+			if (notifEnabled) {
+
+				sendNotification(context, intent.getStringExtra("title"), intent.getStringExtra("message"), intent.getStringExtra("notificationType"), data);
+
+			}
 		}
 
 	}
@@ -85,7 +94,18 @@ public class FCMNotificationReceiver extends BroadcastReceiver {
 
 
 		String channelId = context.getString(R.string.default_notification_channel_id);
-		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+		SharedPreferences sharedPreferences =
+				PreferenceManager.getDefaultSharedPreferences(context);
+		boolean soundEnabled = sharedPreferences.getBoolean("notifications_sounds_enable_settings", true);
+
+
+		Uri defaultSoundUri = null;
+
+		if(soundEnabled){
+			defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		}
+
 		NotificationCompat.Builder notificationBuilder =
 				new NotificationCompat.Builder(context, channelId)
 						.setSmallIcon(R.drawable.ic_basketball_event)
