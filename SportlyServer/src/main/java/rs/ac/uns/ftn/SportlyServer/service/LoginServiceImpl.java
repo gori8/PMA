@@ -212,6 +212,9 @@ public class LoginServiceImpl implements  LoginService{
             User user = userRepository.findByEmail(ret.getEmail());
 
             if(user==null){
+
+                ret.setFirstLogin(true);
+
                 user = new User();
                 user.setFirstName(ret.getIme());
                 user.setLastName(ret.getPrezime());
@@ -270,6 +273,9 @@ public class LoginServiceImpl implements  LoginService{
         User user = userRepository.findByEmail(ret.getEmail());
 
         if(user==null){
+
+            ret.setFirstLogin(true);
+
             user = new User();
             user.setFirstName(ret.getIme());
             user.setLastName(ret.getPrezime());

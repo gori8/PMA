@@ -20,4 +20,5 @@ public class UserDTO {
     private String token;
     private float rating;
     private int expiresIn;
+    private boolean firstLogin;
 }

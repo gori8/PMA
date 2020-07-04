@@ -586,9 +586,7 @@ public class LoginActivity extends AppCompatActivity {
 
         String id = user.getId().toString();
 
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
-        if (databaseReference.getKey() == null) {
+        if (user.isFirstLogin()) {
 
             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
 

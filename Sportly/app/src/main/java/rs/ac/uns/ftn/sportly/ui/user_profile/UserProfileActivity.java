@@ -287,7 +287,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent chatIntent = new Intent(UserProfileActivity.this, ChatActivity.class);
-                chatIntent.putExtra("user_id", userId);
+                chatIntent.putExtra("user_id", userId.toString());
                 chatIntent.putExtra("user_name", tvName.getText());
                 startActivity(chatIntent);
 
