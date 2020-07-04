@@ -125,8 +125,8 @@ public class RequestCursorAdapter extends SimpleCursorAdapter {
             public void onClick(View v) {
 
                 mProgressDialog = new ProgressDialog(context);
-                mProgressDialog.setTitle("Inviting Friend...");
-                mProgressDialog.setMessage("Please wait while we are processing your invitation.");
+                mProgressDialog.setTitle("Confirming Invitation...");
+                mProgressDialog.setMessage("Please wait while we are processing your confirmation.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 

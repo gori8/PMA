@@ -27,6 +27,7 @@ import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -369,6 +370,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 } else {
                     Log.d("REZ", "Meesage recieved: " + response.code());
+                    LoginActivity.mGoogleSignInClient.signOut();
                 }
             }
 
@@ -486,6 +488,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 } else {
                     Log.d("REZ", "Meesage recieved: " + response.code());
+                    LoginManager.getInstance().logOut();
                 }
             }
 

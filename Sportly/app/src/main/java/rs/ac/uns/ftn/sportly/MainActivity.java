@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(SportlyUtils.getConnectivityStatus(MainActivity.this) == 0){
                     AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                    alert.setMessage("You are not signed in.").
+                    alert.setMessage("You need internet connection to sign out.").
                             setPositiveButton("Ok", new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialog, int which) {
 
