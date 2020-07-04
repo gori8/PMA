@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     AppBarConfiguration appBarConfiguration;
     NavController navController;
 
-    public static String SYNC_DATA = "SYNC_DATA";
     public static String NOTIFICATION_INTENT = "NOTIFICATION";
 
 

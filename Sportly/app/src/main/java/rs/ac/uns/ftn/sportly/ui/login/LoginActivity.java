@@ -1,7 +1,9 @@
 package rs.ac.uns.ftn.sportly.ui.login;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.FaceDetector;
 import android.os.Bundle;
@@ -67,6 +69,7 @@ import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
+import rs.ac.uns.ftn.sportly.sync.SyncDataService;
 import rs.ac.uns.ftn.sportly.ui.register.RegisterActivity;
 import rs.ac.uns.ftn.sportly.utils.JwtTokenUtils;
 import rs.ac.uns.ftn.sportly.utils.SportlyUtils;
@@ -94,6 +97,24 @@ public class LoginActivity extends AppCompatActivity {
     //---------FIREBASE---------
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference mDatabase;
+
+
+    public static String SYNC_DATA_FINISHED= "sync_finished";
+
+
+    private BroadcastReceiver syncDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(LoginActivity.SYNC_DATA_FINISHED)){
+
+                String authType = intent.getStringExtra("authType");
+
+                goToMainActivityIfLoginSuccess(authType);
+
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if(SportlyUtils.getConnectivityStatus(this) == 0){
+        if (SportlyUtils.getConnectivityStatus(this) == 0) {
             goToMainActivityIfLoginSuccess("");
         }
         //----------GOOGLE----------
@@ -147,7 +168,7 @@ public class LoginActivity extends AppCompatActivity {
         //----------EMAIL----------
         //to do, sacuvati zadnji login pa iscitati
 
-        if(googleAccount != null){
+        if (googleAccount != null) {
             loadingView();
             // Signed in successfully with google, show authenticated UI.
             goToMainActivityIfLoginSuccess(GOOGLE);
@@ -156,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
             //postGoogleToken(googleAccount.getEmail(), googleAccount.getIdToken());
 
             //System.out.println("GOOGLE: " + userEmail);
-        }else if(isLoggedInFacebook){
+        } else if (isLoggedInFacebook) {
             // Signed in successfully with facebook, show authenticated UI.
 
             loadingView();
@@ -193,7 +214,7 @@ public class LoginActivity extends AppCompatActivity {
             // The Task returned from this call is always completed, no need to attach a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResultGoogle(task);
-        }else{
+        } else {
             //----------FACEBOOOK----------
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
             //goToMainActivityIfLoginSuccess(FACEBOOK);
@@ -201,7 +222,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     //----------HELPER-FUNCTIONS----------
-    private void goToMainActivityIfLoginSuccess(String method){
+    private void goToMainActivityIfLoginSuccess(String method) {
         //set sign in method
         signInMethod = method;
 
@@ -211,12 +232,12 @@ public class LoginActivity extends AppCompatActivity {
         loginActivity.startActivity(intent);
     }
 
-    private void showErrorMessageIfLoginFail(String message){
-        TextView tv = (TextView)findViewById(R.id.sign_in_message);
+    private void showErrorMessageIfLoginFail(String message) {
+        TextView tv = (TextView) findViewById(R.id.sign_in_message);
         tv.setText(message);
     }
 
-    private void loadingView(){
+    private void loadingView() {
         //on sign in view hide buttons
         TextView title = findViewById(R.id.login_title);
         title.setVisibility(View.GONE);
@@ -276,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void setGoogleButtonText(SignInButton signInButton, String text){
+    private void setGoogleButtonText(SignInButton signInButton, String text) {
         for (int i = 0; i < signInButton.getChildCount(); i++) {
             View v = signInButton.getChildAt(i);
 
@@ -290,7 +311,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private List<String> returnGoogleSignInParameters(GoogleSignInAccount account){
+    private List<String> returnGoogleSignInParameters(GoogleSignInAccount account) {
         List<String> data = new ArrayList<>();
         //All parameters that we want
         data.add(account.getEmail());
@@ -298,7 +319,7 @@ public class LoginActivity extends AppCompatActivity {
         return data;
     }
 
-    private void setGoogleButtonClickEvent(SignInButton signInButton, GoogleSignInClient mGoogleSignInClient){
+    private void setGoogleButtonClickEvent(SignInButton signInButton, GoogleSignInClient mGoogleSignInClient) {
         // Register a callback to respond to the user
         signInButton.setOnClickListener(new View.OnClickListener() {
             private void signIn() {
@@ -317,7 +338,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void postGoogleToken(String email, String idToken){
+    private void postGoogleToken(String email, String idToken) {
         GoogleRequestDTO dto = new GoogleRequestDTO();
         dto.setEmail(email);
         dto.setIdToken(idToken);
@@ -326,7 +347,7 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                if (response.code() == 200){
+                if (response.code() == 200) {
                         /*
                         TODO: Save to DB
                          */
@@ -334,9 +355,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Google sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme() +" "+ userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(), userDTO.getIme() + " " + userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
-                    Log.i("GOOGLE SIGN IN","User ID: "+userDTO.getId());
+                    Log.i("GOOGLE SIGN IN", "User ID: " + userDTO.getId());
 
                     FirebaseMessaging.getInstance().subscribeToTopic(userDTO.getId().toString())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -346,14 +367,14 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
 
-                }else{
-                    Log.d("REZ","Meesage recieved: "+response.code());
+                } else {
+                    Log.d("REZ", "Meesage recieved: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<UserDTO> call, Throwable t) {
-                Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
+                Log.d("REZ", t.getMessage() != null ? t.getMessage() : "error");
             }
         });
     }
@@ -379,7 +400,8 @@ public class LoginActivity extends AppCompatActivity {
         String json = task.get().get(0).getRawResponse();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            data = objectMapper.readValue(json, new TypeReference<Map<String, String>>(){});
+            data = objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
+            });
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -387,7 +409,7 @@ public class LoginActivity extends AppCompatActivity {
         return data;
     }
 
-    private void setFacebookButtonClickEvent(LoginButton mLoginButton){
+    private void setFacebookButtonClickEvent(LoginButton mLoginButton) {
         // Register a callback to respond to the user
         mLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @SneakyThrows
@@ -431,7 +453,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void postFacebookToken(String userId, String token){
+    private void postFacebookToken(String userId, String token) {
         FacebookRequestDTO dto = new FacebookRequestDTO();
         dto.setUserId(userId);
         dto.setToken(token);
@@ -440,7 +462,7 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                if (response.code() == 200){
+                if (response.code() == 200) {
                         /*
                         TODO: Save to DB
                          */
@@ -448,10 +470,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     System.out.println("Facebook sign in success");
                     userEmail = userDTO.getEmail();
-                    JwtTokenUtils.saveJwtToken(userDTO.getId(),userDTO.getIme()+" "+userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
+                    JwtTokenUtils.saveJwtToken(userDTO.getId(), userDTO.getIme() + " " + userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
 
 
-                    Log.i("FACEBOOK SIGN IN","User ID: "+userDTO.getId());
+                    Log.i("FACEBOOK SIGN IN", "User ID: " + userDTO.getId());
 
                     FirebaseMessaging.getInstance().subscribeToTopic(userDTO.getId().toString())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -462,41 +484,41 @@ public class LoginActivity extends AppCompatActivity {
                             });
 
 
-                }else{
-                    Log.d("REZ","Meesage recieved: "+response.code());
+                } else {
+                    Log.d("REZ", "Meesage recieved: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<UserDTO> call, Throwable t) {
-                Log.d("REZ", t.getMessage() != null?t.getMessage():"error");
+                Log.d("REZ", t.getMessage() != null ? t.getMessage() : "error");
             }
         });
     }
 
     //----------EMAIL-FUNCTIONS----------
-    private void setEmailButtonClickEvent(Button signInButton){
+    private void setEmailButtonClickEvent(Button signInButton) {
         // Register a callback to respond to the user
         signInButton.setOnClickListener(new View.OnClickListener() {
             private void signIn() {
-                TextView email = (TextView)findViewById(R.id.login_email);
-                TextView password = (TextView)findViewById(R.id.login_password);
+                TextView email = (TextView) findViewById(R.id.login_email);
+                TextView password = (TextView) findViewById(R.id.login_password);
                 String email_txt = email.getText().toString();
                 String password_txt = password.getText().toString();
 
                 //TEMP VALIDATION
-                if(email_txt.equals("stevan@gmail.com") || email_txt.equals("milan@gmail.com") || email_txt.equals("igor@gmail.com")){
-                    if(password_txt.equals("test")) {
+                if (email_txt.equals("stevan@gmail.com") || email_txt.equals("milan@gmail.com") || email_txt.equals("igor@gmail.com")) {
+                    if (password_txt.equals("test")) {
                         loadingView();
                         goToMainActivityIfLoginSuccess(EMAIL_ACCOUNT);
                         userEmail = email_txt;
                         System.out.println(userEmail);
                         System.out.println("Email sign in success");
-                    }else{
+                    } else {
                         System.out.println("Email sign in error");
                         showErrorMessageIfLoginFail("Log in failed. Please try again.");
                     }
-                }else{
+                } else {
                     System.out.println("Email sign in error");
                     showErrorMessageIfLoginFail("Log in failed. Please try again.");
                 }
@@ -508,7 +530,7 @@ public class LoginActivity extends AppCompatActivity {
                 switch (v.getId()) {
                     case R.id.log_in_with_email_button:
                         //hide keyboard
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                 InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
@@ -521,13 +543,13 @@ public class LoginActivity extends AppCompatActivity {
 
     //----------REGISTER-FUNCTIONS----------
 
-    private void goToRegisterActivity(){
+    private void goToRegisterActivity() {
         LoginActivity loginActivity = (LoginActivity) this;
         Intent intent = new Intent(loginActivity, RegisterActivity.class);
         loginActivity.startActivity(intent);
     }
 
-    private void setRegisterButtonClickEvent(Button registerButton){
+    private void setRegisterButtonClickEvent(Button registerButton) {
         // Register a callback to respond to the user
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -547,9 +569,9 @@ public class LoginActivity extends AppCompatActivity {
         String emailString = email.getText().toString();
 
         String toastMsg = "";
-        if(emailString.equals("")) {
+        if (emailString.equals("")) {
             toastMsg = "Please enter email";
-        }else{
+        } else {
             toastMsg = "We sent an email to " + emailString;
         }
 
@@ -563,7 +585,6 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUserOnFirebase(UserDTO user, String authType) {
 
         String id = user.getId().toString();
-
 
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
@@ -587,7 +608,11 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (task.isSuccessful()) {
 
-                        goToMainActivityIfLoginSuccess(authType);
+
+                        Intent serviceIntent = new Intent(LoginActivity.this, SyncDataService.class);
+                        serviceIntent.putExtra("flagStarted","LoginActivity");
+                        serviceIntent.putExtra("authType",authType);
+                        startService(serviceIntent);
 
                     }
 
@@ -596,15 +621,30 @@ public class LoginActivity extends AppCompatActivity {
 
         } else {
 
-            goToMainActivityIfLoginSuccess(authType);
+            Intent serviceIntent = new Intent(LoginActivity.this, SyncDataService.class);
+            serviceIntent.putExtra("flagStarted","LoginActivity");
+            serviceIntent.putExtra("authType",authType);
+            startService(serviceIntent);
 
         }
 
 
+    }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SYNC_DATA_FINISHED);
+
+        this.registerReceiver(this.syncDataReceiver, filter);
+    }
 
 
+    public void onPause() {
+        super.onPause();
 
+        this.unregisterReceiver(this.syncDataReceiver);
     }
 }

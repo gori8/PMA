@@ -82,7 +82,7 @@ public class FCMNotificationReceiver extends BroadcastReceiver {
 			notificationManager.createNotificationChannel(channel);
 		}
 
-		notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+		notificationManager.notify((int)System.currentTimeMillis(), notificationBuilder.build());
 	}
 
 }
