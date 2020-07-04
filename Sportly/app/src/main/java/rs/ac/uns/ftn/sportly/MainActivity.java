@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     AppBarConfiguration appBarConfiguration;
     public NavController navController;
 
+    public TextView nameTV;
+
     public static String NOTIFICATION_INTENT = "NOTIFICATION";
 
     public static String FAVOURITE_ONCLICK = "fav_onclick";
@@ -102,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
         pendingIntent = PendingIntent.getService(this, 888, alarmIntent, 0);
 
         manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-
-
 
         init();
 
@@ -275,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
         //FUNKCIJA DA SE POPUNE INFO U NAV DRAWERU
 
         ImageView drawerIcon = navigationView.getHeaderView(0).findViewById(R.id.main_drawer_icon);
-        TextView nameTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_title);
+        nameTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_title);
         TextView emailTV = navigationView.getHeaderView(0).findViewById(R.id.drawer_subTitle);
 
         //drawerIcon.setImageResource(photoUrl);

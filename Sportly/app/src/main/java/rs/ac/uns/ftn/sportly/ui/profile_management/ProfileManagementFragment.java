@@ -63,6 +63,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rs.ac.uns.ftn.sportly.BuildConfig;
+import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
@@ -217,9 +218,10 @@ public class ProfileManagementFragment extends Fragment {
 
                                         JwtTokenUtils.setName(userDTO.getIme() + " " + userDTO.getPrezime(),ProfileManagementFragment.this.getContext());
 
-                                        showCreatePopup();
+                                        MainActivity mainActivity = (MainActivity) ProfileManagementFragment.this.getActivity();
+                                        mainActivity.nameTV.setText(JwtTokenUtils.getName(mainActivity));
 
-                                        //TODO: PREBACI SE NA MAP FRAGMENT
+                                        showCreatePopup();
                                     }else{
                                         Log.d("REZ","Meesage recieved: "+response.code());
                                     }
