@@ -68,6 +68,7 @@ import rs.ac.uns.ftn.sportly.MainActivity;
 import rs.ac.uns.ftn.sportly.R;
 import rs.ac.uns.ftn.sportly.dto.FacebookRequestDTO;
 import rs.ac.uns.ftn.sportly.dto.GoogleRequestDTO;
+import rs.ac.uns.ftn.sportly.dto.JwtAuthenticationRequest;
 import rs.ac.uns.ftn.sportly.dto.UserDTO;
 import rs.ac.uns.ftn.sportly.service.SportlyServerServiceUtils;
 import rs.ac.uns.ftn.sportly.sync.SyncDataService;
@@ -149,6 +150,11 @@ public class LoginActivity extends AppCompatActivity {
         //----------REGISTER----------
         Button registerButton = findViewById(R.id.register_button);
         setRegisterButtonClickEvent(registerButton);
+
+        String errorMsg = getIntent().getStringExtra("errorMsg");
+        if(errorMsg != null){
+            showErrorMessageIfLoginFail(errorMsg);
+        }
     }
 
     @SneakyThrows
@@ -202,7 +208,16 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finishAffinity();
+        if(findViewById(R.id.loadingPanel).getVisibility() == View.VISIBLE && signInMethod.equals(FACEBOOK)){
+            LoginActivity.mGoogleSignInClient.signOut();
+            LoginManager.getInstance().logOut();
+            restartLoginActivityWithoutMsg();
+        }else {
+            LoginActivity.mGoogleSignInClient.signOut();
+            LoginManager.getInstance().logOut();
+            restartLoginActivityWithoutMsg();
+            finishAffinity();
+        }
     }
 
     @Override
@@ -269,9 +284,6 @@ public class LoginActivity extends AppCompatActivity {
 
         Button register = findViewById(R.id.register_button);
         register.setVisibility(View.GONE);
-
-        TextView forgotPass = findViewById(R.id.forgot_password_message);
-        forgotPass.setVisibility(View.GONE);
 
         //on sign in view show loading
         findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
@@ -352,6 +364,11 @@ public class LoginActivity extends AppCompatActivity {
                         /*
                         TODO: Save to DB
                          */
+
+                    GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(LoginActivity.this);
+                    if(googleAccount == null)
+                        return;
+
                     UserDTO userDTO = response.body();
 
                     System.out.println("Google sign in success");
@@ -371,12 +388,15 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Log.d("REZ", "Meesage recieved: " + response.code());
                     LoginActivity.mGoogleSignInClient.signOut();
+                    restarLoginActivity();
                 }
             }
 
             @Override
             public void onFailure(Call<UserDTO> call, Throwable t) {
                 Log.d("REZ", t.getMessage() != null ? t.getMessage() : "error");
+                LoginActivity.mGoogleSignInClient.signOut();
+                restarLoginActivity();
             }
         });
     }
@@ -418,6 +438,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 //goToMainActivityIfLoginSuccess(FACEBOOK);
+                signInMethod = FACEBOOK;
                 setResult(RESULT_OK);
                 System.out.println("Facebook sign in success");
 
@@ -468,6 +489,11 @@ public class LoginActivity extends AppCompatActivity {
                         /*
                         TODO: Save to DB
                          */
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                    boolean isLoggedInFacebook = accessToken != null && !accessToken.isExpired();
+                    if(isLoggedInFacebook == false)
+                        return;
+
                     UserDTO userDTO = response.body();
 
                     System.out.println("Facebook sign in success");
@@ -489,12 +515,15 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Log.d("REZ", "Meesage recieved: " + response.code());
                     LoginManager.getInstance().logOut();
+                    restarLoginActivity();
                 }
             }
 
             @Override
             public void onFailure(Call<UserDTO> call, Throwable t) {
                 Log.d("REZ", t.getMessage() != null ? t.getMessage() : "error");
+                LoginManager.getInstance().logOut();
+                restarLoginActivity();
             }
         });
     }
@@ -504,27 +533,62 @@ public class LoginActivity extends AppCompatActivity {
         // Register a callback to respond to the user
         signInButton.setOnClickListener(new View.OnClickListener() {
             private void signIn() {
-                TextView email = (TextView) findViewById(R.id.login_email);
-                TextView password = (TextView) findViewById(R.id.login_password);
+                EditText email = (EditText) findViewById(R.id.login_email);
+                EditText password = (EditText) findViewById(R.id.login_password);
                 String email_txt = email.getText().toString();
                 String password_txt = password.getText().toString();
 
                 //TEMP VALIDATION
-                if (email_txt.equals("stevan@gmail.com") || email_txt.equals("milan@gmail.com") || email_txt.equals("igor@gmail.com")) {
-                    if (password_txt.equals("test")) {
-                        loadingView();
-                        goToMainActivityIfLoginSuccess(EMAIL_ACCOUNT);
-                        userEmail = email_txt;
-                        System.out.println(userEmail);
-                        System.out.println("Email sign in success");
-                    } else {
-                        System.out.println("Email sign in error");
-                        showErrorMessageIfLoginFail("Log in failed. Please try again.");
-                    }
-                } else {
+                if (email_txt.trim().equals("") || password_txt.trim().equals("")) {
                     System.out.println("Email sign in error");
-                    showErrorMessageIfLoginFail("Log in failed. Please try again.");
+                    showErrorMessageIfLoginFail("Please fill data correctly.");
+                    return;
                 }
+
+                JwtAuthenticationRequest request = new JwtAuthenticationRequest();
+                request.setUsername(email_txt);
+                request.setPassword(password_txt);
+
+                loadingView();
+
+                Call<UserDTO> call = SportlyServerServiceUtils.sportlyServerService.standardLogin(request);
+                call.enqueue(new Callback<UserDTO>() {
+                    @Override
+                    public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                        if (response.code() == 200) {
+                        /*
+                        TODO: Save to DB
+                         */
+                            UserDTO userDTO = response.body();
+
+                            System.out.println("Standard sign in success");
+                            userEmail = userDTO.getEmail();
+                            JwtTokenUtils.saveJwtToken(userDTO.getId(), userDTO.getIme() + " " + userDTO.getPrezime(), userDTO.getEmail(), userDTO.getToken(), LoginActivity.this);
+
+                            Log.i("STANDARD SIGN IN", "User ID: " + userDTO.getId());
+
+                            FirebaseMessaging.getInstance().subscribeToTopic(userDTO.getId().toString())
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            registerUserOnFirebase(userDTO, EMAIL);
+                                        }
+                                    });
+
+                        } else {
+                            Log.d("REZ", "Meesage recieved: " + response.code());
+                            JwtTokenUtils.removeJwtToken(LoginActivity.this);
+                            restarLoginActivity();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<UserDTO> call, Throwable t) {
+                        Log.d("REZ", t.getMessage() != null ? t.getMessage() : "error");
+                        JwtTokenUtils.removeJwtToken(LoginActivity.this);
+                        restarLoginActivity();
+                    }
+                });
 
             }
 
@@ -647,5 +711,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onPause();
 
         this.unregisterReceiver(this.syncDataReceiver);
+    }
+
+    public void restarLoginActivity(){
+        Intent intent = getIntent();
+        intent.putExtra("errorMsg", "Sign failed. Please try again.");
+        finish();
+        startActivity(intent);
+    }
+
+    public void restartLoginActivityWithoutMsg(){
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 }

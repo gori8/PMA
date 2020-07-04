@@ -126,6 +126,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "userCreator")
     private List<UserRating> ratedUsers = new ArrayList<>();    //lista ocena koje je dodelio drugim korisnicima
 
+    private boolean firstLogin;
+
     public FriendDTO createFriendDto(){
         FriendDTO friend = new FriendDTO();
         friend.setId(this.getId());

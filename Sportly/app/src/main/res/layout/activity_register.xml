@@ -57,57 +57,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="254dp"
-            android:layout_height="wrap_content"
-            android:textSize="16dp"
-            android:inputType="textPassword"
-            android:textColor="@color/colorPrimary"
-            android:textCursorDrawable="@null"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
-            android:layout_centerHorizontal="true">
-            <RadioButton android:id="@+id/register_radio_male"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:text="Male"
-                android:checked="true"
-                android:buttonTint="@color/colorPrimary"
-                android:textColor="@color/colorPrimary"
-                android:onClick="onRadioButtonRegisterClicked"/>
-            <RadioButton android:id="@+id/register_radio_female"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Female"
-                android:buttonTint="@color/colorPrimary"
-                android:textColor="@color/colorPrimary"
-                android:onClick="onRadioButtonRegisterClicked"/>
-        </RadioGroup>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/register_username"
-            android:layout_width="254dp"
-            android:layout_height="40dp"
-            android:textSize="16dp"
-            android:hint="Username"
-            android:textColor="@color/colorPrimary"
-            android:textCursorDrawable="@null"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/gray_edges_background"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <EditText
             android:id="@+id/register_email"
             android:layout_width="254dp"
